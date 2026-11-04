@@ -75,7 +75,8 @@
    *   mode 'words'   — число дано словами, рамки: существительное + глагол
    *   mode 'numeral' — число дано цифрами в рамке, рамки: числительное + (по очереди) существительное или глагол;
    *                    третье слово дано готовым
-   *   mode 'mix'     — задания обоих режимов вперемешку (поровну, не больше 2 подряд)
+   *   mode 'mix'     — неизвестны любые две части из трёх, по трети заданий:
+   *                    существительное + глагол / числительное + существительное / числительное + глагол
    */
   function makeGenerate(mode) {
     return function (rng, ctx) {
@@ -84,13 +85,19 @@
         s.plan = Polski.mixedSequence(rng, ['A', 'B'], ctx.total, { maxRun: 3 });
         s.tenses = Polski.mixedSequence(rng, ['pres', 'past', 'fut'], ctx.total, { maxRun: 2 });
         s.second = Polski.mixedSequence(rng, ['noun', 'verb'], ctx.total, { maxRun: 2 }); // для 'numeral'
-        s.modes = Polski.mixedSequence(rng, ['words', 'numeral'], ctx.total, { maxRun: 2 }); // для 'mix'
+        s.pairs = Polski.mixedSequence(rng, ['noun+verb', 'num+noun', 'num+verb'], ctx.total, { maxRun: 2 }); // для 'mix'
         s.pool = rng.shuffle(ENTRIES);   // ещё не использованные предложения
         s.verbs = {};                    // глаголы, уже бывшие в этом проходе
       }
 
       var i = ctx.round - 1;
-      var m = mode === 'mix' ? s.modes[i % s.modes.length] : mode;
+      var m = mode;
+      var second = s.second[i % s.second.length];       // вторая рамка в режиме 'numeral'
+      if (mode === 'mix') {
+        var pair2 = s.pairs[i % s.pairs.length];
+        m = pair2 === 'noun+verb' ? 'words' : 'numeral';
+        if (m === 'numeral') second = pair2 === 'num+noun' ? 'noun' : 'verb';
+      }
       var group = s.plan[i % s.plan.length];
       var tense = s.tenses[i % s.tenses.length];
       var aspect = tense === 'pres' ? 'impf' : (rng.chance(0.5) ? 'impf' : 'perf');
@@ -124,7 +131,6 @@
         var numList = L.numeralOptionsNm(n, e.gender, allowCollective).map(L.capitalize);
         var numTr = {};
         numList.forEach(function (x) { numTr[x] = String(n); });
-        var second = s.second[i % s.second.length];
         slots = {
           num: {
             color: 'blue', label: 'Liczebnik', placeholder: String(n),
