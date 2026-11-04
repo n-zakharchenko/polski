@@ -252,9 +252,58 @@
    * Прохождение теста
    * ==================================================================== */
 
+  /* ---------- правило: кнопка (i) и окно ---------- */
+
+  /**
+   * test.rule = { title?: 'Zasada', html: '…' } — статичный HTML из самого бандла.
+   * Возвращает функцию, создающую кнопку (i), или null, если правила нет.
+   */
+  function ruleButtonFactory(test) {
+    if (!test.rule) return null;
+    var title = test.rule.title || 'Zasada';
+
+    var body = el('div', { class: 'rule-body' });
+    body.innerHTML = test.rule.html; // доверенный контент из бандла, не пользовательский ввод
+
+    var dlg = el('dialog', { class: 'rule-dialog', 'aria-label': title });
+    var inner = el('div', { class: 'rule-inner' }, [
+      el('div', { class: 'rule-head' }, [
+        el('h2', { class: 'rule-title', text: title }),
+        el('button', {
+          class: 'rule-close', type: 'button', 'aria-label': 'Zamknij', text: '×',
+          onclick: function () { closeDlg(); },
+        }),
+      ]),
+      body,
+    ]);
+    dlg.appendChild(inner);
+    // клик по фону вокруг окна закрывает его
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) closeDlg(); });
+    document.body.appendChild(dlg);
+
+    function openDlg() {
+      if (typeof dlg.showModal === 'function') dlg.showModal();
+      else dlg.setAttribute('open', '');
+    }
+    function closeDlg() {
+      if (typeof dlg.close === 'function') dlg.close();
+      else dlg.removeAttribute('open');
+    }
+
+    return function () {
+      return el('div', { class: 'card-footer' }, [
+        el('button', {
+          class: 'info-btn', type: 'button', title: title, 'aria-label': title, text: 'i',
+          onclick: openDlg,
+        }),
+      ]);
+    };
+  }
+
   /** opts.backHref — куда ведёт кнопка на итоговом экране (по умолчанию главная) */
   function run(test, root, opts) {
     var backHref = (opts && opts.backHref) || 'index.html';
+    var makeRuleButton = ruleButtonFactory(test);
     var state;
 
     function start() {
@@ -311,7 +360,10 @@
         task.prompt != null ? el('div', { class: 'task-prompt', text: String(task.prompt) }) : null,
       ]) : null;
 
-      root.replaceChildren(el('div', {}, [progressBar(), header, area, feedback, actionBtn]));
+      root.replaceChildren(el('div', {}, [
+        progressBar(), header, area, feedback, actionBtn,
+        makeRuleButton ? makeRuleButton() : null,
+      ]));
 
       handler = (TYPES[task.type] || TYPES.input)(task, area, api) || {};
       if (handler.getAnswer) actionBtn.disabled = true;
@@ -362,7 +414,7 @@
         : pct >= 50 ? 'Nieźle, ćwicz dalej!'
         : 'Spróbuj jeszcze raz!';
 
-      root.replaceChildren(
+      root.replaceChildren(el('div', {}, [
         el('div', { class: 'summary' }, [
           el('div', { class: 'summary-score', text: state.correct + ' / ' + test.rounds }),
           el('div', { class: 'summary-pct', text: pct + '%' }),
@@ -371,8 +423,9 @@
             el('button', { class: 'btn', type: 'button', text: 'Jeszcze raz', onclick: start }),
             el('a', { class: 'btn btn-secondary', href: backHref, text: 'Wstecz' }),
           ]),
-        ])
-      );
+        ]),
+        makeRuleButton ? makeRuleButton() : null,
+      ]));
     }
 
     start();

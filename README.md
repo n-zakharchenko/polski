@@ -54,6 +54,7 @@ Polski.register({
   icon: 'Ab',             // 1–3 символа в плашке
   rounds: 10,             // сколько заданий за проход
   soon: false,            // true — заглушка без generate
+  rule: { title: 'Zasada', html: '<table>…</table>' },  // необязательно: кнопка (i) внизу карточки
 
   // Обязательно. Генерирует одно задание.
   // rng: int(min,max), pick(arr), shuffle(arr), sample(arr,n), chance(p), float()

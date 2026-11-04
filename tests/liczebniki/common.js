@@ -79,7 +79,45 @@
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
+  /* ---------- правило для кнопки (i) ---------- */
+
+  var RULE_NIEMESKOOSOBOWE = {
+    title: 'Zasada',
+    html: [
+      '<table class="rule-table">',
+      '<thead><tr>',
+      '<th>Jeżeli mamy liczebnik</th><th>rzeczownik stoi</th><th>czasownik stoi</th>',
+      '</tr></thead>',
+      '<tbody>',
+
+      '<tr class="g1">',
+      '<td data-label="Jeżeli mamy liczebnik"><mark>2, 3, 4</mark>;<br>22, 23, 24;<br>32, 33, 34; (…)<br>72, 73, 74; (…)<br>122, 123, 124 itd.</td>',
+      '<td data-label="rzeczownik stoi">w <mark>mianowniku lm.</mark><br><span class="rule-q">kto? co? są (jest)</span></td>',
+      '<td data-label="czasownik stoi">w <mark>3. osobie lm.</mark> czasu teraźniejszego, przeszłego lub przyszłego <span class="rule-q">(one)</span></td>',
+      '</tr>',
+      '<tr class="rule-example"><td colspan="3">',
+      '<span class="num">Dwa</span> / <span class="num">Trzydzieści cztery</span> samochody jadą / jechały / będą jechały.',
+      '</td></tr>',
+
+      '<tr class="g2">',
+      '<td data-label="Jeżeli mamy liczebnik">od <mark>5 do 21</mark> (w tym <mark>11–19</mark>),<br>od 25 do 31 (…)<br>od 65 do 71 (…)<br>od 95 do 101 …</td>',
+      '<td data-label="rzeczownik stoi">w <mark>dopełniaczu lm.</mark><br><span class="rule-q">kogo? czego? nie ma</span></td>',
+      '<td data-label="czasownik stoi">w <mark>3. osobie lp.</mark> czasu teraźniejszego, przeszłego, przyszłego <span class="rule-q">(ono)</span></td>',
+      '</tr>',
+      '<tr class="rule-example"><td colspan="3">',
+      '<span class="num">Pięć</span> / <span class="num">Sto dwadzieścia jeden</span> samochodów jedzie / jechało / będzie jechało.',
+      '</td></tr>',
+
+      '</tbody>',
+      '</table>',
+      '<p class="rule-uwaga"><strong>Uwaga!</strong> Liczebnik <b>jeden</b> znajdujący się na końcu liczby, ',
+      'niezależnie od rodzaju rzeczownika, zawsze stawiamy w rodzaju męskim, np.: ',
+      '<i>dwadzieścia jeden okien</i>, <i>trzydzieści jeden kobiet</i>, <i>czterdzieści jeden stron</i>.</p>',
+    ].join(''),
+  };
+
   Polski.liczebniki = {
+    ruleNiemeskoosobowe: RULE_NIEMESKOOSOBOWE,
     groupOf: groupOf,
     randomNumber: randomNumber,
     parseEntry: parseEntry,

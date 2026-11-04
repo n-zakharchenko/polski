@@ -32,6 +32,7 @@
     title: 'Niemęskoosobowe',
     icon: 'NM',
     rounds: 15,
+    rule: L.ruleNiemeskoosobowe,   // кнопка (i) внизу карточки
 
     generate: function (rng, ctx) {
       var s = ctx.session;
