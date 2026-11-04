@@ -13,6 +13,16 @@ core/engine.js        реестр тестов, рандом, проверка 
 core/ui.js            экраны: задание → проверка → итог; готовые типы заданий
 core/settings.js      тема и окно «Ustawienia» (PolskiSettings.addSection — свои секции)
 core/account.js       вход через Google (Firebase Auth), секция «Konto», блок входа на итоге теста
+core/balance.js       БАЛАНС: очки за ответы, серии, бонус, стоимость отрезков — все числа игры здесь
+core/progress.js      очки пользователя в Firestore (users/{uid}), блок очков на итоге теста
+journey/route.js      маршрут малюха: города по кругу (name, lat, lon, major, tier, label)
+journey/poland.js     контур Польши (Natural Earth 1:50m)
+journey/maluch.webp   малюх: 32 изометрических кадра из 3D-модели (Martin Trafas, CC BY 4.0)
+journey/relief.webp   отмывка рельефа (Terrain Tiles, z7): серый 50% = без изменений, на карте через mix-blend-mode
+journey/terrain-light.webp, terrain-dark.webp
+                      пастельная раскраска: лес и вода (ESA WorldCover 2021), горы (по высоте); своя картинка на тему
+journey/rivers.js     реки Natural Earth 1:10m (упрощённые), рисуются линиями внутри контура Польши
+journey/journey.js    карта на главной: маршрут, пройденная часть, малюх; locate(points)
 firestore.rules       правила доступа к Firestore (вставляются вручную в консоли Firebase)
 privacy.html          Polityka prywatności
 tests/manifest.js     дерево разделов и тестов
@@ -128,6 +138,13 @@ Polski.register({
 - Данные пользователя — в `users/{uid}` (без e-mail). Модуль данных регистрирует удаление своих данных
   через `PolskiAccount.onBeforeDelete(fn)`, чтобы «Usuń konto» стирало всё.
 - С `file://` вход не работает (секция «Konto» это пишет).
+
+## Podróż: очки и карта
+
+- Очки считаются в `core/ui.js` по правилам `core/balance.js` и видны только после входа.
+  Сохраняются один раз — на итоге теста (`Polski.progress.mountSummary`); вошёл прямо на итоге — тест тоже сохранится.
+- Малюх едет непрерывно: сумма очков = пробег по маршруту (`Polski.journey.locate`).
+- Поменяли баланс так, что максимум за тест (`Polski.balance.maxForTest`) больше 5000, — поднимите лимит в `firestore.rules`.
 
 ## Локальный запуск
 

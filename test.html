@@ -4,9 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Test — Polski</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <script src="core/settings.js"></script> <!-- тема — до отрисовки; шестерёнка настроек -->
   <script src="core/account.js" defer></script> <!-- вход через Google; без входа Firebase не грузится -->
+  <script src="core/progress.js" defer></script> <!-- очки в Firestore -->
 </head>
 <body class="test-page">
   <main>
@@ -19,6 +21,9 @@
   <script src="core/engine.js"></script>
   <script src="core/ui.js"></script>
   <script src="tests/manifest.js"></script>
+  <script src="core/balance.js"></script>
+  <script src="journey/route.js"></script>
+  <script src="journey/journey.js"></script> <!-- здесь только locate(): «следующий город» на итоге -->
   <script>
     (function () {
       var app = document.getElementById('app');

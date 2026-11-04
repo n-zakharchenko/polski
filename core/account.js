@@ -12,9 +12,13 @@
  *
  * Для модулей данных:
  *   PolskiAccount.user()               — текущий пользователь Firebase или null
+ *   PolskiAccount.ready()              — Promise<user | null>: дождаться, если вход в этом браузере был
+ *   PolskiAccount.firestore()          — Promise<{ F, db } | null>: Firestore Lite (F — модуль SDK)
  *   PolskiAccount.onChange(fn)         — подписка на вход/выход
  *   PolskiAccount.onBeforeDelete(fn)   — fn(user) → Promise: удалить свои данные перед удалением аккаунта
- *   PolskiAccount.mountSummary(box)    — блок «Zaloguj się…» на итоговом экране теста
+ *   PolskiAccount.mountLogin(box, lead) — блок «текст + Zaloguj przez Google»; после входа скрывается
+ *
+ * «Usuń konto» всегда удаляет документ users/{uid} (очки и т. п.) — на любой странице с этим файлом.
  */
 (function () {
   'use strict';
@@ -34,14 +38,14 @@
   // с file:// вход через Google не работает
   var supported = location.protocol === 'https:' || location.protocol === 'http:';
 
-  var fb = null;          // { auth, A } — после загрузки SDK
+  var fb = null;          // { app, auth, A } — после загрузки SDK
+  var store = null;       // Promise<{ F, db }> — Firestore Lite
   var loading = null;     // Promise загрузки
   var loadFailed = false;
   var user = null;
   var known = false;      // Firebase уже сообщил, вошёл ли пользователь
   var busy = false;       // идёт вход / выход / удаление
   var confirmDelete = false;
-  var signedInHere = false;
   var error = '';
   var listeners = [];
   var views = [];         // смонтированные блоки: { box, kind }
@@ -109,7 +113,7 @@
           known = true;
           writeFlag(!!u);
           if (!u) confirmDelete = false;
-          if (!fb) { fb = { auth: auth, A: m[1] }; resolve(fb); }
+          if (!fb) { fb = { app: app, auth: auth, A: m[1] }; resolve(fb); }
           emit();
         });
       });
@@ -122,6 +126,35 @@
     });
     emit();
     return loading;
+  }
+
+  /** Promise<user | null>; Firebase грузим, только если вход в этом браузере уже был */
+  function ready() {
+    if (fb) return Promise.resolve(user);
+    if (loading || (supported && readFlag())) return prepare().then(function () { return user; });
+    return Promise.resolve(null);
+  }
+
+  /** Promise<{ F, db } | null> — Firestore Lite поверх того же приложения */
+  function firestore() {
+    if (!store) {
+      store = prepare().then(function (f) {
+        if (!f) return null;
+        return import(SDK + 'firebase-firestore-lite.js').then(function (F) {
+          return { F: F, db: F.getFirestore(f.app) };
+        });
+      });
+      store.then(function (s) { if (!s) store = null; }, function () { store = null; });
+    }
+    return store;
+  }
+
+  // данные пользователя в users/{uid} — удаляются вместе с аккаунтом
+  function deleteUserDoc(u) {
+    return firestore().then(function (s) {
+      if (!s) throw new Error('Firestore niedostępny');
+      return s.F.deleteDoc(s.F.doc(s.db, 'users', u.uid));
+    });
   }
 
   function provider() {
@@ -145,7 +178,7 @@
 
   function signIn() {
     run(function () {
-      return fb.A.signInWithPopup(fb.auth, provider()).then(function () { signedInHere = true; });
+      return fb.A.signInWithPopup(fb.auth, provider());
     });
   }
 
@@ -160,7 +193,9 @@
     if (!u) return;
     run(function () {
       return fb.A.reauthenticateWithPopup(u, provider())
-        .then(function () { return Promise.all(beforeDelete.map(function (fn) { return fn(u); })); })
+        .then(function () {
+          return Promise.all([deleteUserDoc(u)].concat(beforeDelete.map(function (fn) { return fn(u); })));
+        })
         .then(function () { return fb.A.deleteUser(u); })
         .then(function () { confirmDelete = false; });
     });
@@ -190,7 +225,7 @@
     return error ? h('p', { class: 'account-error', role: 'alert', text: error }) : null;
   }
 
-  function loginBlock() {
+  function loginBlock(lead) {
     var btn = loadFailed
       ? h('button', { class: 'btn btn-wide', type: 'button', text: 'Spróbuj ponownie', onclick: prepare })
       : h('button', {
@@ -200,7 +235,7 @@
         onclick: signIn,
       });
     return [
-      h('p', { class: 'account-lead', text: LEAD }),
+      h('p', { class: 'account-lead', text: lead || LEAD }),
       btn,
       errorLine(),
       h('a', { class: 'account-privacy', href: 'privacy.html', text: 'Polityka prywatności' }),
@@ -247,22 +282,21 @@
     return who.concat(actions, [errorLine()]);
   }
 
-  function summaryView() {
-    if (user) {
-      return signedInHere ? [h('p', { class: 'account-who', text: '✓ Zalogowano jako ' + userName() + '.' })] : [];
-    }
+  // блок входа вне настроек: после входа исчезает (что показать дальше, решает тот, кто его вставил)
+  function loginView(v) {
+    if (user) return [];
     if (!known && readFlag()) return []; // скорее всего вход уже есть — ждём Firebase, не мигаем кнопкой
-    return loginBlock();
+    return loginBlock(v.lead);
   }
 
   function render(v) {
-    var nodes = v.kind === 'summary' ? summaryView() : settingsView();
+    var nodes = v.kind === 'login' ? loginView(v) : settingsView();
     v.box.replaceChildren(h('div', { class: 'account' }, nodes));
     v.box.hidden = nodes.length === 0;
   }
 
-  function mount(box, kind) {
-    var v = { box: box, kind: kind };
+  function mount(box, kind, lead) {
+    var v = { box: box, kind: kind, lead: lead };
     views.push(v);
     render(v);
   }
@@ -281,14 +315,16 @@
 
   window.PolskiAccount = {
     supported: supported,
+    sdk: SDK,
     user: function () { return user; },
+    ready: ready,
+    firestore: firestore,
     onChange: function (fn) { listeners.push(fn); },
     onBeforeDelete: function (fn) { beforeDelete.push(fn); },
-    // итог теста: показываем, только если вход вообще возможен и пользователь не вошёл
-    mountSummary: function (box) {
-      if (!supported || user) return false;
-      signedInHere = false;
-      mount(box, 'summary');
+    // блок входа с поясняющим текстом; сразу подгружает SDK, чтобы popup открылся по клику
+    mountLogin: function (box, lead) {
+      if (!supported) return false;
+      mount(box, 'login', lead);
       if (!loadFailed) prepare();
       return true;
     },

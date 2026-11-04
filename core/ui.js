@@ -520,7 +520,8 @@
     }
 
     function start() {
-      state = { rng: Polski.createRng(), round: 0, correct: 0, wrong: 0, session: {} };
+      // points / streak — очки и серия верных подряд (core/balance.js); видны только после входа
+      state = { rng: Polski.createRng(), round: 0, correct: 0, wrong: 0, session: {}, points: 0, streak: 0, gain: 0 };
       nextTask();
     }
 
@@ -553,6 +554,10 @@
           stopIdleHint();
           var res = Polski.checkAnswer(test, task, answer);
           if (res.ok) state.correct += 1; else state.wrong += 1;
+          // очки: верно — по серии, «Prawie!» / ошибка — 0 и серия с нуля
+          state.streak = res.ok ? state.streak + 1 : 0;
+          state.gain = res.ok && Polski.balance ? Polski.balance.taskPoints(state.streak) : 0;
+          state.points += state.gain;
           updateProgress(true);
           if (handler.onResult) handler.onResult(res);
           if (!handler.ownFeedback) showFeedback(feedback, res, task);
@@ -604,17 +609,27 @@
       ]));
     }
 
+    function showPoints() {
+      return !!(Polski.balance && window.PolskiAccount && window.PolskiAccount.user());
+    }
+
     function progressBar() {
+      var pts = showPoints();
       state.ui = {
         okEl: el('span', { class: 'count-ok', title: 'Dobrze' }),
         badEl: el('span', { class: 'count-bad', title: 'Błędy' }),
         fill: el('div', { class: 'progress-fill' }),
+        ptsEl: pts ? el('span', { class: 'count-pts', title: 'Punkty' }) : null,
+        streakEl: pts ? el('span', { class: 'streak', title: 'Seria poprawnych odpowiedzi' }) : null,
       };
       updateProgress(false);
       return el('div', { class: 'progress' }, [
         el('div', { class: 'progress-text' }, [
-          el('span', { text: state.round + ' / ' + test.rounds }),
-          el('span', { class: 'counts' }, [state.ui.okEl, state.ui.badEl]),
+          el('span', { class: 'progress-round' }, [
+            el('span', { text: state.round + ' / ' + test.rounds }),
+            state.ui.streakEl,
+          ]),
+          el('span', { class: 'counts' }, [state.ui.ptsEl, state.ui.okEl, state.ui.badEl]),
         ]),
         el('div', { class: 'progress-track' }, [state.ui.fill]),
       ]);
@@ -625,6 +640,24 @@
       state.ui.fill.style.width = Math.round((doneCount / test.rounds) * 100) + '%';
       state.ui.okEl.textContent = '✓ ' + state.correct;
       state.ui.badEl.textContent = '✗ ' + state.wrong;
+      if (state.ui.ptsEl) {
+        state.ui.ptsEl.replaceChildren('⭐ ' + state.points.toLocaleString('pl-PL'));
+        if (answered && state.gain) {
+          var pop = el('span', { class: 'pts-pop', text: '+' + state.gain, 'aria-hidden': 'true' });
+          pop.addEventListener('animationend', function () { pop.remove(); });
+          state.ui.ptsEl.appendChild(pop);
+        }
+      }
+      if (state.ui.streakEl) {
+        var mult = Polski.balance.multiplier(state.streak);
+        var label = mult > 1 ? '🔥 ×' + String(mult).replace('.', ',') : '';
+        if (label && label !== state.ui.streakEl.textContent && answered) {
+          state.ui.streakEl.classList.remove('bump');
+          void state.ui.streakEl.offsetWidth; // перезапуск анимации
+          state.ui.streakEl.classList.add('bump');
+        }
+        state.ui.streakEl.textContent = label;
+      }
     }
 
     /* ---------- итог ---------- */
@@ -637,8 +670,9 @@
         : pct >= 50 ? 'Nieźle, ćwicz dalej!'
         : 'Spróbuj jeszcze raz!';
 
-      // без входа — предложение войти (core/account.js); без account.js блока просто нет
+      // очки: после входа — сохраняем, без входа — предлагаем войти (core/progress.js); без него блока нет
       var accountBox = el('div', { class: 'summary-account', hidden: true });
+      var bonus = Polski.balance ? Polski.balance.testBonus(state.correct, test.rounds) : 0;
 
       root.replaceChildren(el('div', {}, [
         el('div', { class: 'summary' }, [
@@ -654,7 +688,11 @@
         makeRuleButton(),
       ]));
 
-      if (window.PolskiAccount) window.PolskiAccount.mountSummary(accountBox);
+      if (Polski.progress) {
+        Polski.progress.mountSummary(accountBox, {
+          points: state.points + bonus, bonus: bonus, perfect: bonus > 0,
+        });
+      }
     }
 
     start();

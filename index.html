@@ -4,9 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Polski — testy</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <script src="core/settings.js"></script> <!-- тема — до отрисовки; шестерёнка настроек -->
   <script src="core/account.js" defer></script> <!-- вход через Google; без входа Firebase не грузится -->
+  <script src="core/progress.js" defer></script> <!-- очки в Firestore -->
 </head>
 <body>
   <main>
@@ -20,11 +22,19 @@
 
     <!-- экран выбора — если у раздела есть chooser -->
     <div class="chooser card" id="chooser" hidden></div>
+
+    <!-- карта путешествия малюхом (journey/journey.js); только на главной, под тестами -->
+    <section class="journey card" id="journey" hidden></section>
   </main>
 
   <script src="core/engine.js"></script>
   <script src="core/ui.js"></script>
   <script src="tests/manifest.js"></script>
+  <script src="core/balance.js"></script>
+  <script src="journey/route.js"></script>
+  <script src="journey/poland.js"></script>
+  <script src="journey/rivers.js"></script>
+  <script src="journey/journey.js"></script>
   <script>
     (function () {
       var list = document.getElementById('test-list');
@@ -33,6 +43,7 @@
       var items = Polski.manifest;
 
       if (groupId) {
+        document.getElementById('journey').remove(); // карта — только на главной
         var path = Polski.findPath(groupId);
         var group = path && path[path.length - 1];
         if (!group || !Polski.isGroup(group)) {

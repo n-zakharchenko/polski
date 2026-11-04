@@ -1,0 +1,77 @@
+/*
+ * Маршрут путешествия малюхом: круг по Польше из Варшавы в Варшаву.
+ * Замкнутый (loop): после последнего города — обратно в первый.
+ *
+ * Город: { name, lat, lon, major?, tier?, label? }
+ *   major — подпись видна всегда (у остальных — только у текущего и следующего города)
+ *   tier  — тип отрезка ОТ этого города до следующего (1 / 2 / 3); без него — по расстоянию (core/balance.js)
+ *   label — где подпись: 'right' (по умолчанию), 'left', 'top', 'bottom'
+ * Город может встретиться дважды (Radom): на карте это одна точка и один город в счётчике.
+ */
+window.Polski = window.Polski || {};
+Polski.route = {
+  loop: true,
+  cities: [
+    { name: 'Warszawa', lat: 52.230, lon: 21.012, major: true },
+    { name: 'Radom', lat: 51.403, lon: 21.147 },
+    { name: 'Puławy', lat: 51.416, lon: 21.969 },
+    { name: 'Lublin', lat: 51.246, lon: 22.568, major: true, label: 'left' },
+    { name: 'Chełm', lat: 51.143, lon: 23.472, label: 'left' },
+    { name: 'Łuków', lat: 51.931, lon: 22.383, label: 'left' },
+    { name: 'Biała Podlaska', lat: 52.033, lon: 23.116, label: 'left' },
+    { name: 'Bielsk Podlaski', lat: 52.765, lon: 23.187, label: 'left' },
+    { name: 'Hajnówka', lat: 52.743, lon: 23.581, label: 'left' },
+    { name: 'Białystok', lat: 53.133, lon: 23.164, major: true, label: 'left' },
+    { name: 'Sokółka', lat: 53.406, lon: 23.503, label: 'left' },
+    { name: 'Augustów', lat: 53.844, lon: 22.979, label: 'left' },
+    { name: 'Suwałki', lat: 54.111, lon: 22.931, label: 'left' },
+    { name: 'Giżycko', lat: 54.038, lon: 21.766, label: 'top' },
+    { name: 'Mrągowo', lat: 53.865, lon: 21.304, label: 'bottom' },
+    { name: 'Olsztyn', lat: 53.778, lon: 20.480, major: true, label: 'bottom' },
+    { name: 'Działdowo', lat: 53.234, lon: 20.180 },
+    { name: 'Elbląg', lat: 54.156, lon: 19.404 },
+    { name: 'Frombork', lat: 54.358, lon: 19.681, label: 'top' },
+    { name: 'Hel', lat: 54.608, lon: 18.801, label: 'top' },
+    { name: 'Gdynia', lat: 54.519, lon: 18.531, label: 'left' },
+    { name: 'Gdańsk', lat: 54.352, lon: 18.646, major: true },
+    { name: 'Kościerzyna', lat: 54.122, lon: 17.981, label: 'left' },
+    { name: 'Tczew', lat: 54.092, lon: 18.778 },
+    { name: 'Grudziądz', lat: 53.484, lon: 18.754 },
+    { name: 'Toruń', lat: 53.013, lon: 18.598 },
+    { name: 'Inowrocław', lat: 52.798, lon: 18.261, label: 'bottom' },
+    { name: 'Bydgoszcz', lat: 53.123, lon: 18.008, major: true, label: 'left' },
+    { name: 'Chojnice', lat: 53.697, lon: 17.557, label: 'left' },
+    { name: 'Koszalin', lat: 54.194, lon: 16.172, label: 'top' },
+    { name: 'Szczecin', lat: 53.428, lon: 14.553, major: true },
+    { name: 'Gorzów Wielkopolski', lat: 52.731, lon: 15.240 },
+    { name: 'Słubice', lat: 52.350, lon: 14.561 },
+    { name: 'Świebodzin', lat: 52.247, lon: 15.533 },
+    { name: 'Zielona Góra', lat: 51.935, lon: 15.506, major: true },
+    { name: 'Żary', lat: 51.642, lon: 15.137, label: 'left' },
+    { name: 'Głogów', lat: 51.663, lon: 16.085 },
+    { name: 'Bolesławiec', lat: 51.264, lon: 15.570, label: 'left' },
+    { name: 'Lubin', lat: 51.401, lon: 16.202 },
+    { name: 'Wrocław', lat: 51.108, lon: 17.039, major: true },
+    { name: 'Świdnica', lat: 50.844, lon: 16.488 },
+    { name: 'Kudowa-Zdrój', lat: 50.443, lon: 16.243, label: 'left' },
+    { name: 'Kłodzko', lat: 50.435, lon: 16.661 },
+    { name: 'Bystrzyca Kłodzka', lat: 50.298, lon: 16.651, label: 'bottom' },
+    { name: 'Nysa', lat: 50.474, lon: 17.334 },
+    { name: 'Prudnik', lat: 50.322, lon: 17.578, label: 'bottom' },
+    { name: 'Racibórz', lat: 50.092, lon: 18.219, label: 'left' },
+    { name: 'Cieszyn', lat: 49.749, lon: 18.632, label: 'left' },
+    { name: 'Bielsko-Biała', lat: 49.822, lon: 19.044 },
+    { name: 'Żywiec', lat: 49.686, lon: 19.192, label: 'bottom' },
+    { name: 'Wadowice', lat: 49.883, lon: 19.493 },
+    { name: 'Kraków', lat: 50.065, lon: 19.945, major: true, label: 'top' },
+    { name: 'Bochnia', lat: 49.969, lon: 20.430, label: 'bottom' },
+    { name: 'Busko-Zdrój', lat: 50.470, lon: 20.719, label: 'top' },
+    { name: 'Mielec', lat: 50.287, lon: 21.424 },
+    { name: 'Dębica', lat: 50.051, lon: 21.411, label: 'bottom' },
+    { name: 'Rzeszów', lat: 50.041, lon: 21.999, major: true, label: 'bottom' },
+    { name: 'Leżajsk', lat: 50.262, lon: 22.418 },
+    { name: 'Stalowa Wola', lat: 50.583, lon: 22.054 },
+    { name: 'Sandomierz', lat: 50.682, lon: 21.749, label: 'left' },
+    { name: 'Radom', lat: 51.403, lon: 21.147 },
+  ],
+};

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- флаг Польши 8:5, со скруглением и тонкой рамкой: белая половина видна на светлой вкладке -->
+  <clipPath id="f"><rect x="1" y="6" width="30" height="20" rx="3"/></clipPath>
+  <g clip-path="url(#f)">
+    <rect x="1" y="6" width="30" height="10" fill="#ffffff"/>
+    <rect x="1" y="16" width="30" height="10" fill="#dc143c"/>
+  </g>
+  <rect x="1.5" y="6.5" width="29" height="19" rx="2.5" fill="none" stroke="#000" stroke-opacity="0.18"/>
+</svg>

@@ -27,6 +27,14 @@
   --num: #3f6fe8;   /* число словами */
   --b-bg: #e8efff;  /* рамка и варианты числительного */
   --b-text: #24449e;
+  /* карта путешествия */
+  --map-land: #f1f3f8;
+  --map-border: #d3d8e3;
+  --terrain-light: inline;
+  --terrain-dark: none;
+  --map-river: #a3c4e6;
+  --relief-blend: hard-light;  /* на светлой суше soft-light почти не виден */
+  --relief-opacity: 0.45;
 }
 
 /*
@@ -63,6 +71,13 @@
     --num: #8aa8ff;
     --b-bg: #17223f;
     --b-text: #c9d7ff;
+    --map-land: #242833;
+    --map-border: #3a4050;
+    --terrain-light: none;
+    --terrain-dark: inline;
+    --map-river: #34547d;
+    --relief-blend: soft-light;
+    --relief-opacity: 1;
   }
 }
 
@@ -91,6 +106,13 @@
   --num: #8aa8ff;
   --b-bg: #17223f;
   --b-text: #c9d7ff;
+  --map-land: #242833;
+  --map-border: #3a4050;
+  --terrain-light: none;
+  --terrain-dark: inline;
+  --map-river: #34547d;
+  --relief-blend: soft-light;
+  --relief-opacity: 1;
 }
 
 * { box-sizing: border-box; }
@@ -480,6 +502,129 @@ h1 {
 .counts { display: inline-flex; gap: 12px; }
 .count-ok { color: var(--ok); }
 .count-bad { color: var(--bad); }
+
+/* очки и серия (видны после входа) */
+.progress-round { display: inline-flex; align-items: center; gap: 8px; }
+.count-pts { position: relative; color: var(--text); white-space: nowrap; }
+.pts-pop {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  color: var(--ok);
+  font-weight: 800;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: pts-pop 1s ease-out forwards;
+}
+@keyframes pts-pop {
+  0% { opacity: 0; transform: translate(-50%, 6px) scale(0.8); }
+  20% { opacity: 1; transform: translate(-50%, 0) scale(1.15); }
+  100% { opacity: 0; transform: translate(-50%, -20px) scale(1); }
+}
+.streak { display: inline-block; color: var(--accent); font-weight: 800; }
+.streak:empty { display: none; }
+.streak.bump { animation: streak-bump 0.5s ease; }
+@keyframes streak-bump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+.summary-points { display: grid; gap: 4px; margin-bottom: 4px; }
+.summary-points p { margin: 0; }
+.summary-points .btn { justify-self: center; margin-top: 6px; }
+.pts-total { font-size: 1.4rem; }
+.pts-total strong { color: var(--ok); }
+.pts-sub { color: var(--muted); }
+.pts-sub strong { color: var(--text); }
+.pts-map { margin-top: 6px; color: var(--accent); font-weight: 700; text-decoration: none; }
+.pts-map:hover { text-decoration: underline; }
+.summary-points:not(:empty) + div:not(:empty) { margin-top: 14px; }
+
+/* ---------- Карта путешествия (journey/journey.js) ---------- */
+
+.journey { margin-top: 44px; padding: 10px 12px 14px; }
+.journey[hidden] { display: none; }
+.journey-lead { margin: 6px 4px 4px; font-weight: 700; line-height: 1.35; }
+.journey-frame { position: relative; }
+.journey-map { display: block; width: 100%; height: auto; }
+.map-land { fill: var(--map-land); }
+.map-border { fill: none; stroke: var(--map-border); stroke-width: 2.5; stroke-linejoin: round; }
+/* пастельная раскраска (journey/terrain-*.webp): показываем картинку своей темы */
+.map-terrain { pointer-events: none; }
+.map-terrain-light { display: var(--terrain-light); }
+.map-terrain-dark { display: var(--terrain-dark); }
+.map-river { fill: none; stroke: var(--map-river); stroke-linecap: round; stroke-linejoin: round; }
+/* рельеф (journey/relief.webp): серый 50% не меняет сушу, темнее — тень, светлее — свет */
+.map-relief { mix-blend-mode: var(--relief-blend); opacity: var(--relief-opacity); pointer-events: none; }
+/* маршрут — тонкий пунктир; пройденная часть — тот же пунктир, красный */
+.map-route, .map-done {
+  fill: none;
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.map-route { stroke: var(--muted); stroke-opacity: 0.6; }
+.map-done { stroke: var(--accent); stroke-width: 2.6; }
+.map-city { fill: var(--card); stroke: var(--muted); stroke-width: 1.6; }
+.map-city.reached { fill: var(--accent); stroke: var(--accent); }
+.map-city.next { stroke: var(--accent); stroke-width: 2.2; }
+.map-label {
+  fill: var(--muted);
+  font-size: 17px;
+  font-weight: 600;
+  paint-order: stroke;
+  stroke: var(--map-land);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.map-label.next { fill: var(--text); font-weight: 800; }
+.map-label.off { display: none; }
+.map-car { pointer-events: none; }
+.map-car.driving .car-body { animation: car-bump 0.24s ease-in-out infinite alternate; }
+@keyframes car-bump { from { transform: translateY(0); } to { transform: translateY(-1.3px); } }
+
+.journey-info { padding: 6px 4px 0; }
+.journey-stats { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 14px; font-weight: 600; }
+.journey-points strong { font-size: 1.35rem; }
+.journey-cities { color: var(--muted); }
+.journey-next { margin: 4px 0 0; color: var(--muted); }
+.journey-next strong { color: var(--text); }
+.journey-alt { margin: 0; color: var(--muted); font-size: 0.9rem; text-align: center; }
+
+/* без входа: карта приглушена, поверх приглашение */
+.journey.locked .journey-map { opacity: 0.45; filter: grayscale(0.5); }
+/* приглашение — под картой, слегка наезжая на её низ: влезает на любой ширине */
+.journey-overlay {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-top: -56px;
+  padding: 0 4px;
+}
+.journey-overlay:empty { display: none; }
+.journey-cta {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  max-width: 320px;
+  padding: 18px 18px 16px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.journey-cta p { margin: 0; }
+.journey-cta-title { font-size: 1.2rem; font-weight: 800; }
+.journey-cta-text { color: var(--muted); }
+.journey-login { width: 100%; }
+.journey-login .account { justify-items: center; }
+.journey-login .account-privacy { justify-self: center; }
+@media (prefers-reduced-motion: reduce) {
+  .map-car.driving .car-body, .streak.bump { animation: none; }
+  .pts-pop { display: none; }
+}
 
 /* ---------- Задание «рамки и варианты» (slots) ---------- */
 
