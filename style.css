@@ -23,6 +23,7 @@
   --g-text: #14532d;
   --tip-bg: #1d2330;
   --tip-text: #ffffff;
+  --num: #3f6fe8;   /* число словами */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,6 +48,7 @@
     --g-text: #bbf7d0;
     --tip-bg: #f1f3f8;
     --tip-text: #13151b;
+    --num: #8aa8ff;
   }
 }
 
@@ -370,10 +372,7 @@ h1 {
 }
 
 .slots-num {
-  padding: 4px 12px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #fff;
+  color: var(--num);
   font-weight: 800;
 }
 

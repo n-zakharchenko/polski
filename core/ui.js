@@ -7,7 +7,7 @@
  *   'choice' — выбор варианта; task.options: массив строк, task.answer: правильная строка
  *   'slots'  — предложение с цветными рамками, слова выбираются из вариантов:
  *              task.source   — исходное предложение (показывается сверху)
- *              task.sentence — части: 'текст' | { num: 5 } | { slot: 'имя' }
+ *              task.sentence — части: 'текст' | { num: 5, words?: 'Pięć' } | { slot: 'имя' }
  *              task.slots    — { имя: { color: 'yellow'|'green', label, options: [...], answer } }
  *   'custom' — бандл рисует сам: test.render(task, container, submit)
  * Общие поля: task.question — инструкция ("Napisz słownie:"), task.prompt — то, что крупно.
@@ -122,7 +122,9 @@
 
     var sentence = el('div', { class: 'slots-sentence' }, task.sentence.map(function (part) {
       if (typeof part === 'string') return el('span', { class: 'slots-text', text: part });
-      if (part.num != null) return el('span', { class: 'slots-num', text: String(part.num) });
+      if (part.num != null) {
+        return el('span', { class: 'slots-num', title: String(part.num), text: part.words || String(part.num) });
+      }
       var cfg = task.slots[part.slot];
       var slot = el('button', {
         class: 'slot slot-' + cfg.color, type: 'button', 'aria-label': cfg.label || part.slot,
