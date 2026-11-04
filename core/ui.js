@@ -8,7 +8,8 @@
  *   'slots'  — предложение с цветными рамками, слова выбираются из вариантов:
  *              task.source   — исходное предложение (показывается сверху)
  *              task.sentence — части: 'текст' | { num: 5, words?: 'Pięć' } | { slot: 'имя' }
- *              task.slots    — { имя: { color: 'yellow'|'green', label, options: [...], answer } }
+ *              task.slots    — { имя: { color: 'yellow'|'green'|'blue', label, options: [...], answer,
+ *                                       placeholder?: 'текст в пустой рамке', tr?: перевод } }
  *   'custom' — бандл рисует сам: test.render(task, container, submit)
  * Общие поля: task.question — инструкция ("Napisz słownie:"), task.prompt — то, что крупно.
  */
@@ -243,6 +244,7 @@
       var cfg = task.slots[part.slot];
       var slot = el('button', {
         class: 'slot slot-' + cfg.color, type: 'button', 'aria-label': cfg.label || part.slot,
+        'data-placeholder': cfg.placeholder, // напр. цифра «22» в пустой рамке числительного
       });
       slot.addEventListener('click', function () { unfill(part.slot); });
       slotEls[part.slot] = slot;

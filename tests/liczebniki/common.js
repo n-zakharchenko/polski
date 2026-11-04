@@ -285,6 +285,81 @@
     return out;
   }
 
+  /* ---------- режим «выбери числительное»: числа и варианты ---------- */
+
+  var COLLECTIVE = {
+    5: 'pięcioro', 6: 'sześcioro', 7: 'siedmioro', 8: 'ośmioro', 9: 'dziewięcioro',
+    10: 'dziesięcioro', 11: 'jedenaścioro', 12: 'dwanaścioro', 13: 'trzynaścioro', 14: 'czternaścioro',
+    15: 'piętnaścioro', 16: 'szesnaścioro', 17: 'siedemnaścioro', 18: 'osiemnaścioro', 19: 'dziewiętnaścioro',
+    20: 'dwadzieścioro', 30: 'trzydzieścioro', 40: 'czterdzieścioro', 50: 'pięćdziesięcioro',
+    60: 'sześćdziesięcioro', 70: 'siedemdziesięcioro', 80: 'osiemdziesięcioro', 90: 'dziewięćdziesięcioro',
+  };
+
+  function isX1(n) { return n > 20 && n % 10 === 1 && n % 100 !== 11; }  // 21, 31 … 101, 121 …
+
+  /**
+   * Числа для режима «liczebnik» (niemęskoosobowe) — только такие, у которых есть 3 настоящих варианта:
+   *   'A': 2, 3, 4 и составные на 2 (22, 32 … 192, кроме 112)
+   *   'B': 5–20, круглые десятки 30–90, составные на 1 (21, 31 … 191, 101)
+   */
+  var NM_NUM_POOL = { A: [2, 3, 4], B: [] };
+  (function () {
+    for (var t = 2; t <= 19; t++) if (t !== 11) NM_NUM_POOL.A.push(t * 10 + 2);
+    for (var n = 5; n <= 20; n++) NM_NUM_POOL.B.push(n);
+    [30, 40, 50, 60, 70, 80, 90].forEach(function (x) { NM_NUM_POOL.B.push(x); });
+    for (var k = 2; k <= 19; k++) if (k !== 11) NM_NUM_POOL.B.push(k * 10 + 1);
+    NM_NUM_POOL.B.push(101);
+  })();
+
+  /** allowCollective = false (cielę) — в группе 'B' только числа на 1, чтобы третий вариант был «jedna», а не «-oro» */
+  function numeralNumberNm(rng, group, allowCollective) {
+    var pool = NM_NUM_POOL[group];
+    if (group === 'B' && allowCollective === false) pool = pool.filter(function (n) { return isX1(n) || n === 101; });
+    return rng.pick(pool);
+  }
+
+  /**
+   * Варианты числительного для niemęskoosobowych; первый — правильный.
+   *   на 2:        dwa / dwie (другой род) / dwóch                 — dwadzieścia dwie / dwadzieścia dwa / dwudziestu dwóch
+   *   3, 4:        trzy / trzech / trzej
+   *   на 1 (21…):  dwadzieścia jeden / dwadzieścia jedna / dwudziestu jeden   (правило «Uwaga»)
+   *   5–20, 30…90: pięć / pięciu / pięcioro
+   * allowCollective = false — без собирательного (для cielę «pięcioro cieląt» — правильно)
+   */
+  function numeralOptionsNm(n, gender, allowCollective) {
+    var correct = numberWords(n, gender);
+    var virile = numberWordsVirile(n, 'dwóch');
+    var third = null;
+    if (n % 10 === 2 && n % 100 !== 12) third = numberWords(n, gender === 'f' ? 'm' : 'f');
+    else if (n === 3 || n === 4) third = DWAJ[n];
+    else if (isX1(n) || n === 101) third = correct.replace(/jeden$/, 'jedna');
+    else if (COLLECTIVE[n] && allowCollective) third = COLLECTIVE[n];
+    return uniq([correct, virile, third]);
+  }
+
+  /**
+   * Варианты числительного для męskoosobowych; первый — правильный.
+   *   2–4, группа 'A':  dwaj / dwóch / dwa      группа 'B': dwóch / dwaj / dwa
+   *   больше 4:         pięciu / pięć           на 1: dwudziestu jeden / dwadzieścia jeden / dwudziestu jednego
+   * (собирательные pięcioro не даём: «pięcioro studentów» — правильно для смешанной группы)
+   */
+  function numeralOptionsMo(n, group) {
+    if (n <= 4) {
+      var dwaj = DWAJ[n], dwoch = numberWordsVirile(n, 'dwóch'), dwa = numberWords(n, 'm');
+      return group === 'A' ? [dwaj, dwoch, dwa] : [dwoch, dwaj, dwa];
+    }
+    var correct = numberWordsVirile(n, 'dwóch');
+    var list = [correct, numberWords(n, 'm')];
+    if (isX1(n) || n === 101) list.push(correct.replace(/jeden$/, 'jednego'));
+    return uniq(list);
+  }
+
+  function uniq(list) {
+    var out = [];
+    list.forEach(function (x) { if (x && out.indexOf(x) === -1) out.push(x); });
+    return out;
+  }
+
   /* ---------- правило для кнопки (i) ---------- */
 
   var RULE_MESKOOSOBOWE = {
@@ -366,6 +441,9 @@
     ruleNiemeskoosobowe: RULE_NIEMESKOOSOBOWE,
     ruleMeskoosobowe: RULE_MESKOOSOBOWE,
     numberWordsVirile: numberWordsVirile,
+    numeralNumberNm: numeralNumberNm,
+    numeralOptionsNm: numeralOptionsNm,
+    numeralOptionsMo: numeralOptionsMo,
     randomNumberMo: randomNumberMo,
     parseEntryMo: parseEntryMo,
     nounTrapsMo: nounTrapsMo,

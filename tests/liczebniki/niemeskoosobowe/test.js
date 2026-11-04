@@ -70,18 +70,19 @@
     return { list: [e.nomPl, e.genPl, trap.form], tr: tr };
   }
 
-  Polski.register({
-    id: 'liczebniki-niemeskoosobowe',
-    title: 'Niemęskoosobowe',
-    icon: 'NM',
-    rounds: 15,
-    rule: L.ruleNiemeskoosobowe,   // кнопка (i) внизу карточки
-
-    generate: function (rng, ctx) {
+  /**
+   * Генератор заданий.
+   *   mode 'words'   — число дано словами, рамки: существительное + глагол
+   *   mode 'numeral' — число дано цифрами в рамке, рамки: числительное + (по очереди) существительное или глагол;
+   *                    третье слово дано готовым
+   */
+  function makeGenerate(mode) {
+    return function (rng, ctx) {
       var s = ctx.session;
       if (!s.plan) {
         s.plan = Polski.mixedSequence(rng, ['A', 'B'], ctx.total, { maxRun: 3 });
         s.tenses = Polski.mixedSequence(rng, ['pres', 'past', 'fut'], ctx.total, { maxRun: 2 });
+        s.second = Polski.mixedSequence(rng, ['noun', 'verb'], ctx.total, { maxRun: 2 }); // для 'numeral'
         s.pool = rng.shuffle(ENTRIES);   // ещё не использованные предложения
         s.verbs = {};                    // глаголы, уже бывшие в этом проходе
       }
@@ -93,9 +94,56 @@
 
       var e = takeEntry(s);
       var pair = VERBS[e.verb];
-      var n = L.randomNumber(rng, group);
       var verbs = verbOptions(rng, pair, aspect, tense, group);
       var nouns = nounOptions(e);
+      var rest = { text: e.rest + '.', tr: e.restRu };
+
+      var nounSlot = {
+        color: 'yellow',
+        label: 'Rzeczownik',
+        options: rng.shuffle(nouns.list),
+        answer: group === 'A' ? e.nomPl : e.genPl,
+        tr: nouns.tr,
+      };
+      var verbSlot = {
+        color: 'green',
+        label: 'Czasownik',
+        options: rng.shuffle(verbs.list),
+        answer: verbs.list[0],
+        tr: verbs.tr,
+      };
+
+      var n, sentence, slots;
+      if (mode === 'numeral') {
+        // «pięcioro cieląt» — правильно, поэтому для cielę собирательное не предлагаем
+        var allowCollective = e.sg !== 'cielę';
+        n = L.numeralNumberNm(rng, group, allowCollective);
+        var numList = L.numeralOptionsNm(n, e.gender, allowCollective).map(L.capitalize);
+        var numTr = {};
+        numList.forEach(function (x) { numTr[x] = String(n); });
+        var second = s.second[i % s.second.length];
+        slots = {
+          num: {
+            color: 'blue', label: 'Liczebnik', placeholder: String(n),
+            options: rng.shuffle(numList), answer: numList[0], tr: numTr,
+          },
+        };
+        slots[second] = second === 'noun' ? nounSlot : verbSlot;
+        sentence = [
+          { slot: 'num' },
+          second === 'noun' ? { slot: 'noun' } : { text: nounSlot.answer, tr: nouns.tr[nounSlot.answer] },
+          second === 'verb' ? { slot: 'verb' } : { text: verbSlot.answer, tr: verbs.tr[verbSlot.answer] },
+          rest,
+        ];
+      } else {
+        n = L.randomNumber(rng, group);
+        slots = { noun: nounSlot, verb: verbSlot };
+        sentence = [
+          { num: n, words: L.capitalize(L.numberWords(n, e.gender)) },
+          { slot: 'noun' }, { slot: 'verb' },
+          rest,
+        ];
+      }
 
       return {
         type: 'slots',
@@ -105,33 +153,33 @@
           { text: L.verbForm(pair[aspect], aspect, tense, e.gender), tr: L.ruForm(pair[aspect], aspect, tense, e.gender) },
           { text: e.rest + '.', tr: e.restRu },
         ],
-        sentence: [
-          { num: n, words: L.capitalize(L.numberWords(n, e.gender)) },
-          { slot: 'noun' }, { slot: 'verb' },
-          { text: e.rest + '.', tr: e.restRu },
-        ],
-        slots: {
-          noun: {
-            color: 'yellow',
-            label: 'Rzeczownik',
-            options: rng.shuffle(nouns.list),
-            answer: group === 'A' ? e.nomPl : e.genPl,
-            tr: nouns.tr,
-          },
-          verb: {
-            color: 'green',
-            label: 'Czasownik',
-            options: rng.shuffle(verbs.list),
-            answer: verbs.list[0],
-            tr: verbs.tr,
-          },
-        },
+        sentence: sentence,
+        slots: slots,
         group: group,
         number: n,
         tense: tense,
         aspect: aspect,
         verb: e.verb,
       };
-    },
+    };
+  }
+
+  Polski.register({
+    id: 'liczebniki-niemeskoosobowe',
+    title: 'Niemęskoosobowe',
+    icon: 'NM',
+    rounds: 15,
+    rule: L.ruleNiemeskoosobowe,   // кнопка (i) внизу карточки
+    generate: makeGenerate('words'),
+  });
+
+  Polski.register({
+    id: 'liczebniki-niemeskoosobowe-num',
+    title: 'Niemęskoosobowe + liczebnik',
+    desc: 'Wybierz też liczebnik',
+    icon: 'NM',
+    rounds: 15,
+    rule: L.ruleNiemeskoosobowe,
+    generate: makeGenerate('numeral'),
   });
 })();

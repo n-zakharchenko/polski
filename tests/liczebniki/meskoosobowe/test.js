@@ -82,18 +82,19 @@
     return { list: [e.nomPl, e.genPl, trap.form], tr: tr };
   }
 
-  Polski.register({
-    id: 'liczebniki-meskoosobowe',
-    title: 'Męskoosobowe',
-    icon: 'MO',
-    rounds: 15,
-    rule: L.ruleMeskoosobowe,   // кнопка (i) внизу карточки
-
-    generate: function (rng, ctx) {
+  /**
+   * Генератор заданий.
+   *   mode 'words'   — число дано словами, рамки: существительное + глагол
+   *   mode 'numeral' — число дано цифрами в рамке, рамки: числительное + (по очереди) существительное или глагол;
+   *                    третье слово дано готовым
+   */
+  function makeGenerate(mode) {
+    return function (rng, ctx) {
       var s = ctx.session;
       if (!s.plan) {
         s.plan = Polski.mixedSequence(rng, ['A', 'B', 'C'], ctx.total, { maxRun: 2 });
         s.tenses = Polski.mixedSequence(rng, ['pres', 'past', 'fut'], ctx.total, { maxRun: 2 });
+        s.second = Polski.mixedSequence(rng, ['noun', 'verb'], ctx.total, { maxRun: 2 }); // для 'numeral'
         s.pool = rng.shuffle(ENTRIES);
         s.verbs = {};
       }
@@ -107,9 +108,53 @@
       var e = takeEntry(s);
       var pair = VERBS[e.verb];
       var n = L.randomNumberMo(rng, group);
-      var words = L.numberWordsVirile(n, group === 'A' ? 'dwaj' : 'dwóch');
       var verbs = verbOptions(rng, pair, aspect, tense, who);
       var nouns = nounOptions(rng, e);
+      var rest = { text: e.rest + '.', tr: e.restRu };
+
+      var nounSlot = {
+        color: 'yellow',
+        label: 'Rzeczownik',
+        options: rng.shuffle(nouns.list),
+        answer: group === 'A' ? e.nomPl : e.genPl,
+        tr: nouns.tr,
+      };
+      var verbSlot = {
+        color: 'green',
+        label: 'Czasownik',
+        options: rng.shuffle(verbs.list),
+        answer: verbs.list[0],
+        tr: verbs.tr,
+      };
+
+      var sentence, slots;
+      if (mode === 'numeral') {
+        var numList = L.numeralOptionsMo(n, group).map(L.capitalize);
+        var numTr = {};
+        numList.forEach(function (x) { numTr[x] = String(n); });
+        var second = s.second[i % s.second.length];
+        slots = {
+          num: {
+            color: 'blue', label: 'Liczebnik', placeholder: String(n),
+            options: rng.shuffle(numList), answer: numList[0], tr: numTr,
+          },
+        };
+        slots[second] = second === 'noun' ? nounSlot : verbSlot;
+        sentence = [
+          { slot: 'num' },
+          second === 'noun' ? { slot: 'noun' } : { text: nounSlot.answer, tr: nouns.tr[nounSlot.answer] },
+          second === 'verb' ? { slot: 'verb' } : { text: verbSlot.answer, tr: verbs.tr[verbSlot.answer] },
+          rest,
+        ];
+      } else {
+        var words = L.numberWordsVirile(n, group === 'A' ? 'dwaj' : 'dwóch');
+        slots = { noun: nounSlot, verb: verbSlot };
+        sentence = [
+          { num: n, words: L.capitalize(words) },
+          { slot: 'noun' }, { slot: 'verb' },
+          rest,
+        ];
+      }
 
       return {
         type: 'slots',
@@ -118,33 +163,33 @@
           { text: L.verbForm(pair[aspect], aspect, tense, 'm'), tr: L.ruForm(pair[aspect], aspect, tense, 'm') },
           { text: e.rest + '.', tr: e.restRu },
         ],
-        sentence: [
-          { num: n, words: L.capitalize(words) },
-          { slot: 'noun' }, { slot: 'verb' },
-          { text: e.rest + '.', tr: e.restRu },
-        ],
-        slots: {
-          noun: {
-            color: 'yellow',
-            label: 'Rzeczownik',
-            options: rng.shuffle(nouns.list),
-            answer: group === 'A' ? e.nomPl : e.genPl,
-            tr: nouns.tr,
-          },
-          verb: {
-            color: 'green',
-            label: 'Czasownik',
-            options: rng.shuffle(verbs.list),
-            answer: verbs.list[0],
-            tr: verbs.tr,
-          },
-        },
+        sentence: sentence,
+        slots: slots,
         group: group,
         number: n,
         tense: tense,
         aspect: aspect,
         verb: e.verb,
       };
-    },
+    };
+  }
+
+  Polski.register({
+    id: 'liczebniki-meskoosobowe',
+    title: 'Męskoosobowe',
+    icon: 'MO',
+    rounds: 15,
+    rule: L.ruleMeskoosobowe,   // кнопка (i) внизу карточки
+    generate: makeGenerate('words'),
+  });
+
+  Polski.register({
+    id: 'liczebniki-meskoosobowe-num',
+    title: 'Męskoosobowe + liczebnik',
+    desc: 'Wybierz też liczebnik',
+    icon: 'MO',
+    rounds: 15,
+    rule: L.ruleMeskoosobowe,
+    generate: makeGenerate('numeral'),
   });
 })();
