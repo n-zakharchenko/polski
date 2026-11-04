@@ -8,7 +8,7 @@
 </head>
 <body class="test-page">
   <main>
-    <a class="back" href="index.html">← Wszystkie testy</a>
+    <a class="back" id="back" href="index.html">← Wstecz</a>
     <h1 id="title"></h1>
     <div class="card" id="app"></div>
   </main>
@@ -26,12 +26,25 @@
         return;
       }
 
-      Polski.loadBundles('', id).then(function () {
+      var path = Polski.findPath(id);
+      var entry = path && path[path.length - 1];
+      if (!entry || Polski.isGroup(entry)) {
+        Polski.ui.showError(app, 'Nie ma takiego testu: ' + id);
+        return;
+      }
+      var parent = path[path.length - 2];
+      if (parent) document.getElementById('back').href = 'index.html?g=' + encodeURIComponent(parent.id);
+
+      Polski.loadBundles('', [entry]).then(function () {
         var test = Polski.tests[id];
         if (!test) throw new Error('Test „' + id + '” nie zarejestrował się.');
         document.title = test.title + ' — Polski';
         document.getElementById('title').textContent = test.title;
-        Polski.ui.run(test, app);
+        if (test.soon) {
+          app.textContent = 'Test w przygotowaniu.';
+          return;
+        }
+        Polski.ui.run(test, app, { backHref: document.getElementById('back').href });
       }).catch(function (err) {
         Polski.ui.showError(app, err);
       });

@@ -15,7 +15,8 @@
 
   Polski.register = function (def) {
     if (!def || !def.id) throw new Error('Polski.register: нужен id');
-    if (typeof def.generate !== 'function') {
+    // soon: true — заглушка: карточка видна, но тест ещё не готов
+    if (!def.soon && typeof def.generate !== 'function') {
       throw new Error('Polski.register(' + def.id + '): нужна функция generate(rng)');
     }
     Polski.tests[def.id] = Object.assign(
@@ -116,19 +117,37 @@
     });
   }
 
-  /** Загрузить бандлы из манифеста (все или один по id). base — путь до корня сайта. */
-  Polski.loadBundles = function (base, onlyId) {
-    var entries = Polski.manifest.filter(function (e) { return !onlyId || e.id === onlyId; });
-    if (onlyId && entries.length === 0) {
-      return Promise.reject(new Error('Nie ma takiego testu: ' + onlyId));
+  /* ---------- Манифест: дерево разделов и тестов ---------- */
+
+  /** раздел — запись с items; тест — запись с files */
+  Polski.isGroup = function (entry) { return Array.isArray(entry.items); };
+
+  /** Путь от корня до записи с данным id: [раздел, …, запись] или null. */
+  Polski.findPath = function (id, list, path) {
+    list = list || Polski.manifest;
+    path = path || [];
+    for (var i = 0; i < list.length; i++) {
+      var e = list[i];
+      if (e.id === id) return path.concat(e);
+      if (Polski.isGroup(e)) {
+        var r = Polski.findPath(id, e.items, path.concat(e));
+        if (r) return r;
+      }
     }
+    return null;
+  };
+
+  /** Загрузить файлы тестов из переданных записей (разделы пропускаются). base — путь до корня сайта. */
+  Polski.loadBundles = function (base, entries) {
     var srcs = [];
     entries.forEach(function (e) {
-      (e.files || ['test.js']).forEach(function (f) {
-        srcs.push((base || '') + 'tests/' + e.id + '/' + f);
+      if (Polski.isGroup(e)) return;
+      (e.files || []).forEach(function (f) {
+        var src = (base || '') + 'tests/' + f;
+        if (srcs.indexOf(src) === -1) srcs.push(src);
       });
     });
-    // по очереди, чтобы words.js успел загрузиться раньше test.js
+    // по очереди: данные и бандлы, от которых зависит тест, — раньше него
     return srcs.reduce(function (p, src) {
       return p.then(function () { return loadScript(src); });
     }, Promise.resolve());

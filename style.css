@@ -119,6 +119,22 @@ h1 {
 }
 .test-card:hover .test-arrow { transform: translateX(4px); color: var(--accent); }
 
+/* тест ещё не готов */
+.test-card.soon { opacity: 0.6; cursor: default; }
+.test-card.soon:hover { transform: none; box-shadow: var(--shadow); border-color: var(--card-border); }
+.test-card.soon .test-icon { background: var(--muted); box-shadow: none; }
+
+.badge {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.back[hidden] { display: none; }
+
 /* ---------- Обычная кнопка (для тестов) ---------- */
 
 .btn {

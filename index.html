@@ -8,10 +8,12 @@
 </head>
 <body>
   <main>
-    <h1>Polski 🇵🇱</h1>
-    <p class="subtitle">Wybierz test</p>
+    <!-- одна страница и для главной, и для раздела: index.html?g=<id раздела> -->
+    <a class="back" id="back" href="index.html" hidden>← Wstecz</a>
+    <h1 id="title">Polski 🇵🇱</h1>
+    <p class="subtitle" id="subtitle">Wybierz test</p>
 
-    <!-- кнопки строятся из tests/manifest.js -->
+    <!-- карточки строятся из tests/manifest.js -->
     <nav class="test-list" id="test-list"></nav>
   </main>
 
@@ -22,19 +24,51 @@
     (function () {
       var list = document.getElementById('test-list');
       var el = Polski.ui.el;
+      var groupId = new URLSearchParams(location.search).get('g');
+      var items = Polski.manifest;
 
-      Polski.loadBundles('').then(function () {
-        Polski.manifest.forEach(function (entry) {
+      if (groupId) {
+        var path = Polski.findPath(groupId);
+        var group = path && path[path.length - 1];
+        if (!group || !Polski.isGroup(group)) {
+          Polski.ui.showError(list, 'Nie ma takiego działu: ' + groupId);
+          return;
+        }
+        items = group.items;
+        var parent = path[path.length - 2];
+        var back = document.getElementById('back');
+        back.href = parent ? 'index.html?g=' + encodeURIComponent(parent.id) : 'index.html';
+        back.hidden = false;
+        document.title = group.title + ' — Polski';
+        document.getElementById('title').textContent = group.title;
+      }
+
+      function card(href, info, soon) {
+        return el(soon ? 'div' : 'a', {
+          class: 'test-card' + (soon ? ' soon' : ''),
+          href: soon ? null : href,
+          'aria-disabled': soon ? 'true' : null,
+        }, [
+          el('span', { class: 'test-icon', text: info.icon || '' }),
+          el('span', { class: 'test-text' }, [
+            el('span', { class: 'test-title', text: info.title }),
+            info.desc ? el('span', { class: 'test-desc', text: info.desc }) : null,
+          ]),
+          soon
+            ? el('span', { class: 'badge', text: 'Wkrótce' })
+            : el('span', { class: 'test-arrow', 'aria-hidden': 'true', text: '→' }),
+        ]);
+      }
+
+      Polski.loadBundles('', items).then(function () {
+        items.forEach(function (entry) {
+          if (Polski.isGroup(entry)) {
+            list.appendChild(card('index.html?g=' + encodeURIComponent(entry.id), entry, false));
+            return;
+          }
           var t = Polski.tests[entry.id];
           if (!t) return;
-          list.appendChild(el('a', { class: 'test-card', href: 'test.html?id=' + encodeURIComponent(t.id) }, [
-            el('span', { class: 'test-icon', text: t.icon }),
-            el('span', { class: 'test-text' }, [
-              el('span', { class: 'test-title', text: t.title }),
-              el('span', { class: 'test-desc', text: t.desc }),
-            ]),
-            el('span', { class: 'test-arrow', 'aria-hidden': 'true', text: '→' }),
-          ]));
+          list.appendChild(card('test.html?id=' + encodeURIComponent(t.id), t, t.soon));
         });
       }).catch(function (err) {
         Polski.ui.showError(list, err);

@@ -35,7 +35,9 @@
     return [].concat(task.answer)[0];
   }
 
-  function run(test, root) {
+  /** opts.backHref — куда ведёт кнопка на итоговом экране (по умолчанию главная) */
+  function run(test, root, opts) {
+    var backHref = (opts && opts.backHref) || 'index.html';
     var state;
 
     function start() {
@@ -196,7 +198,7 @@
           el('p', { class: 'summary-msg', text: msg }),
           el('div', { class: 'summary-actions' }, [
             el('button', { class: 'btn', type: 'button', text: 'Jeszcze raz', onclick: start }),
-            el('a', { class: 'btn btn-secondary', href: 'index.html', text: 'Wszystkie testy' }),
+            el('a', { class: 'btn btn-secondary', href: backHref, text: 'Wstecz' }),
           ]),
         ])
       );
