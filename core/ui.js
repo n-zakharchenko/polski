@@ -451,7 +451,7 @@
     };
   }
 
-  var IDLE_HINT_MS = 15000;                       // «долго думает»
+  var IDLE_HINT_STEPS = [15000, 30000, 60000];    // «долго думает»: от начала задания
   var IDLE_HINT_TEXT = 'Zastanawiasz się? Zajrzyj do zasady.';
   var FIRST_HINT_TEXT = 'Tutaj znajdziesz zasadę.';
   var FIRST_HINT_KEY = 'polski.ruleHintShown';    // показать один раз за всё время
@@ -471,23 +471,30 @@
   function run(test, root, opts) {
     var backHref = (opts && opts.backHref) || 'index.html';
     var rule = ruleButtonFactory(test);
-    var idleTimer = null;
+    var idleTimers = [];
     var firstHintPending = !!rule && takeFirstVisit();
     var state;
 
     function makeRuleButton() { return rule ? rule.make() : null; }
 
-    /** «долго думает»: через 15 с без ответа — подсказка над (i) */
+    /** «долго думает»: без ответа — подсказка над (i) через 15 с, 30 с и 1 мин от начала задания */
     function armIdleHint() {
-      clearTimeout(idleTimer);
+      clearIdleTimers();
       if (!rule) return;
-      idleTimer = setTimeout(function () {
-        if (!state.answered) rule.showHint(IDLE_HINT_TEXT);
-      }, IDLE_HINT_MS);
+      idleTimers = IDLE_HINT_STEPS.map(function (ms) {
+        return setTimeout(function () {
+          if (!state.answered) rule.showHint(IDLE_HINT_TEXT); // если ещё видна — появится заново
+        }, ms);
+      });
+    }
+
+    function clearIdleTimers() {
+      idleTimers.forEach(clearTimeout);
+      idleTimers = [];
     }
 
     function stopIdleHint() {
-      clearTimeout(idleTimer);
+      clearIdleTimers();
       if (rule) rule.hideHint();
     }
 
