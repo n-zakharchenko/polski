@@ -23,7 +23,15 @@ Polski.manifest = [
           'liczebniki/niemeskoosobowe/test.js',
         ],
       },
-      { id: 'liczebniki-meskoosobowe',    files: ['liczebniki/meskoosobowe/test.js'] },
+      {
+        id: 'liczebniki-meskoosobowe',
+        files: [
+          'liczebniki/common.js',
+          'liczebniki/meskoosobowe/verbs.js',
+          'liczebniki/meskoosobowe/words.js',
+          'liczebniki/meskoosobowe/test.js',
+        ],
+      },
       { id: 'liczebniki-mix',             files: ['liczebniki/mix/test.js'] },
     ],
   },

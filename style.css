@@ -665,7 +665,8 @@ h1 {
   font-style: italic;
   font-weight: 600;
 }
-.rule-example .num { color: var(--num); }
+.rule-body .num { color: var(--num); font-weight: 700; }
+.rule-lead { margin: 0 0 12px; font-size: 0.95rem; }
 .rule-uwaga {
   margin: 14px 0 0;
   padding: 10px 14px;

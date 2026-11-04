@@ -100,11 +100,14 @@
 
   /* ---------- глаголы: видовые пары и формы ---------- */
 
-  /** 'inf: 3sg, 3pl, przeszły m., przeszły ż.' → объект (тот же формат для русского) */
+  /**
+   * 'inf: 3sg, 3pl, przeszły m., przeszły ż.[, przeszły męskoos. lm.]' → объект (тот же формат для русского).
+   * Пятое поле (pracowali, nieśli) нужно только для męskoosobowych.
+   */
   function parseVerb(s) {
     var m = /^\s*([^:]+):(.*)$/.exec(s);
     var f = splitList(m[2]);
-    return { inf: m[1].trim(), s3: f[0], p3: f[1], pastM: f[2], pastF: f[3] };
+    return { inf: m[1].trim(), s3: f[0], p3: f[1], pastM: f[2], pastF: f[3], pastVir: f[4] };
   }
 
   /** строки из verbs.js → { 'szczekać': { impf: {..., ru: {...}}, perf: {..., ru: {...}} } } */
@@ -140,6 +143,7 @@
   /** перевод той же формы, что verbForm: szczekały → лаяли, będzie szczekało → будет лаять */
   function ruForm(v, aspect, tense, who) {
     var r = v.ru;
+    if (who === 'V') who = 'A'; // по-русски мн. ч. одно: работали
     var plural = who === 'A';
     if (tense === 'past') return ruPastFor(r, who);
     if (tense === 'pres' || (tense === 'fut' && aspect === 'perf')) return plural ? r.p3 : r.s3;
@@ -165,15 +169,16 @@
    *   v      — одна половина пары (impf или perf)
    *   aspect — 'impf' | 'perf'
    *   tense  — 'pres' (только impf) | 'past' | 'fut'
-   *   who    — 'A' (2, 3, 4… → 3 os. lm. «one»), 'B' (5… → 3 os. lp. «ono»),
-   *            или род существительного в ед. ч.: 'm' | 'f' | 'n'
+   *   who    — 'A' (3 os. lm. «one»: pracowały), 'V' (3 os. lm. męskoos. «oni»: pracowali),
+   *            'B' (3 os. lp. «ono»: pracowało), или род существительного в ед. ч.: 'm' | 'f' | 'n'
    */
   function verbForm(v, aspect, tense, who) {
-    var plural = who === 'A';
-    if (tense === 'past') return pastFor(v, who);
+    var plural = who === 'A' || who === 'V';
+    var past = who === 'V' ? v.pastVir : pastFor(v, who);
+    if (tense === 'past') return past;
     if (tense === 'pres' || (tense === 'fut' && aspect === 'perf')) return plural ? v.p3 : v.s3;
     // будущее несовершенного: będzie / będą + прошедшее
-    return (plural ? 'będą ' : 'będzie ') + pastFor(v, who);
+    return (plural ? 'będą ' : 'będzie ') + past;
   }
 
   /* ---------- число словами (2–199) ---------- */
@@ -203,7 +208,124 @@
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
+  /* ---------- męskoosobowe: числительные ---------- */
+
+  var DWAJ = { 2: 'dwaj', 3: 'trzej', 4: 'czterej' };
+  var VIR_UNITS = ['', 'jeden', 'dwóch', 'trzech', 'czterech', 'pięciu', 'sześciu', 'siedmiu', 'ośmiu', 'dziewięciu'];
+  var VIR_TEENS = ['dziesięciu', 'jedenastu', 'dwunastu', 'trzynastu', 'czternastu',
+    'piętnastu', 'szesnastu', 'siedemnastu', 'osiemnastu', 'dziewiętnastu'];
+  var VIR_TENS = ['', '', 'dwudziestu', 'trzydziestu', 'czterdziestu', 'pięćdziesięciu',
+    'sześćdziesięciu', 'siedemdziesięciu', 'osiemdziesięciu', 'dziewięćdziesięciu'];
+
+  /**
+   * Число словами для męskoosobowych существительных.
+   *   form 'dwaj' (только 2, 3, 4) → dwaj / trzej / czterej
+   *   иначе — форма на -ch / -u: dwóch, pięciu, dwudziestu dwóch, stu czterech, dwudziestu jeden
+   */
+  function numberWordsVirile(n, form) {
+    if (form === 'dwaj') {
+      if (!DWAJ[n]) throw new Error('dwaj/trzej/czterej — tylko 2, 3, 4');
+      return DWAJ[n];
+    }
+    if (n < 2 || n > 199) throw new Error('numberWordsVirile: 2–199, dostałem ' + n);
+    var words = [];
+    if (n >= 100) { words.push('stu'); n -= 100; }
+    if (n >= 20) { words.push(VIR_TENS[Math.floor(n / 10)]); n %= 10; }
+    else if (n >= 10) { words.push(VIR_TEENS[n - 10]); n = 0; }
+    if (n > 0) words.push(VIR_UNITS[n]);
+    return words.join(' ');
+  }
+
+  /**
+   * Группы męskoosobowe:
+   *   'A' — dwaj, trzej, czterej       → mian. lm. + 3 os. lm. «oni»
+   *   'B' — dwóch, trzech, czterech    → dop. lm. + 3 os. lp. «ono»
+   *   'C' — больше 4 (pięciu, dwudziestu dwóch, stu …) → dop. lm. + 3 os. lp. «ono»
+   */
+  function randomNumberMo(rng, group) {
+    if (group === 'A' || group === 'B') return rng.int(2, 4);
+    var max = rng.chance(0.5) ? 30 : 199;
+    for (;;) {
+      var n = rng.int(5, max);
+      if (n !== 1) return n;
+    }
+  }
+
+  /**
+   * 'robotnik, robotnicy, robotników, robotnika, robotniki | pracować | w fabryce | рабочий, … | на фабрике'
+   *   → { sg, nomPl, genPl, genSg, nonVir, verb, rest, ru: { sg, nomPl, genPl, genSg }, restRu }
+   */
+  function parseEntryMo(line) {
+    var parts = line.split('|').map(function (s) { return s.trim(); });
+    var noun = splitList(parts[0]);
+    var ru = splitList(parts[3]);
+    return {
+      sg: noun[0], nomPl: noun[1], genPl: noun[2], genSg: noun[3], nonVir: noun[4],
+      gender: 'm',
+      verb: parts[1],
+      rest: parts[2],
+      ru: { sg: ru[0], nomPl: ru[1], genPl: ru[2], genSg: ru[3] },
+      restRu: parts[4] || '',
+    };
+  }
+
+  /**
+   * Ловушки для существительного męskoosobowego — все подходящие:
+   *   форма niemęskoosobowa (robotniki) и dop. lp. (robotnika),
+   *   если они отличаются от mian. lm. и dop. lm. → [{ form, ru }, …]
+   */
+  function nounTrapsMo(e) {
+    var out = [];
+    // dop. lp. первым: если формы совпадают (programisty), перевод — «программиста»
+    [{ form: e.genSg, ru: e.ru.genSg }, { form: e.nonVir, ru: e.ru.nomPl }].forEach(function (c) {
+      if (!c.form || c.form === e.nomPl || c.form === e.genPl) return;
+      if (out.some(function (o) { return o.form === c.form; })) return;
+      out.push(c);
+    });
+    return out;
+  }
+
   /* ---------- правило для кнопки (i) ---------- */
+
+  var RULE_MESKOOSOBOWE = {
+    title: 'Zasada',
+    html: [
+      '<p class="rule-lead">Liczebniki <b>2, 3, 4</b> w mianowniku lm. występują w dwóch formach: ',
+      '<i>dwaj – dwóch</i>, <i>trzej – trzech</i>, <i>czterej – czterech</i>.</p>',
+      '<table class="rule-table">',
+      '<thead><tr>',
+      '<th>Jeżeli mamy liczebnik</th><th>rzeczownik stoi</th><th>czasownik stoi</th>',
+      '</tr></thead>',
+      '<tbody>',
+
+      '<tr class="g1">',
+      '<td data-label="Jeżeli mamy liczebnik"><mark>dwaj, trzej lub czterej</mark></td>',
+      '<td data-label="rzeczownik stoi">w <mark>mianowniku lm.</mark><br><span class="rule-q">kto? co? są (jest)</span></td>',
+      '<td data-label="czasownik stoi">w <mark>3. osobie lm.</mark> czasu teraźniejszego, przeszłego lub przyszłego <span class="rule-q">(oni)</span></td>',
+      '</tr>',
+      '<tr class="rule-example"><td colspan="3">',
+      '<span class="num">Dwaj</span> robotnicy pracują / pracowali / będą pracowali.',
+      '</td></tr>',
+
+      '<tr class="g2">',
+      '<td data-label="Jeżeli mamy liczebnik"><mark>dwóch, trzech lub czterech</mark></td>',
+      '<td data-label="rzeczownik stoi">w <mark>dopełniaczu lm.</mark><br><span class="rule-q">kogo? czego? nie ma</span></td>',
+      '<td data-label="czasownik stoi">w <mark>3. osobie lp.</mark> czasu teraźniejszego, przeszłego, przyszłego <span class="rule-q">(ono)</span></td>',
+      '</tr>',
+      '<tr class="rule-example"><td colspan="3">',
+      '<span class="num">Dwóch</span> robotników pracuje / pracowało / będzie pracowało.',
+      '</td></tr>',
+
+      '</tbody>',
+      '</table>',
+      '<p class="rule-uwaga">Liczebniki <b>większe niż 4</b> łączą się zawsze z rzeczownikiem w <b>dopełniaczu lm.</b>, ',
+      'a w zdaniach, w których liczebnik z rzeczownikiem pełni funkcję podmiotu, czasownik (orzeczenie) stoi ',
+      'w <b>3. osobie lp.</b>, np.:<br>',
+      '<i><span class="num">Pięciu</span> robotników pracuje / pracowało / będzie pracowało.</i><br>',
+      '<i><span class="num">Trzydziestu dwóch</span> studentów zdaje / zdawało / będzie zdawało egzamin.</i><br>',
+      '<i><span class="num">Stu czterech</span> sportowców pojedzie / pojechało na olimpiadę.</i></p>',
+    ].join(''),
+  };
 
   var RULE_NIEMESKOOSOBOWE = {
     title: 'Zasada',
@@ -242,6 +364,11 @@
 
   Polski.liczebniki = {
     ruleNiemeskoosobowe: RULE_NIEMESKOOSOBOWE,
+    ruleMeskoosobowe: RULE_MESKOOSOBOWE,
+    numberWordsVirile: numberWordsVirile,
+    randomNumberMo: randomNumberMo,
+    parseEntryMo: parseEntryMo,
+    nounTrapsMo: nounTrapsMo,
     groupOf: groupOf,
     randomNumber: randomNumber,
     parseEntry: parseEntry,

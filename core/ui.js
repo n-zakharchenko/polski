@@ -387,6 +387,8 @@
   function ruleButtonFactory(test) {
     if (!test.rule) return null;
     var title = test.rule.title || 'Zasada';
+    var openedKey = 'polski.ruleOpened.' + test.id;   // правило уже открывали в этой сессии
+    var opened = readSession(openedKey);
 
     var body = el('div', { class: 'rule-body' });
     body.innerHTML = test.rule.html; // доверенный контент из бандла, не пользовательский ввод
@@ -409,6 +411,8 @@
 
     function openDlg() {
       hideHint();
+      opened = true;
+      writeSession(openedKey);
       if (typeof dlg.showModal === 'function') dlg.showModal();
       else dlg.setAttribute('open', '');
     }
@@ -448,7 +452,17 @@
       },
       showHint: showHint,
       hideHint: hideHint,
+      /** правило уже открывали в этой сессии — подсказки про него больше не нужны */
+      wasOpened: function () { return opened; },
     };
+  }
+
+  /* sessionStorage живёт, пока открыта вкладка; без него — просто помним в памяти страницы */
+  function readSession(key) {
+    try { return window.sessionStorage.getItem(key) === '1'; } catch (e) { return false; }
+  }
+  function writeSession(key) {
+    try { window.sessionStorage.setItem(key, '1'); } catch (e) { /* не страшно */ }
   }
 
   var IDLE_HINT_STEPS = [15000, 30000, 60000];    // «долго думает»: от начала задания
@@ -477,13 +491,17 @@
 
     function makeRuleButton() { return rule ? rule.make() : null; }
 
-    /** «долго думает»: без ответа — подсказка над (i) через 15 с, 30 с и 1 мин от начала задания */
+    /**
+     * «долго думает»: без ответа — подсказка над (i) через 15 с, 30 с и 1 мин от начала задания.
+     * Если правило в этой сессии уже открывали — не показываем.
+     * Логика общая для всех тестов с test.rule; сам тест её не описывает.
+     */
     function armIdleHint() {
       clearIdleTimers();
-      if (!rule) return;
+      if (!rule || rule.wasOpened()) return;
       idleTimers = IDLE_HINT_STEPS.map(function (ms) {
         return setTimeout(function () {
-          if (!state.answered) rule.showHint(IDLE_HINT_TEXT); // если ещё видна — появится заново
+          if (!state.answered && !rule.wasOpened()) rule.showHint(IDLE_HINT_TEXT); // если ещё видна — появится заново
         }, ms);
       });
     }
