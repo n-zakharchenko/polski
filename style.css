@@ -21,8 +21,9 @@
   --g-bg: #dcfce7;
   --g-border: #34c46a;
   --g-text: #14532d;
-  --tip-bg: #1d2330;
-  --tip-text: #ffffff;
+  --tip-bg: #fbf7f3;      /* все подсказки: мягкий кремовый пузырь */
+  --tip-text: #7c7169;
+  --tip-shadow: 0 10px 28px rgba(70, 50, 30, 0.16), 0 2px 6px rgba(70, 50, 30, 0.08);
   --num: #3f6fe8;   /* число словами */
 }
 
@@ -46,8 +47,9 @@
     --g-bg: #10301e;
     --g-border: #2fb862;
     --g-text: #bbf7d0;
-    --tip-bg: #f1f3f8;
-    --tip-text: #13151b;
+    --tip-bg: #2e2925;
+    --tip-text: #d9cfc6;
+    --tip-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
     --num: #8aa8ff;
   }
 }
@@ -405,29 +407,15 @@ h1 {
 .slot.right { box-shadow: 0 0 0 3px var(--ok); }
 .slot.wrong { box-shadow: 0 0 0 3px var(--bad); }
 
+/* правильное слово над ошибочной рамкой */
 .slot-tip {
   position: absolute;
-  bottom: calc(100% + 10px);
+  bottom: calc(100% + 12px);
   left: 50%;
-  padding: 6px 12px;
-  border-radius: 10px;
-  background: var(--tip-bg);
-  color: var(--tip-text);
-  font-size: 1rem;
   white-space: nowrap;
   transform: translateX(-50%);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
   animation: tip-in 0.3s ease 0.35s both;
   z-index: 3;
-}
-.slot-tip::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -6px;
-  border: 6px solid transparent;
-  border-top-color: var(--tip-bg);
 }
 
 .slots-group { margin-top: 16px; }
@@ -513,79 +501,75 @@ h1 {
   user-select: none;
 }
 
+/* ---------- Общий вид всех подсказок: мягкий пузырь с хвостиком ---------- */
+
+.bubble {
+  padding: 9px 16px 10px;
+  border-radius: 16px;
+  background: var(--tip-bg);
+  color: var(--tip-text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+  box-shadow: var(--tip-shadow);
+}
+/* хвостик — повёрнутый квадрат со скруглённым кончиком; --tail-x задаёт, куда он смотрит */
+.bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: var(--tail-x, 50%);
+  width: 14px;
+  height: 14px;
+  margin: -8px 0 0 -7px;
+  background: inherit;
+  border-bottom-right-radius: 4px;
+  transform: rotate(45deg);
+  box-shadow: 3px 3px 5px rgba(70, 50, 30, 0.06);
+}
+.bubble.below::after {
+  top: auto;
+  bottom: 100%;
+  margin: 0 0 -8px -7px;
+  border-radius: 4px 0 0 0;
+  box-shadow: none;
+}
+
+/* перевод по долгому нажатию */
 .tr-tip {
   --tail-x: 50%;
-  --bubble-bg: #ffffff;
-  --bubble-line: #1d2330;
   position: fixed;
   z-index: 2000;
   max-width: min(260px, calc(100vw - 16px));
-  padding: 6px 14px 7px;
-  border: 2px solid var(--bubble-line);
-  border-radius: 18px;
-  background: var(--bubble-bg);
-  color: var(--bubble-line);
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.3;
-  text-align: center;
   pointer-events: none;
-  box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.12);
   opacity: 0;
-  transform: scale(0.6);
-  transform-origin: var(--tail-x) calc(100% + 12px);
-  transition: opacity 0.12s ease, transform 0.12s ease;
+  transform: translateY(6px) scale(0.96);
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
-.tr-tip.below { transform-origin: var(--tail-x) -12px; }
-.tr-tip.visible {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 0.12s ease, transform 0.22s cubic-bezier(0.3, 1.6, 0.5, 1); /* «пружинка» */
-}
+.tr-tip.below { transform: translateY(-6px) scale(0.96); }
+.tr-tip.visible { opacity: 1; transform: none; }
 
-/* хвостик: обводка (::before) + заливка (::after) */
-.tr-tip::before,
-.tr-tip::after {
-  content: "";
+/* подсказка над кнопкой (i) */
+.card-footer { position: relative; }
+.hint-tip {
   position: absolute;
-  left: var(--tail-x);
-  width: 0;
-  height: 0;
-  border-style: solid;
+  right: 0;
+  bottom: calc(100% + 14px);
+  width: max-content;
+  max-width: min(260px, calc(100vw - 64px));
+  z-index: 4;
+  animation: hint-in 0.3s ease both;
 }
-.tr-tip::before {
-  top: 100%;
-  margin-left: -9px;
-  border-width: 11px 9px 0 0;
-  border-color: var(--bubble-line) transparent transparent transparent;
-}
-.tr-tip::after {
-  top: 100%;
-  margin-top: -2px;
-  margin-left: -6px;
-  border-width: 8px 6px 0 0;
-  border-color: var(--bubble-bg) transparent transparent transparent;
-}
-.tr-tip.below::before {
-  top: auto;
-  bottom: 100%;
-  border-width: 0 9px 11px 0;
-  border-color: transparent transparent var(--bubble-line) transparent;
-}
-.tr-tip.below::after {
-  top: auto;
-  bottom: 100%;
-  margin-top: 0;
-  margin-bottom: -2px;
-  border-width: 0 6px 8px 0;
-  border-color: transparent transparent var(--bubble-bg) transparent;
+.hint-tip::after { left: auto; right: 8px; margin-left: 0; } /* хвостик — на центр кнопки (i) */
+@keyframes hint-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
 }
 
-@media (prefers-color-scheme: dark) {
-  .tr-tip { --bubble-bg: #f4f5fa; --bubble-line: #13151b; }
-}
 @media (prefers-reduced-motion: reduce) {
-  .tr-tip, .tr-tip.visible { transition: opacity 0.12s ease; transform: none; }
+  .tr-tip, .tr-tip.below, .tr-tip.visible { transition: opacity 0.12s ease; transform: none; }
+  .hint-tip { animation: none; }
 }
 
 /* ---------- Кнопка (i) и окно с правилом ---------- */

@@ -71,7 +71,7 @@
       var text = node.getAttribute('data-tr');
       if (!text) return;
       if (!tip) {
-        tip = el('div', { class: 'tr-tip', role: 'tooltip' });
+        tip = el('div', { class: 'tr-tip bubble', role: 'tooltip' });
         document.body.appendChild(tip);
       }
       clearTimeout(hideTimer);
@@ -355,7 +355,7 @@
           if (!ok) mistakes += 1;
           slot.classList.add(ok ? 'right' : 'wrong');
           if (!ok) {
-            slot.appendChild(el('span', { class: 'slot-tip', role: 'tooltip', text: task.slots[name].answer }));
+            slot.appendChild(el('span', { class: 'slot-tip bubble', role: 'tooltip', text: task.slots[name].answer }));
             sentence.classList.add('has-tip'); // раздвинуть строки, чтобы подсказка ничего не закрывала
           }
         });
@@ -380,7 +380,9 @@
 
   /**
    * test.rule = { title?: 'Zasada', html: '…' } — статичный HTML из самого бандла.
-   * Возвращает функцию, создающую кнопку (i), или null, если правила нет.
+   * Возвращает { make, showHint, hideHint } или null, если правила нет:
+   *   make()          — создать подвал карточки с кнопкой (i)
+   *   showHint(text)  — подсказка-облачко над кнопкой (исчезает от любого касания)
    */
   function ruleButtonFactory(test) {
     if (!test.rule) return null;
@@ -406,6 +408,7 @@
     document.body.appendChild(dlg);
 
     function openDlg() {
+      hideHint();
       if (typeof dlg.showModal === 'function') dlg.showModal();
       else dlg.setAttribute('open', '');
     }
@@ -414,21 +417,79 @@
       else dlg.removeAttribute('open');
     }
 
-    return function () {
-      return el('div', { class: 'card-footer' }, [
-        el('button', {
-          class: 'info-btn', type: 'button', title: title, 'aria-label': title, text: 'i',
-          onclick: openDlg,
-        }),
-      ]);
+    var footer = null;
+    var hint = null;
+    function onAnyPress() { hideHint(); }
+
+    function hideHint() {
+      if (hint) { hint.remove(); hint = null; }
+      document.removeEventListener('pointerdown', onAnyPress, true);
+    }
+
+    function showHint(text) {
+      if (!footer || !footer.isConnected) return;
+      hideHint();
+      hint = el('div', { class: 'hint-tip bubble', role: 'status', text: text });
+      footer.appendChild(hint);
+      // исчезает от любого касания — но не от того, что вызвало показ
+      setTimeout(function () { if (hint) document.addEventListener('pointerdown', onAnyPress, true); }, 0);
+    }
+
+    return {
+      make: function () {
+        hideHint();
+        footer = el('div', { class: 'card-footer' }, [
+          el('button', {
+            class: 'info-btn', type: 'button', title: title, 'aria-label': title, text: 'i',
+            onclick: openDlg,
+          }),
+        ]);
+        return footer;
+      },
+      showHint: showHint,
+      hideHint: hideHint,
     };
+  }
+
+  var IDLE_HINT_MS = 15000;                       // «долго думает»
+  var IDLE_HINT_TEXT = 'Zastanawiasz się? Zajrzyj do zasady.';
+  var FIRST_HINT_TEXT = 'Tutaj znajdziesz zasadę.';
+  var FIRST_HINT_KEY = 'polski.ruleHintShown';    // показать один раз за всё время
+
+  /** true, если подсказку про правило ещё ни разу не показывали (и сразу помечает как показанную) */
+  function takeFirstVisit() {
+    try {
+      if (window.localStorage.getItem(FIRST_HINT_KEY)) return false;
+      window.localStorage.setItem(FIRST_HINT_KEY, '1');
+      return true;
+    } catch (e) {
+      return false; // хранилище недоступно — лучше не показать, чем показывать каждый раз
+    }
   }
 
   /** opts.backHref — куда ведёт кнопка на итоговом экране (по умолчанию главная) */
   function run(test, root, opts) {
     var backHref = (opts && opts.backHref) || 'index.html';
-    var makeRuleButton = ruleButtonFactory(test);
+    var rule = ruleButtonFactory(test);
+    var idleTimer = null;
+    var firstHintPending = !!rule && takeFirstVisit();
     var state;
+
+    function makeRuleButton() { return rule ? rule.make() : null; }
+
+    /** «долго думает»: через 15 с без ответа — подсказка над (i) */
+    function armIdleHint() {
+      clearTimeout(idleTimer);
+      if (!rule) return;
+      idleTimer = setTimeout(function () {
+        if (!state.answered) rule.showHint(IDLE_HINT_TEXT);
+      }, IDLE_HINT_MS);
+    }
+
+    function stopIdleHint() {
+      clearTimeout(idleTimer);
+      if (rule) rule.hideHint();
+    }
 
     function start() {
       state = { rng: Polski.createRng(), round: 0, correct: 0, wrong: 0, session: {} };
@@ -461,6 +522,7 @@
         submit: function (answer) {
           if (state.answered) return null;
           state.answered = true;
+          stopIdleHint();
           var res = Polski.checkAnswer(test, task, answer);
           if (res.ok) state.correct += 1; else state.wrong += 1;
           updateProgress(true);
@@ -487,12 +549,19 @@
 
       root.replaceChildren(el('div', {}, [
         progressBar(), header, area, feedback, actionBtn,
-        makeRuleButton ? makeRuleButton() : null,
+        makeRuleButton(),
       ]));
 
       handler = (TYPES[task.type] || TYPES.input)(task, area, api) || {};
       if (handler.getAnswer) actionBtn.disabled = true;
       else actionBtn.hidden = true; // ответ — по клику в самом задании
+
+      armIdleHint();
+      if (firstHintPending) {
+        // первый заход в тест — один раз за всё время показываем, где правило
+        firstHintPending = false;
+        setTimeout(function () { if (!state.answered) rule.showHint(FIRST_HINT_TEXT); }, 700);
+      }
     }
 
     function showFeedback(box, res, task) {
@@ -533,6 +602,7 @@
     /* ---------- итог ---------- */
 
     function showSummary() {
+      stopIdleHint();
       var pct = Math.round((state.correct / test.rounds) * 100);
       var msg = pct === 100 ? 'Perfekcyjnie! 🎉'
         : pct >= 80 ? 'Świetnie!'
@@ -549,7 +619,7 @@
             el('a', { class: 'btn btn-secondary', href: backHref, text: 'Wstecz' }),
           ]),
         ]),
-        makeRuleButton ? makeRuleButton() : null,
+        makeRuleButton(),
       ]));
     }
 
