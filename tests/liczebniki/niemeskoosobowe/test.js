@@ -172,7 +172,7 @@
   [
     { id: 'liczebniki-niemeskoosobowe',     title: 'Rzeczownik + czasownik', icon: 'R+C', mode: 'words' },
     { id: 'liczebniki-niemeskoosobowe-num', title: 'Liczebnik',              icon: '2+',  mode: 'numeral' },
-    { id: 'liczebniki-niemeskoosobowe-mix', title: 'Mix',                    icon: 'MIX', mode: 'mix' },
+    { id: 'liczebniki-niemeskoosobowe-mix', title: 'Mieszane',               icon: '⇄',  mode: 'mix' },
   ].forEach(function (t) {
     Polski.register({
       id: t.id,

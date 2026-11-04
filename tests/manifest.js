@@ -53,8 +53,8 @@ Polski.manifest = [
       },
       {
         id: 'liczebniki-mx',
-        title: 'Mix',
-        icon: 'MIX',
+        title: 'Mieszane',
+        icon: '⇄',
         items: [
           { id: 'liczebniki-mix',     files: MIX_FILES },
           { id: 'liczebniki-mix-num', files: MIX_FILES },

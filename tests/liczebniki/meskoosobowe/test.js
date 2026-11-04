@@ -182,7 +182,7 @@
   [
     { id: 'liczebniki-meskoosobowe',     title: 'Rzeczownik + czasownik', icon: 'R+C', mode: 'words' },
     { id: 'liczebniki-meskoosobowe-num', title: 'Liczebnik',              icon: '2+',  mode: 'numeral' },
-    { id: 'liczebniki-meskoosobowe-mix', title: 'Mix',                    icon: 'MIX', mode: 'mix' },
+    { id: 'liczebniki-meskoosobowe-mix', title: 'Mieszane',               icon: '⇄',  mode: 'mix' },
   ].forEach(function (t) {
     Polski.register({
       id: t.id,
