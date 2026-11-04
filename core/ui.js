@@ -64,6 +64,7 @@
         state.answered = true;
         var res = Polski.checkAnswer(test, task, answer);
         if (res.ok) state.score += 1;
+        state.scoreEl.textContent = 'Punkty: ' + state.score;
         showFeedback(feedback, res, task);
         answerArea.classList.add('locked');
         actionBtn.textContent = state.round >= test.rounds ? 'Wynik' : 'Dalej';
@@ -154,22 +155,24 @@
 
     function showFeedback(box, res, task) {
       box.className = 'feedback ' + (res.ok ? 'ok' : 'bad');
-      box.replaceChildren(
+      // replaceChildren превращает null в текст "null", поэтому собираем через el(), он пропускает null
+      box.replaceChildren(el('div', {}, [
         el('strong', { text: res.ok ? 'Dobrze! ✓' : 'Źle ✗' }),
         !res.ok && task.type !== 'choice'
           ? el('div', {}, ['Poprawnie: ', el('b', { text: firstAnswer(task) })])
           : null,
         res.hint ? el('div', { class: 'feedback-hint', text: res.hint }) : null,
-        task.explain ? el('div', { class: 'feedback-hint', text: task.explain }) : null
-      );
+        task.explain ? el('div', { class: 'feedback-hint', text: task.explain }) : null,
+      ]));
     }
 
     function progressBar() {
       var pct = Math.round(((state.round - 1) / test.rounds) * 100);
+      state.scoreEl = el('span', { text: 'Punkty: ' + state.score });
       return el('div', { class: 'progress' }, [
         el('div', { class: 'progress-text' }, [
           el('span', { text: 'Pytanie ' + state.round + ' / ' + test.rounds }),
-          el('span', { text: 'Punkty: ' + state.score }),
+          state.scoreEl,
         ]),
         el('div', { class: 'progress-track' }, [
           el('div', { class: 'progress-fill', style: 'width:' + pct + '%' }),
