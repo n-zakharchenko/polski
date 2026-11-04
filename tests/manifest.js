@@ -1,7 +1,7 @@
 /*
  * Дерево разделов и тестов — в этом порядке они идут на страницах.
  *
- * Раздел: { id, title, desc?, icon?, items: [ … ] }   — метаданные тут, логики нет
+ * Раздел: { id, title, desc?, icon?, items: [ … ] }   — метаданные тут, логики нет; разделы вкладываются
  * Тест:   { id, files: [ … ] }                        — метаданные в самом бандле (Polski.register)
  *
  * files — пути относительно tests/, в порядке загрузки
@@ -20,6 +20,7 @@ var MESKOOSOBOWE_FILES = [
   'liczebniki/meskoosobowe/words.js',
   'liczebniki/meskoosobowe/test.js',
 ];
+var MIX_FILES = ['liczebniki/mix/test.js'];
 
 Polski.manifest = [
   {
@@ -28,11 +29,38 @@ Polski.manifest = [
     desc: 'Liczby po polsku',
     icon: '123',
     items: [
-      { id: 'liczebniki-niemeskoosobowe',     files: NIEMESKOOSOBOWE_FILES },
-      { id: 'liczebniki-niemeskoosobowe-num', files: NIEMESKOOSOBOWE_FILES }, // режим «+ liczebnik»
-      { id: 'liczebniki-meskoosobowe',        files: MESKOOSOBOWE_FILES },
-      { id: 'liczebniki-meskoosobowe-num',    files: MESKOOSOBOWE_FILES },    // режим «+ liczebnik»
-      { id: 'liczebniki-mix',                 files: ['liczebniki/mix/test.js'] },
+      {
+        id: 'liczebniki-nm',
+        title: 'Niemęskoosobowe',
+        desc: 'dwa koty, pięć kobiet',
+        icon: 'NM',
+        items: [
+          { id: 'liczebniki-niemeskoosobowe',     files: NIEMESKOOSOBOWE_FILES }, // Rzeczownik + czasownik
+          { id: 'liczebniki-niemeskoosobowe-num', files: NIEMESKOOSOBOWE_FILES }, // Liczebnik
+          { id: 'liczebniki-niemeskoosobowe-mix', files: NIEMESKOOSOBOWE_FILES }, // Mix
+        ],
+      },
+      {
+        id: 'liczebniki-mo',
+        title: 'Męskoosobowe',
+        desc: 'dwaj studenci, pięciu studentów',
+        icon: 'MO',
+        items: [
+          { id: 'liczebniki-meskoosobowe',     files: MESKOOSOBOWE_FILES },
+          { id: 'liczebniki-meskoosobowe-num', files: MESKOOSOBOWE_FILES },
+          { id: 'liczebniki-meskoosobowe-mix', files: MESKOOSOBOWE_FILES },
+        ],
+      },
+      {
+        id: 'liczebniki-mx',
+        title: 'Mix',
+        icon: 'MIX',
+        items: [
+          { id: 'liczebniki-mix',     files: MIX_FILES },
+          { id: 'liczebniki-mix-num', files: MIX_FILES },
+          { id: 'liczebniki-mix-mix', files: MIX_FILES },
+        ],
+      },
     ],
   },
 ];

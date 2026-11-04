@@ -227,6 +227,8 @@ h1 {
 
 .test-page main { max-width: 600px; }
 .test-page h1 { margin-bottom: 16px; }
+.test-page .test-mode { margin: -12px 0 16px; }
+.test-mode[hidden] { display: none; }
 
 .progress { margin-bottom: 20px; }
 .progress-text {

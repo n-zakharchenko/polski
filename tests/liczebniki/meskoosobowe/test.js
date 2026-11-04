@@ -87,6 +87,7 @@
    *   mode 'words'   — число дано словами, рамки: существительное + глагол
    *   mode 'numeral' — число дано цифрами в рамке, рамки: числительное + (по очереди) существительное или глагол;
    *                    третье слово дано готовым
+   *   mode 'mix'     — задания обоих режимов вперемешку (поровну, не больше 2 подряд)
    */
   function makeGenerate(mode) {
     return function (rng, ctx) {
@@ -95,11 +96,13 @@
         s.plan = Polski.mixedSequence(rng, ['A', 'B', 'C'], ctx.total, { maxRun: 2 });
         s.tenses = Polski.mixedSequence(rng, ['pres', 'past', 'fut'], ctx.total, { maxRun: 2 });
         s.second = Polski.mixedSequence(rng, ['noun', 'verb'], ctx.total, { maxRun: 2 }); // для 'numeral'
+        s.modes = Polski.mixedSequence(rng, ['words', 'numeral'], ctx.total, { maxRun: 2 }); // для 'mix'
         s.pool = rng.shuffle(ENTRIES);
         s.verbs = {};
       }
 
       var i = ctx.round - 1;
+      var m = mode === 'mix' ? s.modes[i % s.modes.length] : mode;
       var group = s.plan[i % s.plan.length];
       var tense = s.tenses[i % s.tenses.length];
       var aspect = tense === 'pres' ? 'impf' : (rng.chance(0.5) ? 'impf' : 'perf');
@@ -128,7 +131,7 @@
       };
 
       var sentence, slots;
-      if (mode === 'numeral') {
+      if (m === 'numeral') {
         var numList = L.numeralOptionsMo(n, group).map(L.capitalize);
         var numTr = {};
         numList.forEach(function (x) { numTr[x] = String(n); });
@@ -170,26 +173,24 @@
         tense: tense,
         aspect: aspect,
         verb: e.verb,
+        mode: m,
       };
     };
   }
 
-  Polski.register({
-    id: 'liczebniki-meskoosobowe',
-    title: 'Męskoosobowe',
-    icon: 'MO',
-    rounds: 15,
-    rule: L.ruleMeskoosobowe,   // кнопка (i) внизу карточки
-    generate: makeGenerate('words'),
-  });
-
-  Polski.register({
-    id: 'liczebniki-meskoosobowe-num',
-    title: 'Męskoosobowe + liczebnik',
-    desc: 'Wybierz też liczebnik',
-    icon: 'MO',
-    rounds: 15,
-    rule: L.ruleMeskoosobowe,
-    generate: makeGenerate('numeral'),
+  // три пункта раздела «Męskoosobowe»: Rzeczownik + czasownik / Liczebnik / Mix
+  [
+    { id: 'liczebniki-meskoosobowe',     title: 'Rzeczownik + czasownik', icon: 'R+C', mode: 'words' },
+    { id: 'liczebniki-meskoosobowe-num', title: 'Liczebnik',              icon: '2+',  mode: 'numeral' },
+    { id: 'liczebniki-meskoosobowe-mix', title: 'Mix',                    icon: 'MIX', mode: 'mix' },
+  ].forEach(function (t) {
+    Polski.register({
+      id: t.id,
+      title: t.title,
+      icon: t.icon,
+      rounds: 15,
+      rule: L.ruleMeskoosobowe,   // кнопка (i) внизу карточки
+      generate: makeGenerate(t.mode),
+    });
   });
 })();

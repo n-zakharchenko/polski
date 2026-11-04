@@ -389,7 +389,8 @@
   function ruleButtonFactory(test) {
     if (!test.rule) return null;
     var title = test.rule.title || 'Zasada';
-    var openedKey = 'polski.ruleOpened.' + test.id;   // правило уже открывали в этой сессии
+    // правило уже открывали в этой сессии; rule.id — общее для всех режимов с одним правилом
+    var openedKey = 'polski.ruleOpened.' + (test.rule.id || test.id);
     var opened = readSession(openedKey);
 
     var body = el('div', { class: 'rule-body' });

@@ -10,6 +10,7 @@
   <main>
     <a class="back" id="back" href="index.html">← Wstecz</a>
     <h1 id="title"></h1>
+    <p class="subtitle test-mode" id="mode" hidden></p>
     <div class="card" id="app"></div>
   </main>
 
@@ -38,8 +39,15 @@
       Polski.loadBundles('', [entry]).then(function () {
         var test = Polski.tests[id];
         if (!test) throw new Error('Test „' + id + '” nie zarejestrował się.');
-        document.title = test.title + ' — Polski';
-        document.getElementById('title').textContent = test.title;
+        // тест внутри раздела: заголовок — раздел («Niemęskoosobowe»), под ним — пункт («Liczebnik»)
+        var heading = parent ? parent.title : test.title;
+        document.title = (parent ? parent.title + ' · ' : '') + test.title + ' — Polski';
+        document.getElementById('title').textContent = heading;
+        if (parent) {
+          var modeEl = document.getElementById('mode');
+          modeEl.textContent = test.title;
+          modeEl.hidden = false;
+        }
         if (test.soon) {
           app.textContent = 'Test w przygotowaniu.';
           return;

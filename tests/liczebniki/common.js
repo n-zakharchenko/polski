@@ -363,6 +363,7 @@
   /* ---------- правило для кнопки (i) ---------- */
 
   var RULE_MESKOOSOBOWE = {
+    id: 'liczebniki-meskoosobowe',
     title: 'Zasada',
     html: [
       '<p class="rule-lead">Liczebniki <b>2, 3, 4</b> w mianowniku lm. występują w dwóch formach: ',
@@ -403,6 +404,7 @@
   };
 
   var RULE_NIEMESKOOSOBOWE = {
+    id: 'liczebniki-niemeskoosobowe',   // общая отметка «правило открыто» для всех режимов
     title: 'Zasada',
     html: [
       '<table class="rule-table">',
