@@ -469,7 +469,7 @@
   }
 
   var IDLE_HINT_STEPS = [15000, 30000, 60000];    // «долго думает»: от начала задания
-  var IDLE_HINT_TEXT = 'Zastanawiasz się? Zajrzyj do zasady.';
+  var IDLE_HINT_TEXT = 'Nie wiesz? Sprawdź zasadę.';
   var FIRST_HINT_TEXT = 'Tutaj znajdziesz zasadę.';
   var FIRST_HINT_KEY = 'polski.ruleHintShown';    // показать один раз за всё время
 

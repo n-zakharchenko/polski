@@ -177,8 +177,10 @@
     var past = who === 'V' ? v.pastVir : pastFor(v, who);
     if (tense === 'past') return past;
     if (tense === 'pres' || (tense === 'fut' && aspect === 'perf')) return plural ? v.p3 : v.s3;
-    // будущее несовершенного: będzie / będą + прошедшее
-    return (plural ? 'będą ' : 'będzie ') + past;
+    // будущее несовершенного: będzie / będą + прошедшее; «się» — сразу после będzie: będzie się kąpał
+    var aux = plural ? 'będą ' : 'będzie ';
+    var m = /^(.*) się$/.exec(past);
+    return m ? aux + 'się ' + m[1] : aux + past;
   }
 
   /* ---------- число словами (2–199) ---------- */
