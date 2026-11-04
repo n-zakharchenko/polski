@@ -279,7 +279,10 @@
           }),
         ]),
       ];
-    return who.concat(actions, [errorLine()]);
+    return who.concat(actions, [
+      errorLine(),
+      h('a', { class: 'account-privacy', href: 'privacy.html', text: 'Polityka prywatności' }),
+    ]);
   }
 
   // блок входа вне настроек: после входа исчезает (что показать дальше, решает тот, кто его вставил)
