@@ -31,7 +31,7 @@
 
   /**
    * Род существительного по окончанию: -a → ż (f), -o/-e/-ę/-um → n, иначе m.
-   * Исключения помечаются в базе явно четвёртым полем: 'jabłoń, jabłonie, jabłoni, f'.
+   * Исключения помечаются в базе явно пятым полем: 'jabłoń, jabłonie, jabłoni, jabłoni, f'.
    */
   function guessGender(sg) {
     if (/a$/.test(sg)) return 'f';
@@ -39,45 +39,111 @@
     return 'm';
   }
 
+  function splitList(s) {
+    return (s || '').split(',').map(function (x) { return x.trim(); });
+  }
+
   /**
-   * 'pies, psy, psów | szczekać | na listonosza | собака | на почтальона'
-   *   → { sg, nomPl, genPl, gender, verb, rest, ru, restRu }
+   * 'pies, psy, psów, psa | szczekać | na listonosza | собака, собаки, собак, собаки | на почтальона'
+   *   → { sg, nomPl, genPl, genSg, locPl, gender, verb, rest,
+   *       ru: { sg, nomPl, genPl, genSg, locPl }, restRu }
    */
   function parseEntry(line) {
     var parts = line.split('|').map(function (s) { return s.trim(); });
-    var noun = parts[0].split(',').map(function (s) { return s.trim(); });
-    return {
-      sg: noun[0], nomPl: noun[1], genPl: noun[2],
-      gender: noun[3] || guessGender(noun[0]),
+    var noun = splitList(parts[0]);
+    var ru = splitList(parts[3]);
+    var e = {
+      sg: noun[0], nomPl: noun[1], genPl: noun[2], genSg: noun[3],
+      gender: noun[4] || guessGender(noun[0]),
       verb: parts[1],
       rest: parts[2],
-      ru: parts[3] || '',
+      ru: { sg: ru[0], nomPl: ru[1], genPl: ru[2], genSg: ru[3] },
       restRu: parts[4] || '',
     };
+    e.locPl = locPlPl(e.nomPl);
+    e.ru.locPl = locPlRu(e.ru);
+    return e;
+  }
+
+  /* ---------- местный падеж мн. ч. (запасная ловушка) ---------- */
+
+  /** польский: psy → psach, konie → koniach, okna → oknach, cielęta → cielętach */
+  function locPlPl(nomPl) {
+    return nomPl.replace(/[yiea]$/, '') + 'ach';
+  }
+
+  /** русский: собаки → собаках, лошади → лошадях, стулья → стульях, воздушные шары → воздушных шарах */
+  function locPlRu(ru) {
+    if (ru.nomPl === ru.sg && ru.genPl === ru.sg) return ru.sg; // несклоняемые: такси, кафе
+    var words = ru.nomPl.split(' ');
+    return words.map(function (w, i) {
+      if (/(ые|ие)$/.test(w)) return w.slice(0, -1) + 'х';   // прилагательное: воздушные → воздушных, скорые → скорых
+      if (i < words.length - 1) return w.replace(/ьи$/, 'ьих'); // божьи → божьих
+      if (/ья$/.test(w)) return w.replace(/я$/, 'ях');   // стулья → стульях
+      if (/[ыа]$/.test(w)) return w.slice(0, -1) + 'ах';
+      if (/я$/.test(w)) return w.slice(0, -1) + 'ях';
+      if (/[гкхжшчщ]и$/.test(w)) return w.slice(0, -1) + 'ах';
+      if (/и$/.test(w)) return w.slice(0, -1) + 'ях';
+      return w;
+    }).join(' ');
+  }
+
+  /**
+   * Ловушка для существительного: dop. lp. («dwa psa»),
+   * а если он совпадает с mian. lm. или dop. lm. — miejscownik lm. (książkach).
+   * → { form, ru }
+   */
+  function nounTrap(e) {
+    if (e.genSg && e.genSg !== e.nomPl && e.genSg !== e.genPl) return { form: e.genSg, ru: e.ru.genSg };
+    return { form: e.locPl, ru: e.ru.locPl };
   }
 
   /* ---------- глаголы: видовые пары и формы ---------- */
 
-  /** 'inf: 3sg, 3pl, przeszły m., przeszły ż.' → объект */
+  /** 'inf: 3sg, 3pl, przeszły m., przeszły ż.' → объект (тот же формат для русского) */
   function parseVerb(s) {
     var m = /^\s*([^:]+):(.*)$/.exec(s);
-    var f = m[2].split(',').map(function (x) { return x.trim(); });
+    var f = splitList(m[2]);
     return { inf: m[1].trim(), s3: f[0], p3: f[1], pastM: f[2], pastF: f[3] };
   }
 
-  /** строки из verbs.js → { 'szczekać': { impf: {..., ru}, perf: {..., ru} } } */
+  /** строки из verbs.js → { 'szczekać': { impf: {..., ru: {...}}, perf: {..., ru: {...}} } } */
   function buildVerbs(lines) {
     var map = {};
     lines.forEach(function (line) {
       var parts = line.split('|');
       var impf = parseVerb(parts[0]);
       var perf = parseVerb(parts[1]);
-      var ru = (parts[2] || '').split('/').map(function (s) { return s.trim(); });
-      impf.ru = ru[0] || '';
-      perf.ru = ru[1] || '';
+      impf.ru = parseVerb(parts[2]);
+      perf.ru = parseVerb(parts[3]);
       map[impf.inf] = { impf: impf, perf: perf };
     });
     return map;
+  }
+
+  /* ---------- русский перевод формы глагола ---------- */
+
+  /** 'лаяла' → 'лаяло' / 'лаяли'; 'купалась' → 'купалось'; 'скакала галопом' → 'скакало галопом' */
+  function ruFromFeminine(pastF, ending) {
+    var words = pastF.split(' ');
+    words[0] = words[0].replace(/ла(сь)?$/, function (m, s) { return 'л' + ending + (s || ''); });
+    return words.join(' ');
+  }
+
+  function ruPastFor(r, who) {
+    if (who === 'm') return r.pastM;
+    if (who === 'f') return r.pastF;
+    if (who === 'A') return ruFromFeminine(r.pastF, 'и');
+    return ruFromFeminine(r.pastF, 'о'); // 'n' и 'B'
+  }
+
+  /** перевод той же формы, что verbForm: szczekały → лаяли, będzie szczekało → будет лаять */
+  function ruForm(v, aspect, tense, who) {
+    var r = v.ru;
+    var plural = who === 'A';
+    if (tense === 'past') return ruPastFor(r, who);
+    if (tense === 'pres' || (tense === 'fut' && aspect === 'perf')) return plural ? r.p3 : r.s3;
+    return (plural ? 'будут ' : 'будет ') + r.inf;
   }
 
   /** 'szła' → 'szło' / 'szły'; 'kąpała się' → 'kąpało się' */
@@ -181,6 +247,10 @@
     parseEntry: parseEntry,
     buildVerbs: buildVerbs,
     verbForm: verbForm,
+    ruForm: ruForm,
+    nounTrap: nounTrap,
+    locPlPl: locPlPl,
+    locPlRu: locPlRu,
     guessGender: guessGender,
     numberWords: numberWords,
     capitalize: capitalize,
