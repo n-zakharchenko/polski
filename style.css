@@ -21,9 +21,9 @@
   --g-bg: #dcfce7;
   --g-border: #34c46a;
   --g-text: #14532d;
-  --tip-bg: #fbf7f3;      /* все подсказки: мягкий кремовый пузырь */
-  --tip-text: #7c7169;
-  --tip-shadow: drop-shadow(0 8px 14px rgba(70, 50, 30, 0.14)) drop-shadow(0 1px 2px rgba(70, 50, 30, 0.1));
+  /* все подсказки: белый пузырь, обводка и текст — цвет числительных (--num) */
+  --tip-bg: #ffffff;
+  --tip-shadow: drop-shadow(0 6px 12px rgba(40, 60, 120, 0.12));
   --num: #3f6fe8;   /* число словами */
 }
 
@@ -47,9 +47,8 @@
     --g-bg: #10301e;
     --g-border: #2fb862;
     --g-text: #bbf7d0;
-    --tip-bg: #2e2925;
-    --tip-text: #d9cfc6;
-    --tip-shadow: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.45)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+    --tip-bg: #1d2028;
+    --tip-shadow: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.45));
     --num: #8aa8ff;
   }
 }
@@ -504,33 +503,40 @@ h1 {
 /* ---------- Общий вид всех подсказок: мягкий пузырь с хвостиком ---------- */
 
 .bubble {
-  padding: 9px 16px 10px;
+  padding: 8px 16px 9px;
+  border: 2px solid var(--num);
   border-radius: 16px;
   background: var(--tip-bg);
-  color: var(--tip-text);
+  color: var(--num);
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.35;
   text-align: center;
   filter: var(--tip-shadow);   /* drop-shadow — тень общая для пузыря и хвостика, без стыка */
 }
-/* хвостик — повёрнутый квадрат со скруглённым кончиком; --tail-x задаёт, куда он смотрит */
+/* хвостик — повёрнутый квадрат: обводка по двум внешним сторонам,
+   заливка перекрывает линию пузыря, поэтому стыка нет; --tail-x задаёт, куда он смотрит */
 .bubble::after {
   content: "";
   position: absolute;
   top: 100%;
   left: var(--tail-x, 50%);
-  width: 14px;
-  height: 14px;
-  margin: -8px 0 0 -7px;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
   background: inherit;
+  border-right: 2px solid var(--num);
+  border-bottom: 2px solid var(--num);
   border-bottom-right-radius: 4px;
   transform: rotate(45deg);
 }
 .bubble.below::after {
   top: auto;
   bottom: 100%;
-  margin: 0 0 -8px -7px;
+  margin: 0 0 -6px -6px;
+  border: 0;
+  border-left: 2px solid var(--num);
+  border-top: 2px solid var(--num);
   border-radius: 4px 0 0 0;
 }
 
@@ -559,8 +565,8 @@ h1 {
   z-index: 4;
   animation: hint-in 0.3s ease both;
 }
-/* хвостик — на центр кнопки (i): 12 (сдвиг) + 15 (полкнопки) − 7 (полхвостика) = 20 */
-.hint-tip::after { left: auto; right: 20px; margin-left: 0; }
+/* хвостик — на центр кнопки (i): 12 (сдвиг) + 15 (полкнопки) − 8 (полхвостика с обводкой) − 2 (обводка пузыря) ≈ 17 */
+.hint-tip::after { left: auto; right: 17px; margin-left: 0; }
 @keyframes hint-in {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: none; }
