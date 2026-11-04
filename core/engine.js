@@ -64,6 +64,36 @@
     };
   };
 
+  /**
+   * Перемешанная последовательность меток длины n: метки встречаются примерно поровну,
+   * одна метка не идёт подряд больше opts.maxRun раз (по умолчанию 3),
+   * и последовательность не чередуется строго (A B A B …).
+   */
+  Polski.mixedSequence = function (rng, labels, n, opts) {
+    var maxRun = (opts && opts.maxRun) || 3;
+    var base = Math.floor(n / labels.length);
+    var extra = rng.sample(labels, n - base * labels.length);
+    var bag = [];
+    labels.forEach(function (l) {
+      var count = base + (extra.indexOf(l) === -1 ? 0 : 1);
+      for (var i = 0; i < count; i++) bag.push(l);
+    });
+
+    function good(seq) {
+      var run = 1, longest = 1;
+      for (var i = 1; i < seq.length; i++) {
+        run = seq[i] === seq[i - 1] ? run + 1 : 1;
+        if (run > maxRun) return false;
+        if (run > longest) longest = run;
+      }
+      return seq.length < 4 || longest >= 2; // хотя бы один повтор — не строгое чередование
+    }
+
+    var seq = rng.shuffle(bag);
+    for (var attempt = 0; attempt < 500 && !good(seq); attempt++) seq = rng.shuffle(bag);
+    return seq;
+  };
+
   /* ---------- Сравнение ответов ---------- */
 
   var DIACRITICS = { 'ą': 'a', 'ć': 'c', 'ę': 'e', 'ł': 'l', 'ń': 'n', 'ó': 'o', 'ś': 's', 'ź': 'z', 'ż': 'z' };
@@ -89,6 +119,16 @@
     if (typeof test.check === 'function') {
       var r = test.check(task, answer);
       return typeof r === 'boolean' ? { ok: r } : r;
+    }
+    // 'slots': answer = { имяРамки: выбранноеСлово }; результат по каждой рамке в res.slots
+    if (task.type === 'slots') {
+      var per = {};
+      var allOk = true;
+      Object.keys(task.slots).forEach(function (name) {
+        per[name] = Polski.normalize(answer && answer[name]) === Polski.normalize(task.slots[name].answer);
+        allOk = allOk && per[name];
+      });
+      return { ok: allOk, slots: per };
     }
     var accepted = [].concat(task.answer);
     var given = Polski.normalize(answer);

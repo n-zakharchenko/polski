@@ -57,7 +57,8 @@ Polski.register({
 
   // Обязательно. Генерирует одно задание.
   // rng: int(min,max), pick(arr), shuffle(arr), sample(arr,n), chance(p), float()
-  generate(rng, { round, total }) {
+  // session — объект, общий для всех заданий одного прохода (план, без повторов …)
+  generate(rng, { round, total, session }) {
     return { type: 'input', question: 'Napisz…', prompt: '…', answer: ['…'] };
   },
 
@@ -73,13 +74,36 @@ Polski.register({
 
 | поле       | для        | смысл |
 |------------|------------|-------|
-| `type`     | все        | `'input'` \| `'choice'` \| `'custom'` |
+| `type`     | все        | `'input'` \| `'choice'` \| `'slots'` \| `'custom'` |
 | `question` | все        | инструкция мелко: «Napisz słownie:» |
 | `prompt`   | все        | то, что крупно: «7» |
 | `answer`   | все        | правильный ответ; для `input` можно массив допустимых вариантов |
 | `options`  | `choice`   | варианты ответа (среди них должен быть `answer`) |
 | `explain`  | все        | пояснение после ответа (необязательно) |
 | …          | `custom`   | любые свои поля |
+
+### Тип `slots` — предложение с цветными рамками
+
+```js
+{
+  type: 'slots',
+  source: 'Pies leży na trawie.',                       // исходное предложение сверху
+  sentence: [{ num: 5 }, { slot: 'noun' }, { slot: 'verb' }, 'na trawie.'],
+  slots: {
+    noun: { color: 'yellow', label: 'Rzeczownik', options: ['pies', 'psy', 'psów'], answer: 'psów' },
+    verb: { color: 'green',  label: 'Czasownik',  options: ['leżeć', 'leży', 'leżą'], answer: 'leży' },
+  },
+}
+```
+
+Клик по варианту — слово летит в рамку своего цвета; когда заполнены все рамки, ответ проверяется:
+«Dokładnie!» или «Prawie» и подсказка с правильным словом над ошибочной рамкой.
+До проверки клик по заполненной рамке возвращает слово обратно.
+
+### Помощники движка
+
+- `Polski.mixedSequence(rng, ['A', 'B'], n, { maxRun: 3 })` — перемешанная последовательность меток:
+  поровну, не больше `maxRun` подряд, без строгого чередования.
 
 Проверка по умолчанию не учитывает регистр и лишние пробелы. Если в ответе пропущены польские буквы (`piec` вместо `pięć`), ответ не засчитывается, но выводится подсказка.
 
