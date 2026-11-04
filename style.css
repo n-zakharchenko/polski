@@ -223,6 +223,43 @@ h1 {
 
 .error { margin: 0; color: var(--bad); font-weight: 600; }
 
+/* ---------- Экран выбора (раздел с chooser) ---------- */
+
+.chooser[hidden], .test-list[hidden] { display: none; }
+.chooser { max-width: 600px; }
+.chooser-axis { margin-bottom: 22px; }
+.chooser-label {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.seg { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg-btn {
+  min-height: 46px;
+  padding: 10px 16px;
+  border: 2px solid var(--card-border);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.seg-btn:hover { border-color: var(--accent); }
+.seg-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.seg-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.chooser-hint { margin-top: 8px; color: var(--muted); font-size: 0.9rem; font-style: italic; }
+.chooser-start { margin-top: 6px; }
+
 /* ---------- Экран теста ---------- */
 
 .test-page main { max-width: 600px; }

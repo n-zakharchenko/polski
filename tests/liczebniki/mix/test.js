@@ -1,5 +1,5 @@
 /*
- * Раздел «Mieszane»: те же три пункта, что в Niemęskoosobowe и Męskoosobowe,
+ * «Obie» (оба правила): те же три режима, что у Niemęskoosobowe и Męskoosobowe,
  * но предложения вперемешку из обоих правил.
  *
  * За проход: 7–8 заданий niemęskoosobowych и 7–8 męskoosobowych, одно правило не больше 2 подряд.
@@ -41,11 +41,11 @@
   }
 
   [
-    { id: 'liczebniki-mix',     title: 'Rzeczownik + czasownik', icon: 'R+C',
+    { id: 'liczebniki-mix',     title: 'Obie · Rzeczownik + czasownik', icon: '⇄',
       nm: 'liczebniki-niemeskoosobowe',     mo: 'liczebniki-meskoosobowe' },
-    { id: 'liczebniki-mix-num', title: 'Liczebnik',              icon: '2+',
+    { id: 'liczebniki-mix-num', title: 'Obie · Liczebnik',              icon: '⇄',
       nm: 'liczebniki-niemeskoosobowe-num', mo: 'liczebniki-meskoosobowe-num' },
-    { id: 'liczebniki-mix-mix', title: 'Mieszane',               icon: '⇄',
+    { id: 'liczebniki-mix-mix', title: 'Obie · Wszystko',               icon: '⇄',
       nm: 'liczebniki-niemeskoosobowe-mix', mo: 'liczebniki-meskoosobowe-mix' },
   ].forEach(function (t) {
     Polski.register({

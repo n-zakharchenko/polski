@@ -174,11 +174,11 @@
     };
   }
 
-  // три пункта раздела «Niemęskoosobowe»: Rzeczownik + czasownik / Liczebnik / Mix
+  // три режима правила niemęskoosobowe (выбираются на экране «Liczebniki»)
   [
-    { id: 'liczebniki-niemeskoosobowe',     title: 'Rzeczownik + czasownik', icon: 'R+C', mode: 'words' },
-    { id: 'liczebniki-niemeskoosobowe-num', title: 'Liczebnik',              icon: '2+',  mode: 'numeral' },
-    { id: 'liczebniki-niemeskoosobowe-mix', title: 'Mieszane',               icon: '⇄',  mode: 'mix' },
+    { id: 'liczebniki-niemeskoosobowe',     title: 'Niemęskoosobowe · Rzeczownik + czasownik', icon: 'NM', mode: 'words' },
+    { id: 'liczebniki-niemeskoosobowe-num', title: 'Niemęskoosobowe · Liczebnik',              icon: 'NM', mode: 'numeral' },
+    { id: 'liczebniki-niemeskoosobowe-mix', title: 'Niemęskoosobowe · Wszystko',               icon: 'NM', mode: 'mix' },
   ].forEach(function (t) {
     Polski.register({
       id: t.id,

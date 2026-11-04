@@ -184,11 +184,11 @@
     };
   }
 
-  // три пункта раздела «Męskoosobowe»: Rzeczownik + czasownik / Liczebnik / Mix
+  // три режима правила męskoosobowe (выбираются на экране «Liczebniki»)
   [
-    { id: 'liczebniki-meskoosobowe',     title: 'Rzeczownik + czasownik', icon: 'R+C', mode: 'words' },
-    { id: 'liczebniki-meskoosobowe-num', title: 'Liczebnik',              icon: '2+',  mode: 'numeral' },
-    { id: 'liczebniki-meskoosobowe-mix', title: 'Mieszane',               icon: '⇄',  mode: 'mix' },
+    { id: 'liczebniki-meskoosobowe',     title: 'Męskoosobowe · Rzeczownik + czasownik', icon: 'MO', mode: 'words' },
+    { id: 'liczebniki-meskoosobowe-num', title: 'Męskoosobowe · Liczebnik',              icon: 'MO', mode: 'numeral' },
+    { id: 'liczebniki-meskoosobowe-mix', title: 'Męskoosobowe · Wszystko',               icon: 'MO', mode: 'mix' },
   ].forEach(function (t) {
     Polski.register({
       id: t.id,

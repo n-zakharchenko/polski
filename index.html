@@ -15,6 +15,9 @@
 
     <!-- карточки строятся из tests/manifest.js -->
     <nav class="test-list" id="test-list"></nav>
+
+    <!-- экран выбора — если у раздела есть chooser -->
+    <div class="chooser card" id="chooser" hidden></div>
   </main>
 
   <script src="core/engine.js"></script>
@@ -41,6 +44,60 @@
         back.hidden = false;
         document.title = group.title + ' — Polski';
         document.getElementById('title').textContent = group.title;
+
+        if (group.chooser) {
+          renderChooser(group);
+          return;
+        }
+      }
+
+      /* ---------- экран выбора: ряды кнопок + «Start», выбор запоминается ---------- */
+
+      function renderChooser(group) {
+        var cfg = group.chooser;
+        var key = 'polski.choice.' + group.id;
+        var box = document.getElementById('chooser');
+        document.getElementById('subtitle').textContent = 'Wybierz, co chcesz ćwiczyć';
+        list.hidden = true;
+        box.hidden = false;
+
+        var choice = {};
+        try { choice = JSON.parse(window.localStorage.getItem(key)) || {}; } catch (e) { choice = {}; }
+        cfg.axes.forEach(function (axis) {
+          var valid = axis.options.some(function (o) { return o.id === choice[axis.key]; });
+          if (!valid) choice[axis.key] = axis.options[0].id; // по умолчанию — первый вариант
+        });
+
+        function save() {
+          try { window.localStorage.setItem(key, JSON.stringify(choice)); } catch (e) { /* не страшно */ }
+        }
+
+        function render() {
+          var testId = cfg.tests[cfg.axes.map(function (a) { return choice[a.key]; }).join('.')];
+          box.replaceChildren(el('div', {}, cfg.axes.map(function (axis) {
+            var selected = axis.options.filter(function (o) { return o.id === choice[axis.key]; })[0];
+            return el('div', { class: 'chooser-axis' }, [
+              el('div', { class: 'chooser-label', text: axis.label }),
+              el('div', { class: 'seg', role: 'group', 'aria-label': axis.label }, axis.options.map(function (o) {
+                var active = o.id === choice[axis.key];
+                return el('button', {
+                  class: 'seg-btn' + (active ? ' active' : ''), type: 'button',
+                  'aria-pressed': active ? 'true' : 'false', text: o.title,
+                  onclick: function () { choice[axis.key] = o.id; save(); render(); },
+                });
+              })),
+              selected && selected.hint ? el('div', { class: 'chooser-hint', text: selected.hint }) : null,
+            ]);
+          }).concat([
+            el('a', {
+              class: 'btn btn-wide chooser-start',
+              href: 'test.html?id=' + encodeURIComponent(testId),
+              text: 'Start',
+            }),
+          ])));
+        }
+
+        render();
       }
 
       function card(href, info, soon) {
