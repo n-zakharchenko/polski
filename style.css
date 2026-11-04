@@ -10,6 +10,10 @@
   --shadow: 0 1px 2px rgba(20, 24, 40, 0.06), 0 4px 14px rgba(20, 24, 40, 0.06);
   --shadow-hover: 0 2px 4px rgba(20, 24, 40, 0.08), 0 12px 28px rgba(220, 20, 60, 0.16);
   --radius: 18px;
+  --ok: #16803c;
+  --ok-soft: #e3f6ea;
+  --bad: #c81e3a;
+  --bad-soft: #fde8ec;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,6 +26,10 @@
     --accent-soft: #3a1820;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 14px rgba(0, 0, 0, 0.25);
     --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(220, 20, 60, 0.22);
+    --ok: #4ade80;
+    --ok-soft: #13301f;
+    --bad: #ff6b81;
+    --bad-soft: #3a1820;
   }
 }
 
@@ -162,6 +170,129 @@ h1 {
   box-shadow: var(--shadow);
   padding: 20px;
 }
+
+.btn-wide { width: 100%; }
+.btn-secondary {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow);
+}
+.btn-secondary:hover { box-shadow: var(--shadow-hover); }
+.btn[hidden] { display: none; }
+
+.error { margin: 0; color: var(--bad); font-weight: 600; }
+
+/* ---------- Экран теста ---------- */
+
+.test-page main { max-width: 600px; }
+.test-page h1 { margin-bottom: 16px; }
+
+.progress { margin-bottom: 20px; }
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width 0.3s ease;
+}
+
+.task { text-align: center; margin: 8px 0 20px; }
+.task-question { margin: 0 0 6px; color: var(--muted); font-size: 1rem; }
+.task-prompt {
+  font-size: clamp(2rem, 9vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  word-break: break-word;
+}
+
+.answer-area { margin-bottom: 16px; }
+.answer-area.locked { pointer-events: none; }
+
+.text-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--card-border);
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 1.2rem; /* ≥16px — iOS не зумит поле */
+  outline: none;
+  transition: border-color 0.15s;
+}
+.text-input:focus { border-color: var(--accent); }
+
+.pl-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  justify-content: center;
+}
+.pl-key {
+  min-width: 40px;
+  height: 40px;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+.pl-key:hover { border-color: var(--accent); color: var(--accent); }
+
+.options { display: grid; gap: 10px; }
+@media (min-width: 520px) { .options { grid-template-columns: 1fr 1fr; } }
+.option {
+  min-height: 56px;
+  padding: 12px 16px;
+  border: 2px solid var(--card-border);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.option:hover { border-color: var(--accent); transform: translateY(-1px); }
+.option.correct { border-color: var(--ok); background: var(--ok-soft); }
+.option.wrong { border-color: var(--bad); background: var(--bad-soft); }
+
+.feedback:empty { display: none; }
+.feedback {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  line-height: 1.6;
+}
+.feedback.ok { background: var(--ok-soft); color: var(--ok); }
+.feedback.bad { background: var(--bad-soft); color: var(--bad); }
+.feedback b { color: var(--text); }
+.feedback-hint { color: var(--muted); font-size: 0.95rem; }
+
+.summary { text-align: center; padding: 12px 0; }
+.summary-score { font-size: 3.4rem; font-weight: 800; letter-spacing: -0.03em; }
+.summary-pct { color: var(--muted); font-weight: 600; }
+.summary-msg { font-size: 1.2rem; margin: 12px 0 24px; }
+.summary-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 
 @media (min-width: 768px) {
   main { padding: 56px 24px; }

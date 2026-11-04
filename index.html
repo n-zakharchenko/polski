@@ -11,17 +11,35 @@
     <h1>Polski 🇵🇱</h1>
     <p class="subtitle">Wybierz test</p>
 
-    <nav class="test-list">
-      <a class="test-card" href="tests/numbers.html">
-        <span class="test-icon">123</span>
-        <span class="test-text">
-          <span class="test-title">Liczebniki</span>
-          <span class="test-desc">Liczby po polsku</span>
-        </span>
-        <span class="test-arrow" aria-hidden="true">→</span>
-      </a>
-      <!-- новые тесты добавлять сюда -->
-    </nav>
+    <!-- кнопки строятся из tests/manifest.js -->
+    <nav class="test-list" id="test-list"></nav>
   </main>
+
+  <script src="core/engine.js"></script>
+  <script src="core/ui.js"></script>
+  <script src="tests/manifest.js"></script>
+  <script>
+    (function () {
+      var list = document.getElementById('test-list');
+      var el = Polski.ui.el;
+
+      Polski.loadBundles('').then(function () {
+        Polski.manifest.forEach(function (entry) {
+          var t = Polski.tests[entry.id];
+          if (!t) return;
+          list.appendChild(el('a', { class: 'test-card', href: 'test.html?id=' + encodeURIComponent(t.id) }, [
+            el('span', { class: 'test-icon', text: t.icon }),
+            el('span', { class: 'test-text' }, [
+              el('span', { class: 'test-title', text: t.title }),
+              el('span', { class: 'test-desc', text: t.desc }),
+            ]),
+            el('span', { class: 'test-arrow', 'aria-hidden': 'true', text: '→' }),
+          ]));
+        });
+      }).catch(function (err) {
+        Polski.ui.showError(list, err);
+      });
+    })();
+  </script>
 </body>
 </html>

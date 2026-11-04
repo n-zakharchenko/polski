@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test — Polski</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="test-page">
+  <main>
+    <a class="back" href="index.html">← Wszystkie testy</a>
+    <h1 id="title"></h1>
+    <div class="card" id="app"></div>
+  </main>
+
+  <script src="core/engine.js"></script>
+  <script src="core/ui.js"></script>
+  <script src="tests/manifest.js"></script>
+  <script>
+    (function () {
+      var app = document.getElementById('app');
+      var id = new URLSearchParams(location.search).get('id');
+
+      if (!id) {
+        Polski.ui.showError(app, 'Nie wybrano testu.');
+        return;
+      }
+
+      Polski.loadBundles('', id).then(function () {
+        var test = Polski.tests[id];
+        if (!test) throw new Error('Test „' + id + '” nie zarejestrował się.');
+        document.title = test.title + ' — Polski';
+        document.getElementById('title').textContent = test.title;
+        Polski.ui.run(test, app);
+      }).catch(function (err) {
+        Polski.ui.showError(app, err);
+      });
+    })();
+  </script>
+</body>
+</html>
