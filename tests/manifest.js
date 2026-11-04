@@ -20,7 +20,17 @@ var MESKOOSOBOWE_FILES = [
   'liczebniki/meskoosobowe/words.js',
   'liczebniki/meskoosobowe/test.js',
 ];
-var MIX_FILES = ['liczebniki/mix/test.js'];
+// «Mieszane» берёт задания у тестов обоих разделов — поэтому сначала их файлы
+var MIX_FILES = [
+  'liczebniki/common.js',
+  'liczebniki/verbs.js',
+  'liczebniki/niemeskoosobowe/words.js',
+  'liczebniki/niemeskoosobowe/test.js',
+  'liczebniki/meskoosobowe/verbs.js',
+  'liczebniki/meskoosobowe/words.js',
+  'liczebniki/meskoosobowe/test.js',
+  'liczebniki/mix/test.js',
+];
 
 Polski.manifest = [
   {

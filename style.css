@@ -685,6 +685,8 @@ h1 {
 }
 .rule-body .num { color: var(--num); font-weight: 700; }
 .rule-lead { margin: 0 0 12px; font-size: 0.95rem; }
+.rule-sub { margin: 20px 0 10px; font-size: 1.05rem; color: var(--num); }
+.rule-sub:first-child { margin-top: 0; }
 .rule-uwaga {
   margin: 14px 0 0;
   padding: 10px 14px;
