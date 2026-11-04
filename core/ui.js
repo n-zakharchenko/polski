@@ -237,6 +237,7 @@
           slot.classList.add(ok ? 'right' : 'wrong');
           if (!ok) {
             slot.appendChild(el('span', { class: 'slot-tip', role: 'tooltip', text: task.slots[name].answer }));
+            sentence.classList.add('has-tip'); // раздвинуть строки, чтобы подсказка ничего не закрывала
           }
         });
         area.appendChild(el('div', {

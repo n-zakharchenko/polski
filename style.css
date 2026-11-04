@@ -369,7 +369,10 @@ h1 {
   margin: 26px 0 24px;
   font-size: 1.3rem;
   font-weight: 600;
+  transition: row-gap 0.25s ease, margin-top 0.25s ease;
 }
+/* есть подсказка над рамкой — место под неё */
+.slots-sentence.has-tip { row-gap: 50px; margin-top: 56px; }
 
 .slots-num {
   color: var(--num);
