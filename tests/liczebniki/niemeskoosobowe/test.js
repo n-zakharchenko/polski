@@ -1,30 +1,55 @@
 /*
  * Liczebniki — niemęskoosobowe.
  *
- * Одно задание — одно предложение из базы (words.js):
- *   сверху исходное предложение в ед. ч.:   Pies leży na trawie.
- *   ниже — число словами и две рамки:        Pięć [rzeczownik] [czasownik] na trawie.
+ * Одно задание — одно предложение из базы (words.js) в одном из времён:
+ *   сверху исходное предложение в ед. ч.:   Pies szczekał na listonosza.
+ *   ниже — число словами и две рамки:        Pięć [rzeczownik] [czasownik] na listonosza.
  *   варианты существительного (жёлтые): lp. / mian. lm. / dop. lm.
- *   варианты глагола (зелёные):         bezokolicznik / 3 os. lp. / 3 os. lm.
- * Группа числа (A: 2–4…, B: 5–21…) за проход перемешана: примерно поровну,
- * не больше 3 подряд одной группы и без строгого чередования.
+ *   варианты глагола (зелёные):
+ *     1) правильный — тот же вид и время, нужное число     (szczekało)
+ *     2) тот же вид и время, другое число                   (szczekały)
+ *     3) другой вид в том же времени, число случайное      (zaszczekało / zaszczekały)
+ *        для настоящего времени — простое будущее совершенного (zaszczeka / zaszczekają)
+ *
+ * За проход перемешаны: группа числа (A: 2–4…, B: 5–21…) и время (pres/past/fut).
+ * Вид: в настоящем — несовершенный, в прошедшем и будущем — случайный.
  * В одном проходе не повторяются ни предложения, ни глаголы.
  */
 (function () {
   'use strict';
 
   var L = Polski.liczebniki;
+  var VERBS = L.buildVerbs(Polski.data.verbs);
   var ENTRIES = Polski.data.niemeskoosobowe.map(L.parseEntry);
 
   /** следующее предложение, чей глагол ещё не встречался в проходе */
   function takeEntry(s) {
     if (s.pool.length === 0) s.pool = ENTRIES.slice(); // база кончилась — по второму кругу
     var idx = 0;
-    while (idx < s.pool.length && s.verbs[s.pool[idx].inf]) idx += 1;
+    while (idx < s.pool.length && s.verbs[s.pool[idx].verb]) idx += 1;
     if (idx === s.pool.length) idx = 0; // все глаголы уже были — берём любое
     var e = s.pool.splice(idx, 1)[0];
-    s.verbs[e.inf] = true;
+    s.verbs[e.verb] = true;
     return e;
+  }
+
+  function other(group) { return group === 'A' ? 'B' : 'A'; }
+
+  /** три варианта глагола; первый — правильный */
+  function verbOptions(rng, pair, aspect, tense, group) {
+    var v = pair[aspect];
+    var otherAspect = aspect === 'impf' ? 'perf' : 'impf';
+    // у совершенного нет настоящего — берём его простое будущее (szczeka ↔ zaszczeka)
+    var otherTense = (otherAspect === 'perf' && tense === 'pres') ? 'fut' : tense;
+
+    var correct = L.verbForm(v, aspect, tense, group);
+    var wrongNumber = L.verbForm(v, aspect, tense, other(group));
+    var who = rng.chance(0.5) ? group : other(group);
+    var wrongAspect = L.verbForm(pair[otherAspect], otherAspect, otherTense, who);
+    if (wrongAspect === correct || wrongAspect === wrongNumber) {
+      wrongAspect = L.verbForm(pair[otherAspect], otherAspect, otherTense, other(who));
+    }
+    return [correct, wrongNumber, wrongAspect];
   }
 
   Polski.register({
@@ -38,18 +63,24 @@
       var s = ctx.session;
       if (!s.plan) {
         s.plan = Polski.mixedSequence(rng, ['A', 'B'], ctx.total, { maxRun: 3 });
+        s.tenses = Polski.mixedSequence(rng, ['pres', 'past', 'fut'], ctx.total, { maxRun: 2 });
         s.pool = rng.shuffle(ENTRIES);   // ещё не использованные предложения
         s.verbs = {};                    // глаголы, уже бывшие в этом проходе
       }
 
       var i = ctx.round - 1;
       var group = s.plan[i % s.plan.length];
+      var tense = s.tenses[i % s.tenses.length];
+      var aspect = tense === 'pres' ? 'impf' : (rng.chance(0.5) ? 'impf' : 'perf');
+
       var e = takeEntry(s);
+      var pair = VERBS[e.verb];
       var n = L.randomNumber(rng, group);
+      var verbs = verbOptions(rng, pair, aspect, tense, group);
 
       return {
         type: 'slots',
-        source: L.capitalize(e.sg) + ' ' + e.v3sg + ' ' + e.rest + '.',
+        source: L.capitalize(e.sg) + ' ' + L.verbForm(pair[aspect], aspect, tense, e.gender) + ' ' + e.rest + '.',
         sentence: [
           { num: n, words: L.capitalize(L.numberWords(n, e.gender)) },
           { slot: 'noun' }, { slot: 'verb' }, e.rest + '.',
@@ -64,12 +95,15 @@
           verb: {
             color: 'green',
             label: 'Czasownik',
-            options: rng.shuffle([e.inf, e.v3sg, e.v3pl]),
-            answer: group === 'A' ? e.v3pl : e.v3sg,
+            options: rng.shuffle(verbs),
+            answer: verbs[0],
           },
         },
         group: group,
         number: n,
+        tense: tense,
+        aspect: aspect,
+        verb: e.verb,
       };
     },
   });

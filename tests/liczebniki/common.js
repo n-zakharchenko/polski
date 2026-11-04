@@ -39,17 +39,66 @@
     return 'm';
   }
 
-  /** 'pies, psy, psów | leżeć, leży, leżą | na trawie' → объект с формами */
+  /** 'pies, psy, psów | szczekać | na listonosza' → { sg, nomPl, genPl, gender, verb, rest } */
   function parseEntry(line) {
     var parts = line.split('|').map(function (s) { return s.trim(); });
     var noun = parts[0].split(',').map(function (s) { return s.trim(); });
-    var verb = parts[1].split(',').map(function (s) { return s.trim(); });
     return {
       sg: noun[0], nomPl: noun[1], genPl: noun[2],
       gender: noun[3] || guessGender(noun[0]),
-      inf: verb[0], v3sg: verb[1], v3pl: verb[2],
+      verb: parts[1],
       rest: parts[2],
     };
+  }
+
+  /* ---------- глаголы: видовые пары и формы ---------- */
+
+  /** 'inf: 3sg, 3pl, przeszły m., przeszły ż.' → объект */
+  function parseVerb(s) {
+    var m = /^\s*([^:]+):(.*)$/.exec(s);
+    var f = m[2].split(',').map(function (x) { return x.trim(); });
+    return { inf: m[1].trim(), s3: f[0], p3: f[1], pastM: f[2], pastF: f[3] };
+  }
+
+  /** строки из verbs.js → { 'szczekać': { impf: {...}, perf: {...} } } */
+  function buildVerbs(lines) {
+    var map = {};
+    lines.forEach(function (line) {
+      var halves = line.split('|');
+      var impf = parseVerb(halves[0]);
+      map[impf.inf] = { impf: impf, perf: parseVerb(halves[1]) };
+    });
+    return map;
+  }
+
+  /** 'szła' → 'szło' / 'szły'; 'kąpała się' → 'kąpało się' */
+  function fromFeminine(pastF, ending) {
+    var m = /^(.*)a( się)?$/.exec(pastF);
+    return m[1] + ending + (m[2] || '');
+  }
+
+  /** прошедшее для подлежащего: 'm' | 'f' | 'n' (ед. ч.), 'A' (one: -ły), 'B' (ono: -ło) */
+  function pastFor(v, who) {
+    if (who === 'm') return v.pastM;
+    if (who === 'f') return v.pastF;
+    if (who === 'A') return fromFeminine(v.pastF, 'y');
+    return fromFeminine(v.pastF, 'o'); // 'n' и 'B'
+  }
+
+  /**
+   * Форма глагола.
+   *   v      — одна половина пары (impf или perf)
+   *   aspect — 'impf' | 'perf'
+   *   tense  — 'pres' (только impf) | 'past' | 'fut'
+   *   who    — 'A' (2, 3, 4… → 3 os. lm. «one»), 'B' (5… → 3 os. lp. «ono»),
+   *            или род существительного в ед. ч.: 'm' | 'f' | 'n'
+   */
+  function verbForm(v, aspect, tense, who) {
+    var plural = who === 'A';
+    if (tense === 'past') return pastFor(v, who);
+    if (tense === 'pres' || (tense === 'fut' && aspect === 'perf')) return plural ? v.p3 : v.s3;
+    // будущее несовершенного: będzie / będą + прошедшее
+    return (plural ? 'będą ' : 'będzie ') + pastFor(v, who);
   }
 
   /* ---------- число словами (2–199) ---------- */
@@ -121,6 +170,8 @@
     groupOf: groupOf,
     randomNumber: randomNumber,
     parseEntry: parseEntry,
+    buildVerbs: buildVerbs,
+    verbForm: verbForm,
     guessGender: guessGender,
     numberWords: numberWords,
     capitalize: capitalize,

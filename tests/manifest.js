@@ -18,6 +18,7 @@ Polski.manifest = [
         id: 'liczebniki-niemeskoosobowe',
         files: [
           'liczebniki/common.js',
+          'liczebniki/verbs.js',
           'liczebniki/niemeskoosobowe/words.js',
           'liczebniki/niemeskoosobowe/test.js',
         ],
