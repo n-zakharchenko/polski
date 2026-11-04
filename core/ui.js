@@ -231,19 +231,25 @@
     return {
       ownFeedback: true,
       onResult: function (res) {
+        var mistakes = 0;
         names.forEach(function (name) {
           var ok = res.slots ? res.slots[name] : res.ok;
           var slot = slotEls[name];
+          if (!ok) mistakes += 1;
           slot.classList.add(ok ? 'right' : 'wrong');
           if (!ok) {
             slot.appendChild(el('span', { class: 'slot-tip', role: 'tooltip', text: task.slots[name].answer }));
             sentence.classList.add('has-tip'); // раздвинуть строки, чтобы подсказка ничего не закрывала
           }
         });
+        // 0 ошибок — «Dokładnie!», 1 — «Prawie!», 2 и больше — «O kurde!»
+        var verdict = mistakes === 0 ? { cls: 'ok', text: 'Dokładnie!' }
+          : mistakes === 1 ? { cls: 'bad', text: 'Prawie!' }
+          : { cls: 'fail', text: 'O kurde!' };
         area.appendChild(el('div', {
-          class: 'verdict ' + (res.ok ? 'ok' : 'bad'),
+          class: 'verdict ' + verdict.cls,
           'aria-live': 'polite',
-          text: res.ok ? 'Dokładnie!' : 'Prawie',
+          text: verdict.text,
         }));
       },
     };

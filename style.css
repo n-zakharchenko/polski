@@ -479,6 +479,7 @@ h1 {
 }
 .verdict.ok { background: linear-gradient(135deg, #16a34a, #2fcf6b); }
 .verdict.bad { background: linear-gradient(135deg, #f08a0c, #f7b733); }
+.verdict.fail { background: linear-gradient(135deg, #c81e3a, #ff4d6d); }
 
 @keyframes verdict {
   0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
