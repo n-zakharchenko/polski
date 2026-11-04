@@ -35,7 +35,7 @@
 
   function other(group) { return group === 'A' ? 'B' : 'A'; }
 
-  /** три варианта глагола; первый — правильный */
+  /** три варианта глагола; первый — правильный. tr — перевод каждого (инфинитив своего вида) */
   function verbOptions(rng, pair, aspect, tense, group) {
     var v = pair[aspect];
     var otherAspect = aspect === 'impf' ? 'perf' : 'impf';
@@ -49,7 +49,11 @@
     if (wrongAspect === correct || wrongAspect === wrongNumber) {
       wrongAspect = L.verbForm(pair[otherAspect], otherAspect, otherTense, other(who));
     }
-    return [correct, wrongNumber, wrongAspect];
+    var tr = {};
+    tr[correct] = v.ru;
+    tr[wrongNumber] = v.ru;
+    tr[wrongAspect] = pair[otherAspect].ru;
+    return { list: [correct, wrongNumber, wrongAspect], tr: tr };
   }
 
   Polski.register({
@@ -80,10 +84,16 @@
 
       return {
         type: 'slots',
-        source: L.capitalize(e.sg) + ' ' + L.verbForm(pair[aspect], aspect, tense, e.gender) + ' ' + e.rest + '.',
+        // части с переводом — он показывается по долгому нажатию
+        source: [
+          { text: L.capitalize(e.sg), tr: e.ru },
+          { text: L.verbForm(pair[aspect], aspect, tense, e.gender), tr: pair[aspect].ru },
+          { text: e.rest + '.', tr: e.restRu },
+        ],
         sentence: [
           { num: n, words: L.capitalize(L.numberWords(n, e.gender)) },
-          { slot: 'noun' }, { slot: 'verb' }, e.rest + '.',
+          { slot: 'noun' }, { slot: 'verb' },
+          { text: e.rest + '.', tr: e.restRu },
         ],
         slots: {
           noun: {
@@ -91,12 +101,14 @@
             label: 'Rzeczownik',
             options: rng.shuffle([e.sg, e.nomPl, e.genPl]),
             answer: group === 'A' ? e.nomPl : e.genPl,
+            tr: e.ru,
           },
           verb: {
             color: 'green',
             label: 'Czasownik',
-            options: rng.shuffle(verbs),
-            answer: verbs[0],
+            options: rng.shuffle(verbs.list),
+            answer: verbs.list[0],
+            tr: verbs.tr,
           },
         },
         group: group,

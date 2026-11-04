@@ -40,6 +40,120 @@
     return [].concat(task.answer)[0];
   }
 
+  /** 'текст' или { text, tr } → <span>, с переводом в data-tr */
+  function wordSpan(part, cls) {
+    if (typeof part === 'string') return el('span', { class: cls, text: part });
+    return el('span', { class: cls, 'data-tr': part.tr, text: part.text });
+  }
+
+  /* ======================================================================
+   * Перевод по долгому нажатию (палец) или задержке курсора (мышь).
+   * Работает для любого элемента с атрибутом data-tr.
+   * После долгого нажатия следующий click гасится — вариант не выбирается.
+   * ==================================================================== */
+
+  var trTips = (function () {
+    var HOLD_MS = 450;     // палец
+    var HOVER_MS = 350;    // мышь
+    var MOVE_PX = 10;      // палец сдвинулся — это прокрутка, а не нажатие
+    var tip = null;
+    var timer = null;
+    var hideTimer = null;
+    var start = null;
+    var suppressClick = false;
+
+    function target(e) {
+      return e.target && e.target.closest ? e.target.closest('[data-tr]') : null;
+    }
+
+    function show(node) {
+      var text = node.getAttribute('data-tr');
+      if (!text) return;
+      if (!tip) {
+        tip = el('div', { class: 'tr-tip', role: 'tooltip' });
+        document.body.appendChild(tip);
+      }
+      clearTimeout(hideTimer);
+      tip.textContent = text;
+      tip.classList.add('visible');
+      var r = node.getBoundingClientRect();
+      var w = tip.offsetWidth, h = tip.offsetHeight;
+      var left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), window.innerWidth - w - 8);
+      var top = r.top - h - 10;
+      tip.classList.toggle('below', top < 8);
+      if (top < 8) top = r.bottom + 10;
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+    }
+
+    function hide(delay) {
+      clearTimeout(timer);
+      clearTimeout(hideTimer);
+      if (!tip) return;
+      hideTimer = setTimeout(function () { tip.classList.remove('visible'); }, delay || 0);
+    }
+
+    document.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse') return;
+      hide(0);
+      suppressClick = false;
+      var node = target(e);
+      if (!node) return;
+      start = { x: e.clientX, y: e.clientY };
+      timer = setTimeout(function () {
+        suppressClick = true;
+        show(node);
+      }, HOLD_MS);
+    });
+    document.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'mouse' || !start) return;
+      if (Math.abs(e.clientX - start.x) > MOVE_PX || Math.abs(e.clientY - start.y) > MOVE_PX) {
+        clearTimeout(timer);
+        start = null;
+      }
+    });
+    function release(e) {
+      if (e.pointerType === 'mouse') return;
+      clearTimeout(timer);
+      start = null;
+      if (suppressClick) hide(900); // подсказка ещё немного видна после отпускания
+    }
+    document.addEventListener('pointerup', release);
+    document.addEventListener('pointercancel', release);
+
+    // гасим click после долгого нажатия, чтобы не выбрать вариант
+    document.addEventListener('click', function (e) {
+      if (!suppressClick) return;
+      suppressClick = false;
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
+
+    // системное меню на долгое нажатие (Android/iOS) — не нужно
+    document.addEventListener('contextmenu', function (e) {
+      if (target(e)) e.preventDefault();
+    });
+
+    // мышь: задержка курсора
+    document.addEventListener('pointerover', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      var node = target(e);
+      if (!node) return;
+      clearTimeout(timer);
+      timer = setTimeout(function () { show(node); }, HOVER_MS);
+    });
+    document.addEventListener('pointerout', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      var node = target(e);
+      if (node && node.contains(e.relatedTarget)) return;
+      hide(0);
+    });
+    window.addEventListener('scroll', function () { hide(0); }, true);
+    document.addEventListener('click', function () { hide(0); });
+
+    return { hide: hide };
+  })();
+
   /* ======================================================================
    * Типы заданий. Каждый: (task, area, api) → handler
    *   api.submit(answer) → результат проверки (один раз)
@@ -115,15 +229,24 @@
 
     area.classList.add('slots-area');
 
-    var source = task.source == null ? null : el('div', { class: 'slots-source' }, [
+    // исходное предложение: строка или части [{ text, tr }] — tr показывается по долгому нажатию
+    var sourceParts = task.source == null ? null : [].concat(task.source);
+    var source = sourceParts == null ? null : el('div', { class: 'slots-source' }, [
       el('span', { class: 'slots-caption', text: task.sourceLabel || 'Zdanie' }),
-      el('p', { class: 'slots-source-text', text: task.source }),
+      el('p', { class: 'slots-source-text' }, sourceParts.reduce(function (acc, part, i) {
+        if (i > 0) acc.push(' ');
+        acc.push(wordSpan(part, 'slots-word'));
+        return acc;
+      }, [])),
     ]);
 
     var sentence = el('div', { class: 'slots-sentence' }, task.sentence.map(function (part) {
-      if (typeof part === 'string') return el('span', { class: 'slots-text', text: part });
+      if (typeof part === 'string' || part.text != null) return wordSpan(part, 'slots-text');
       if (part.num != null) {
-        return el('span', { class: 'slots-num', title: String(part.num), text: part.words || String(part.num) });
+        return el('span', {
+          class: 'slots-num', 'data-tr': part.tr || String(part.num),
+          text: part.words || String(part.num),
+        });
       }
       var cfg = task.slots[part.slot];
       var slot = el('button', {
@@ -139,7 +262,9 @@
       return el('div', { class: 'slots-group' }, [
         el('div', { class: 'slots-caption caption-' + cfg.color, text: cfg.label || name }),
         el('div', { class: 'chips' }, cfg.options.map(function (opt) {
-          var chip = el('button', { class: 'chip chip-' + cfg.color, type: 'button', text: opt });
+          // cfg.tr — перевод для всех вариантов (строка) или для каждого ({ вариант: перевод })
+          var tr = typeof cfg.tr === 'string' ? cfg.tr : (cfg.tr && cfg.tr[opt]);
+          var chip = el('button', { class: 'chip chip-' + cfg.color, type: 'button', 'data-tr': tr, text: opt });
           chip.addEventListener('click', function () { pick(name, chip, opt); });
           return chip;
         })),
@@ -332,6 +457,7 @@
 
     function showTask() {
       var task = state.task;
+      trTips.hide(0);
       var feedback = el('div', { class: 'feedback', 'aria-live': 'polite' });
       var actionBtn = el('button', { class: 'btn btn-wide', type: 'button', text: 'Sprawdź' });
       var area = el('div', { class: 'answer-area' });

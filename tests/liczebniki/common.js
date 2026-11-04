@@ -39,7 +39,10 @@
     return 'm';
   }
 
-  /** 'pies, psy, psów | szczekać | na listonosza' → { sg, nomPl, genPl, gender, verb, rest } */
+  /**
+   * 'pies, psy, psów | szczekać | na listonosza | собака | на почтальона'
+   *   → { sg, nomPl, genPl, gender, verb, rest, ru, restRu }
+   */
   function parseEntry(line) {
     var parts = line.split('|').map(function (s) { return s.trim(); });
     var noun = parts[0].split(',').map(function (s) { return s.trim(); });
@@ -48,6 +51,8 @@
       gender: noun[3] || guessGender(noun[0]),
       verb: parts[1],
       rest: parts[2],
+      ru: parts[3] || '',
+      restRu: parts[4] || '',
     };
   }
 
@@ -60,13 +65,17 @@
     return { inf: m[1].trim(), s3: f[0], p3: f[1], pastM: f[2], pastF: f[3] };
   }
 
-  /** строки из verbs.js → { 'szczekać': { impf: {...}, perf: {...} } } */
+  /** строки из verbs.js → { 'szczekać': { impf: {..., ru}, perf: {..., ru} } } */
   function buildVerbs(lines) {
     var map = {};
     lines.forEach(function (line) {
-      var halves = line.split('|');
-      var impf = parseVerb(halves[0]);
-      map[impf.inf] = { impf: impf, perf: parseVerb(halves[1]) };
+      var parts = line.split('|');
+      var impf = parseVerb(parts[0]);
+      var perf = parseVerb(parts[1]);
+      var ru = (parts[2] || '').split('/').map(function (s) { return s.trim(); });
+      impf.ru = ru[0] || '';
+      perf.ru = ru[1] || '';
+      map[impf.inf] = { impf: impf, perf: perf };
     });
     return map;
   }

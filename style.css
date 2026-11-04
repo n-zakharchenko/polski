@@ -504,6 +504,47 @@ h1 {
   @keyframes verdict-fade { 0%, 75% { opacity: 1; } 100% { opacity: 0; } }
 }
 
+/* ---------- Перевод по долгому нажатию / наведению ---------- */
+
+[data-tr] {
+  -webkit-touch-callout: none;   /* без системного меню на долгое нажатие */
+  -webkit-user-select: none;
+  user-select: none;
+}
+.slots-word[data-tr],
+.slots-text[data-tr],
+.slots-num[data-tr] { cursor: help; }
+@media (hover: hover) {
+  .slots-word[data-tr]:hover,
+  .slots-text[data-tr]:hover,
+  .slots-num[data-tr]:hover {
+    text-decoration: underline dotted;
+    text-underline-offset: 4px;
+  }
+}
+
+.tr-tip {
+  position: fixed;
+  z-index: 2000;
+  max-width: min(280px, calc(100vw - 16px));
+  padding: 7px 12px;
+  border-radius: 10px;
+  background: var(--num);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.tr-tip.visible { opacity: 1; transform: none; }
+.tr-tip.below { transform: translateY(-4px); }
+.tr-tip.below.visible { transform: none; }
+
 /* ---------- Кнопка (i) и окно с правилом ---------- */
 
 .card-footer {
