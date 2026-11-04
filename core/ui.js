@@ -47,15 +47,16 @@
   }
 
   /* ======================================================================
-   * Перевод по долгому нажатию (палец) или задержке курсора (мышь).
+   * Перевод по долгому нажатию (1 с) — пальцем или кнопкой мыши.
    * Работает для любого элемента с атрибутом data-tr.
+   * Наведение ничего не показывает: фича почти незаметна и не мешает основному флоу.
    * После долгого нажатия следующий click гасится — вариант не выбирается.
    * ==================================================================== */
 
   var trTips = (function () {
-    var HOLD_MS = 450;     // палец
-    var HOVER_MS = 350;    // мышь
-    var MOVE_PX = 10;      // палец сдвинулся — это прокрутка, а не нажатие
+    var HOLD_MS = 1000;    // сколько держать
+    var LINGER_MS = 1000;  // сколько облачко видно после отпускания
+    var MOVE_PX = 10;      // сдвинулся — это прокрутка/перетаскивание, а не нажатие
     var tip = null;
     var timer = null;
     var hideTimer = null;
@@ -75,15 +76,21 @@
       }
       clearTimeout(hideTimer);
       tip.textContent = text;
-      tip.classList.add('visible');
+      tip.classList.remove('visible');
       var r = node.getBoundingClientRect();
       var w = tip.offsetWidth, h = tip.offsetHeight;
-      var left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), window.innerWidth - w - 8);
-      var top = r.top - h - 10;
-      tip.classList.toggle('below', top < 8);
-      if (top < 8) top = r.bottom + 10;
+      var center = r.left + r.width / 2;
+      var left = Math.min(Math.max(8, center - w / 2), window.innerWidth - w - 8);
+      var top = r.top - h - 14;               // над словом, с местом под хвостик
+      var below = top < 8;
+      if (below) top = r.bottom + 14;
+      tip.classList.toggle('below', below);
+      // хвостик смотрит на центр слова, даже если облачко прижато к краю экрана
+      tip.style.setProperty('--tail-x', Math.min(Math.max(18, center - left), w - 18) + 'px');
       tip.style.left = left + 'px';
       tip.style.top = top + 'px';
+      void tip.offsetWidth; // перезапуск анимации появления
+      tip.classList.add('visible');
     }
 
     function hide(delay) {
@@ -94,7 +101,7 @@
     }
 
     document.addEventListener('pointerdown', function (e) {
-      if (e.pointerType === 'mouse') return;
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
       hide(0);
       suppressClick = false;
       var node = target(e);
@@ -106,17 +113,16 @@
       }, HOLD_MS);
     });
     document.addEventListener('pointermove', function (e) {
-      if (e.pointerType === 'mouse' || !start) return;
+      if (!start) return;
       if (Math.abs(e.clientX - start.x) > MOVE_PX || Math.abs(e.clientY - start.y) > MOVE_PX) {
         clearTimeout(timer);
         start = null;
       }
     });
-    function release(e) {
-      if (e.pointerType === 'mouse') return;
+    function release() {
       clearTimeout(timer);
       start = null;
-      if (suppressClick) hide(900); // подсказка ещё немного видна после отпускания
+      if (suppressClick) hide(LINGER_MS); // облачко ещё немного видно после отпускания
     }
     document.addEventListener('pointerup', release);
     document.addEventListener('pointercancel', release);
@@ -134,20 +140,6 @@
       if (target(e)) e.preventDefault();
     });
 
-    // мышь: задержка курсора
-    document.addEventListener('pointerover', function (e) {
-      if (e.pointerType !== 'mouse') return;
-      var node = target(e);
-      if (!node) return;
-      clearTimeout(timer);
-      timer = setTimeout(function () { show(node); }, HOVER_MS);
-    });
-    document.addEventListener('pointerout', function (e) {
-      if (e.pointerType !== 'mouse') return;
-      var node = target(e);
-      if (node && node.contains(e.relatedTarget)) return;
-      hide(0);
-    });
     window.addEventListener('scroll', function () { hide(0); }, true);
     document.addEventListener('click', function () { hide(0); });
 

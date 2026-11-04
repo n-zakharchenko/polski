@@ -504,46 +504,89 @@ h1 {
   @keyframes verdict-fade { 0%, 75% { opacity: 1; } 100% { opacity: 0; } }
 }
 
-/* ---------- Перевод по долгому нажатию / наведению ---------- */
+/* ---------- Перевод по долгому нажатию (1 с): облачко как в комиксах ---------- */
 
+/* слова никак не выделены — фича почти незаметна; только без системного меню и выделения */
 [data-tr] {
-  -webkit-touch-callout: none;   /* без системного меню на долгое нажатие */
+  -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
 }
-.slots-word[data-tr],
-.slots-text[data-tr],
-.slots-num[data-tr] { cursor: help; }
-@media (hover: hover) {
-  .slots-word[data-tr]:hover,
-  .slots-text[data-tr]:hover,
-  .slots-num[data-tr]:hover {
-    text-decoration: underline dotted;
-    text-underline-offset: 4px;
-  }
-}
 
 .tr-tip {
+  --tail-x: 50%;
+  --bubble-bg: #ffffff;
+  --bubble-line: #1d2330;
   position: fixed;
   z-index: 2000;
-  max-width: min(280px, calc(100vw - 16px));
-  padding: 7px 12px;
-  border-radius: 10px;
-  background: var(--num);
-  color: #fff;
+  max-width: min(260px, calc(100vw - 16px));
+  padding: 6px 14px 7px;
+  border: 2px solid var(--bubble-line);
+  border-radius: 18px;
+  background: var(--bubble-bg);
+  color: var(--bubble-line);
   font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.3;
   text-align: center;
   pointer-events: none;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+  box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.12);
   opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transform: scale(0.6);
+  transform-origin: var(--tail-x) calc(100% + 12px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
 }
-.tr-tip.visible { opacity: 1; transform: none; }
-.tr-tip.below { transform: translateY(-4px); }
-.tr-tip.below.visible { transform: none; }
+.tr-tip.below { transform-origin: var(--tail-x) -12px; }
+.tr-tip.visible {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.12s ease, transform 0.22s cubic-bezier(0.3, 1.6, 0.5, 1); /* «пружинка» */
+}
+
+/* хвостик: обводка (::before) + заливка (::after) */
+.tr-tip::before,
+.tr-tip::after {
+  content: "";
+  position: absolute;
+  left: var(--tail-x);
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+.tr-tip::before {
+  top: 100%;
+  margin-left: -9px;
+  border-width: 11px 9px 0 0;
+  border-color: var(--bubble-line) transparent transparent transparent;
+}
+.tr-tip::after {
+  top: 100%;
+  margin-top: -2px;
+  margin-left: -6px;
+  border-width: 8px 6px 0 0;
+  border-color: var(--bubble-bg) transparent transparent transparent;
+}
+.tr-tip.below::before {
+  top: auto;
+  bottom: 100%;
+  border-width: 0 9px 11px 0;
+  border-color: transparent transparent var(--bubble-line) transparent;
+}
+.tr-tip.below::after {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: -2px;
+  border-width: 0 6px 8px 0;
+  border-color: transparent transparent var(--bubble-bg) transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  .tr-tip { --bubble-bg: #f4f5fa; --bubble-line: #13151b; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tr-tip, .tr-tip.visible { transition: opacity 0.12s ease; transform: none; }
+}
 
 /* ---------- Кнопка (i) и окно с правилом ---------- */
 
