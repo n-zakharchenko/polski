@@ -208,7 +208,7 @@
     var labels = places.map(function (p) { return p.label; });
     // окно в ленту кадров: viewBox сдвигаем на нужный кадр
     var frame = s('svg', { width: MALUCH.units, height: MALUCH.units, viewBox: '0 0 200 200', overflow: 'hidden' }, [
-      s('image', { href: MALUCH.src, width: MALUCH.size * MALUCH.cols, height: MALUCH.size * MALUCH.rows }),
+      s('image', { href: Polski.withVersion(MALUCH.src), width: MALUCH.size * MALUCH.cols, height: MALUCH.size * MALUCH.rows }),
     ]);
     var car = s('g', { class: 'map-car' }, [s('g', { class: 'car-body' }, [frame])]);
     var shownFrame = -1;
@@ -233,10 +233,10 @@
       s('defs', {}, [s('clipPath', { id: 'journey-poland' }, [s('path', { d: land })])]),
       s('path', { class: 'map-land', d: land }), // запасной цвет суши, пока картинки грузятся
       // пастельная физическая карта: лес, вода, горы (journey/terrain-*.webp) — своя для каждой темы
-      s('image', Object.assign({ class: 'map-terrain map-terrain-light', href: 'journey/terrain-light.webp' }, full)),
-      s('image', Object.assign({ class: 'map-terrain map-terrain-dark', href: 'journey/terrain-dark.webp' }, full)),
+      s('image', Object.assign({ class: 'map-terrain map-terrain-light', href: Polski.withVersion('journey/terrain-light.webp') }, full)),
+      s('image', Object.assign({ class: 'map-terrain map-terrain-dark', href: Polski.withVersion('journey/terrain-dark.webp') }, full)),
       // рельеф: серая отмывка (128 — без изменений), накладывается режимом смешивания
-      s('image', Object.assign({ class: 'map-relief', href: 'journey/relief.webp' }, full)),
+      s('image', Object.assign({ class: 'map-relief', href: Polski.withVersion('journey/relief.webp') }, full)),
       s('g', { class: 'map-rivers', 'clip-path': 'url(#journey-poland)' }, rivers),
       s('path', { class: 'map-border', d: land }),
       s('path', { class: 'map-route', d: routeD }),
@@ -370,7 +370,9 @@
       renderInfo(null, map.set(seen));
       Polski.progress.load().then(function (c) {
         if (mode !== 'user' || !c) return;
-        drive(Math.min(seen, c.dist), c.dist, c.points, function () { writeSeen(u.uid, c.dist); });
+        // нет dist (старая запись или старый progress.js из кэша) — пробег = очки
+        var dist = c.dist != null ? c.dist : (c.points || 0);
+        drive(Math.min(seen, dist), dist, c.points, function () { writeSeen(u.uid, dist); });
       }, function () {
         info.replaceChildren(h('p', { class: 'account-error', text: 'Nie udało się wczytać punktów. Odśwież stronę.' }));
       });

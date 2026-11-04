@@ -4,11 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Test — Rajd Polskiej Gramatyki</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css">
-  <script src="core/settings.js"></script> <!-- тема — до отрисовки; шестерёнка настроек -->
-  <script src="core/account.js" defer></script> <!-- вход через Google; без входа Firebase не грузится -->
-  <script src="core/progress.js" defer></script> <!-- очки в Firestore -->
+  <!-- версия сайта: метка ?v= у всех наших файлов (защита от кэша); меняет tools/bump-version.js -->
+  <script>window.POLSKI_V = '20261104-2136';</script>
+  <link rel="icon" href="favicon.svg?v=20261104-2136" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css?v=20261104-2136">
+  <script src="core/settings.js?v=20261104-2136"></script> <!-- тема — до отрисовки; шестерёнка настроек -->
+  <script src="core/account.js?v=20261104-2136" defer></script> <!-- вход через Google; без входа Firebase не грузится -->
+  <script src="core/progress.js?v=20261104-2136" defer></script> <!-- очки в Firestore -->
 </head>
 <body class="test-page">
   <main>
@@ -18,12 +20,12 @@
     <div class="card" id="app"></div>
   </main>
 
-  <script src="core/engine.js"></script>
-  <script src="core/ui.js"></script>
-  <script src="tests/manifest.js"></script>
-  <script src="core/balance.js"></script>
-  <script src="journey/route.js"></script>
-  <script src="journey/journey.js"></script> <!-- здесь только locate(): «следующий город» на итоге -->
+  <script src="core/engine.js?v=20261104-2136"></script>
+  <script src="core/ui.js?v=20261104-2136"></script>
+  <script src="tests/manifest.js?v=20261104-2136"></script>
+  <script src="core/balance.js?v=20261104-2136"></script>
+  <script src="journey/route.js?v=20261104-2136"></script>
+  <script src="journey/journey.js?v=20261104-2136"></script> <!-- здесь только locate(): «следующий город» на итоге -->
   <script>
     (function () {
       var app = document.getElementById('app');

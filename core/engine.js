@@ -146,10 +146,19 @@
 
   /* ---------- Загрузка бандлов (только в браузере) ---------- */
 
+  /**
+   * Защита от кэша: к нашим файлам добавляем метку версии сайта (window.POLSKI_V — в <head> каждой страницы,
+   * её меняет tools/bump-version.js перед публикацией). Новая версия — новые адреса, старый кэш не смешивается.
+   */
+  Polski.withVersion = function (url) {
+    var v = root.POLSKI_V;
+    return v ? url + (url.indexOf('?') === -1 ? '?' : '&') + 'v=' + v : url;
+  };
+
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
       var s = document.createElement('script');
-      s.src = src;
+      s.src = Polski.withVersion(src);
       s.async = false;
       s.onload = function () { resolve(); };
       s.onerror = function () { reject(new Error('Nie udało się wczytać: ' + src)); };
