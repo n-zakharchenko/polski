@@ -51,6 +51,32 @@
     '1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 ' +
     '0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
 
+  /*
+   * Дополнительные секции окна (например, «Konto» из core/account.js):
+   *   PolskiSettings.addSection({ title, render(body), onOpen() })
+   * render вызывается один раз при создании окна, onOpen — при каждом открытии.
+   */
+  var sections = [];
+  var mountPoint = null;
+
+  function mountSection(def) {
+    var sec = document.createElement('section');
+    sec.className = 'settings-section';
+    var label = document.createElement('div');
+    label.className = 'chooser-label';
+    label.textContent = def.title;
+    var body = document.createElement('div');
+    sec.appendChild(label);
+    sec.appendChild(body);
+    mountPoint.appendChild(sec);
+    if (def.render) def.render(body);
+  }
+
+  function addSection(def) {
+    sections.push(def);
+    if (mountPoint) mountSection(def);
+  }
+
   function build() {
     var btn = document.createElement('button');
     btn.className = 'settings-btn';
@@ -73,6 +99,8 @@
       '</section></div>';
 
     var seg = dlg.querySelector('.seg');
+    mountPoint = dlg.querySelector('.rule-inner');
+    sections.forEach(mountSection);
 
     function renderThemes() {
       var current = readTheme();
@@ -94,6 +122,7 @@
 
     function open() {
       renderThemes();
+      sections.forEach(function (s) { if (s.onOpen) s.onOpen(); });
       if (typeof dlg.showModal === 'function') dlg.showModal();
       else dlg.setAttribute('open', '');
     }
@@ -113,5 +142,5 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build);
   else build();
 
-  window.PolskiSettings = { readTheme: readTheme, applyTheme: applyTheme };
+  window.PolskiSettings = { readTheme: readTheme, applyTheme: applyTheme, addSection: addSection };
 })();

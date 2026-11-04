@@ -637,6 +637,9 @@
         : pct >= 50 ? 'Nieźle, ćwicz dalej!'
         : 'Spróbuj jeszcze raz!';
 
+      // без входа — предложение войти (core/account.js); без account.js блока просто нет
+      var accountBox = el('div', { class: 'summary-account', hidden: true });
+
       root.replaceChildren(el('div', {}, [
         el('div', { class: 'summary' }, [
           el('div', { class: 'summary-score', text: state.correct + ' / ' + test.rounds }),
@@ -646,9 +649,12 @@
             el('button', { class: 'btn', type: 'button', text: 'Jeszcze raz', onclick: start }),
             el('a', { class: 'btn btn-secondary', href: backHref, text: 'Wstecz' }),
           ]),
+          accountBox,
         ]),
         makeRuleButton(),
       ]));
+
+      if (window.PolskiAccount) window.PolskiAccount.mountSummary(accountBox);
     }
 
     start();
