@@ -1,10 +1,12 @@
 /*
  * Polski — прогресс пользователя в Firestore.
- *   users/{uid} = { points, tests, perfect, updatedAt }   (без e-mail)
+ *   users/{uid} = { points, dist, tests, perfect, updatedAt }   (без e-mail)
+ *     points — счёт (все очки), dist — пробег малюха (за тест — не дальше следующего города).
+ *     В старых записях dist нет — тогда пробег = points.
  * Пишем один раз — в конце теста. Прирост за запись ограничен правилами (firestore.rules).
  *
- *   Polski.progress.load()                 — Promise<{ points, tests, perfect } | null> (null — не вошли)
- *   Polski.progress.addResult(r)           — r = { points, perfect } → Promise<{ before, after } | null>
+ *   Polski.progress.load()                 — Promise<{ points, dist, tests, perfect } | null> (null — не вошли)
+ *   Polski.progress.addResult(r)           — r = { points, perfect } → Promise<{ before, after, distBefore, distAfter } | null>
  *   Polski.progress.mountSummary(box, r)   — блок на итоге теста: сохранить очки или предложить вход
  */
 (function () {
@@ -22,7 +24,8 @@
         return st.F.getDoc(st.F.doc(st.db, 'users', u.uid));
       }).then(function (snap) {
         var d = snap.exists() ? snap.data() : {};
-        return { points: d.points || 0, tests: d.tests || 0, perfect: d.perfect || 0 };
+        var points = d.points || 0;
+        return { points: points, dist: d.dist != null ? d.dist : points, tests: d.tests || 0, perfect: d.perfect || 0 };
       });
     });
   }
@@ -32,20 +35,23 @@
     if (!a) return Promise.resolve(null);
     return a.ready().then(function (u) {
       if (!u) return null;
-      var before = 0;
+      var before = 0, distBefore = 0, distAfter = 0;
       return load().then(function (c) {
         before = c ? c.points : 0;
+        distBefore = c ? c.dist : 0;
+        distAfter = Polski.journey ? Polski.journey.advance(distBefore, r.points) : distBefore + r.points;
         return a.firestore();
       }).then(function (st) {
         var F = st.F;
         return F.setDoc(F.doc(st.db, 'users', u.uid), {
           points: F.increment(r.points),
+          dist: Math.round(distAfter),
           tests: F.increment(1),
           perfect: F.increment(r.perfect ? 1 : 0),
           updatedAt: F.serverTimestamp(),
         }, { merge: true });
       }).then(function () {
-        return { before: before, after: before + r.points };
+        return { before: before, after: before + r.points, distBefore: distBefore, distAfter: distAfter };
       });
     });
   }
@@ -78,12 +84,19 @@
 
     function saved(res) {
       state = 'saved';
-      var loc = Polski.journey ? Polski.journey.locate(res.after) : null;
+      var J = Polski.journey;
+      var loc = J ? J.locate(res.distAfter) : null;
+      var was = J ? J.locate(res.distBefore) : null;
+      // доехал до нового города: пробег упёрся ровно в начало следующего отрезка
+      var arrived = loc && was && !was.done && (loc.done || loc.seg.index > was.seg.index);
+      var capped = arrived && res.distAfter - res.distBefore < r.points;
       // replaceChildren печатает null строкой «null» — пустые элементы отбрасываем
       line.replaceChildren.apply(line, [
         h('p', { class: 'pts-total' }, ['⭐ ', h('strong', { text: '+' + fmt(r.points) + ' pkt' })]),
         r.bonus ? h('p', { class: 'pts-sub', text: 'w tym +' + fmt(r.bonus) + ' za test bez błędów' }) : null,
-        loc ? h('p', { class: 'pts-sub' }, loc.done
+        arrived ? h('p', { class: 'pts-city' }, ['🏁 Nowe miasto: ', h('strong', { text: was.seg.to.name }), '!']) : null,
+        capped ? h('p', { class: 'pts-sub', text: 'Maluch czeka tu na kolejny test — jedno miasto na test.' }) : null,
+        loc && !arrived ? h('p', { class: 'pts-sub' }, loc.done
           ? ['Podróż ukończona! 🎉']
           : ['Następny przystanek: ', h('strong', { text: loc.seg.to.name }), ' · zostało ' + fmt(loc.left) + ' pkt']) : null,
         h('a', { class: 'pts-map', href: 'index.html', text: 'Zobacz mapę →' }),

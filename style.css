@@ -304,6 +304,7 @@ h1 {
 .settings-btn:hover { color: var(--text); transform: rotate(45deg); }
 .settings-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .rule-dialog.settings-dialog { width: min(440px, calc(100vw - 32px)); }
+h1 { padding-right: 48px; } /* место под шестерёнку: длинный заголовок под неё не залезает */
 .settings-section .seg { margin-top: 2px; }
 .settings-section + .settings-section { margin-top: 24px; }
 
@@ -535,6 +536,7 @@ h1 {
 .pts-total { font-size: 1.4rem; }
 .pts-total strong { color: var(--ok); }
 .pts-sub { color: var(--muted); }
+.pts-city { font-size: 1.1rem; font-weight: 700; }
 .pts-sub strong { color: var(--text); }
 .pts-map { margin-top: 6px; color: var(--accent); font-weight: 700; text-decoration: none; }
 .pts-map:hover { text-decoration: underline; }

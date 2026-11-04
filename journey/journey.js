@@ -2,7 +2,8 @@
  * Podróż — малюх едет по маршруту Polski.route; набранные очки = пробег.
  *
  *   Polski.journey.segments()      — отрезки: { from, to, km, tier, cost, start }, .total — весь круг в очках
- *   Polski.journey.locate(points)  — где малюх: { seg, t (0..1 на отрезке), left, reached, done }
+ *   Polski.journey.locate(dist)    — где малюх: { seg, t (0..1 на отрезке), left, reached, done }
+ *   Polski.journey.advance(dist, earned) — пробег после теста (не дальше следующего города)
  *
  * Карта рисуется на главной в <section id="journey">:
  *   без входа — карта приглушена, поверх «Zacznij podróż» → вход через Google;
@@ -61,6 +62,22 @@
         };
       }
     }
+  }
+
+  /**
+   * Пробег после теста: dist + earned, но не дальше citiesPerTest городов от текущего места
+   * (малюх посреди отрезка — «следующий город» это конец текущего отрезка).
+   */
+  function advance(dist, earned) {
+    var s = segments();
+    dist = Math.max(0, dist || 0);
+    var cap = dist;
+    var n = (Polski.balance.config.citiesPerTest || 1);
+    for (var k = 0; k < n && cap < s.total; k++) {
+      var loc = locate(cap);
+      cap = loc.seg.start + loc.seg.cost;
+    }
+    return Math.min(dist + Math.max(0, earned || 0), Math.max(cap, dist));
   }
 
   function fmt(n) { return Math.round(n).toLocaleString('pl-PL'); }
@@ -291,10 +308,11 @@
       try { window.localStorage.setItem(seenKey(uid), String(p)); } catch (e) { /* не страшно */ }
     }
 
+    // points — счёт игрока (null — ещё грузится), loc — где малюх по пробегу (dist)
     function renderInfo(points, loc) {
       info.replaceChildren(
         h('div', { class: 'journey-stats' }, [
-          h('span', { class: 'journey-points' }, ['⭐ ', h('strong', { text: fmt(points) }), ' pkt']),
+          h('span', { class: 'journey-points' }, ['⭐ ', h('strong', { text: points == null ? '…' : fmt(points) }), ' pkt']),
           h('span', { class: 'journey-cities', text: '🏙 ' + loc.reached + ' / ' + loc.cities + ' miast' }),
         ]),
         loc.done
@@ -306,9 +324,10 @@
       );
     }
 
-    function drive(from, to, done) {
+    // малюх едет по пробегу from → to; points — счёт, который показываем рядом
+    function drive(from, to, points, done) {
       cancelAnimationFrame(anim);
-      if (reduceMotion || to <= from) { renderInfo(to, map.set(to)); if (done) done(); return; }
+      if (reduceMotion || to <= from) { renderInfo(points, map.set(to)); if (done) done(); return; }
       var dur = Math.min(3500, 1200 + (to - from) / 2);
       var t0 = null;
       map.car.classList.add('driving');
@@ -316,8 +335,7 @@
         if (t0 == null) t0 = now;
         var k = Math.min(1, (now - t0) / dur);
         var e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-        var p = from + (to - from) * e;
-        renderInfo(p, map.set(p));
+        renderInfo(points, map.set(from + (to - from) * e));
         if (k < 1) anim = requestAnimationFrame(frame);
         else { map.car.classList.remove('driving'); if (done) done(); }
       }
@@ -348,11 +366,11 @@
       mode = 'user';
       section.classList.remove('locked');
       overlay.replaceChildren();
-      var seen = readSeen(u.uid);
-      renderInfo(seen, map.set(seen));
+      var seen = readSeen(u.uid); // пробег, на котором малюх стоял при прошлом визите
+      renderInfo(null, map.set(seen));
       Polski.progress.load().then(function (c) {
         if (mode !== 'user' || !c) return;
-        drive(Math.min(seen, c.points), c.points, function () { writeSeen(u.uid, c.points); });
+        drive(Math.min(seen, c.dist), c.dist, c.points, function () { writeSeen(u.uid, c.dist); });
       }, function () {
         info.replaceChildren(h('p', { class: 'account-error', text: 'Nie udało się wczytać punktów. Odśwież stronę.' }));
       });
@@ -368,7 +386,7 @@
   }
 
   window.Polski = window.Polski || {};
-  Polski.journey = { segments: segments, locate: locate, fmt: fmt };
+  Polski.journey = { segments: segments, locate: locate, advance: advance, fmt: fmt };
 
   function init() {
     var section = document.getElementById('journey');

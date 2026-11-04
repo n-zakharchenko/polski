@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Polski — testy</title>
+  <title>Rajd Polskiej Gramatyki</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <script src="core/settings.js"></script> <!-- тема — до отрисовки; шестерёнка настроек -->
@@ -14,7 +14,7 @@
   <main>
     <!-- одна страница и для главной, и для раздела: index.html?g=<id раздела> -->
     <a class="back" id="back" href="index.html" hidden>← Wstecz</a>
-    <h1 id="title">Polski 🇵🇱</h1>
+    <h1 id="title">Rajd Polskiej Gramatyki 🇵🇱</h1>
     <p class="subtitle" id="subtitle">Wybierz test</p>
 
     <!-- карточки строятся из tests/manifest.js -->
@@ -55,7 +55,7 @@
         var back = document.getElementById('back');
         back.href = parent ? 'index.html?g=' + encodeURIComponent(parent.id) : 'index.html';
         back.hidden = false;
-        document.title = group.title + ' — Polski';
+        document.title = group.title + ' — Rajd Polskiej Gramatyki';
         document.getElementById('title').textContent = group.title;
 
         if (group.chooser) {
@@ -140,6 +140,10 @@
           if (!t) return;
           list.appendChild(card('test.html?id=' + encodeURIComponent(t.id), t, t.soon));
         });
+        // на главной — заглушка «скоро будут новые тесты» (неактивная)
+        if (!groupId) {
+          list.appendChild(card(null, { icon: '✨', title: 'Nowe testy', desc: 'Kolejne tematy są w drodze' }, true));
+        }
       }).catch(function (err) {
         Polski.ui.showError(list, err);
       });

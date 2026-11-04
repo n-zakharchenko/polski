@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Test — Polski</title>
+  <title>Test — Rajd Polskiej Gramatyki</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <script src="core/settings.js"></script> <!-- тема — до отрисовки; шестерёнка настроек -->
@@ -48,7 +48,7 @@
         if (!test) throw new Error('Test „' + id + '” nie zarejestrował się.');
         // тест внутри раздела: заголовок — раздел («Niemęskoosobowe»), под ним — пункт («Liczebnik»)
         var heading = parent ? parent.title : test.title;
-        document.title = (parent ? parent.title + ' · ' : '') + test.title + ' — Polski';
+        document.title = (parent ? parent.title + ' · ' : '') + test.title + ' — Rajd Polskiej Gramatyki';
         document.getElementById('title').textContent = heading;
         if (parent) {
           var modeEl = document.getElementById('mode');
