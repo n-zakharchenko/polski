@@ -42,6 +42,14 @@
   <script src="journey/rivers.js?v=20261105-0914"></script>
   <script src="journey/journey.js?v=20261105-0914"></script>
   <script>
+    // локальный дебаг карты: только на localhost и только с ?debug; файла dev/debug.js на сайте нет (.gitignore)
+    if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && /[?&]debug\b/.test(location.search)) {
+      var dbg = document.createElement('script');
+      dbg.src = 'dev/debug.js?t=' + Date.now();
+      document.head.appendChild(dbg);
+    }
+  </script>
+  <script>
     (function () {
       var list = document.getElementById('test-list');
       var el = Polski.ui.el;

@@ -542,6 +542,15 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 .pts-total strong { color: var(--ok); }
 .pts-sub { color: var(--muted); }
 .pts-city { font-size: 1.1rem; font-weight: 700; }
+
+/* поп-ап «Nowe miasto» (journey.js → showCity) — на основе окна правила */
+.rule-dialog.city-dialog { width: min(420px, calc(100vw - 32px)); text-align: center; }
+.city-dialog .rule-inner { display: grid; gap: 6px; padding: 24px 22px 22px; }
+.city-dialog p { margin: 0; }
+.city-kicker { color: var(--accent); font-weight: 800; letter-spacing: 0.02em; }
+.city-name { margin: 2px 0 0; font-size: 1.8rem; line-height: 1.15; }
+.city-woj { color: var(--muted); font-size: 0.9rem; }
+.city-text { margin: 10px 0 14px !important; line-height: 1.55; text-align: left; }
 .pts-sub strong { color: var(--text); }
 .pts-map { margin-top: 6px; color: var(--accent); font-weight: 700; text-decoration: none; }
 .pts-map:hover { text-decoration: underline; }

@@ -96,13 +96,23 @@
       line.replaceChildren.apply(line, [
         h('p', { class: 'pts-total' }, ['⭐ ', h('strong', { text: '+' + fmt(r.points) + ' pkt' })]),
         r.bonus ? h('p', { class: 'pts-sub', text: 'w tym +' + fmt(r.bonus) + ' za test bez błędów' }) : null,
-        arrived ? h('p', { class: 'pts-city' }, ['🏁 Nowe miasto: ', h('strong', { text: was.seg.to.name }), '!']) : null,
-        capped ? h('p', { class: 'pts-sub', text: 'Maluch czeka tu na kolejny test — jedno miasto na test.' }) : null,
+        arrived ? h('p', { class: 'pts-city' }, loc.done
+          ? ['🎉 Meta: ', h('strong', { text: was.seg.to.name }), '! Cała Polska objechana.']
+          : ['🏁 Nowe miasto: ', h('strong', { text: was.seg.to.name }), '!']) : null,
+        capped && !loc.done ? h('p', { class: 'pts-sub', text: 'Maluch czeka tu na kolejny test — jedno miasto na test.' }) : null,
         loc && !arrived ? h('p', { class: 'pts-sub' }, loc.done
           ? ['Podróż ukończona! 🎉']
           : ['Następny przystanek: ', h('strong', { text: loc.seg.to.name }), ' · zostało ' + fmt(loc.left) + ' pkt']) : null,
         h('a', { class: 'pts-map', href: 'index.html', text: 'Zobacz mapę →' }),
       ].filter(Boolean));
+
+      // доехал до города — поп-ап «чем знаменит» (один раз на город; финиш — «Meta!»)
+      if (arrived && J.showCity) {
+        var u = acc() && acc().user();
+        setTimeout(function () {
+          if (box.isConnected) J.showCity(was.seg.to.name, u && u.uid, { finish: loc.done });
+        }, 500);
+      }
     }
 
     var retried = false;

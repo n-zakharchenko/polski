@@ -4,6 +4,7 @@
  *   Polski.journey.segments()      — отрезки: { from, to, km, tier, cost, start }, .total — весь круг в очках
  *   Polski.journey.locate(dist)    — где малюх: { seg, t (0..1 на отрезке), left, reached, done }
  *   Polski.journey.advance(dist, earned) — пробег после теста (не дальше следующего города)
+ *   Polski.journey.showCity(name, uid, { finish }) — поп-ап о городе, один раз на город
  *
  * Карта рисуется на главной в <section id="journey">:
  *   без входа — карта приглушена, поверх «Zacznij podróż» → вход через Google;
@@ -280,6 +281,45 @@
     return { svg: svg, set: set, car: car };
   }
 
+  /* ---------- поп-ап «Nowe miasto» (тексты — journey/cities.js) ---------- */
+
+  function shownKey(uid) { return 'polski.cities.' + (uid || 'anon'); }
+
+  /**
+   * Показать поп-ап о городе — один раз на город для этого аккаунта (помним в localStorage).
+   * opts.finish — малюх вернулся на старт: «Meta!». Возвращает true, если поп-ап показан.
+   */
+  function showCity(name, uid, opts) {
+    var info = Polski.cityInfo && Polski.cityInfo[name];
+    if (!info) return false;
+    var finish = !!(opts && opts.finish);
+    var key = shownKey(uid);
+    var id = finish ? name + '#meta' : name; // финиш в Варшаве — свой поп-ап, хоть Варшава и старт
+    var shown = [];
+    try { shown = JSON.parse(window.localStorage.getItem(key)) || []; } catch (e) { shown = []; }
+    if (shown.indexOf(id) !== -1 && !(opts && opts.force)) return false; // force — для дебаг-панели
+    if (shown.indexOf(id) === -1) shown.push(id);
+    try { window.localStorage.setItem(key, JSON.stringify(shown)); } catch (e) { /* покажем, но не запомним */ }
+
+    var dlg = h('dialog', { class: 'rule-dialog city-dialog', 'aria-label': name });
+    function close() {
+      if (typeof dlg.close === 'function' && dlg.open) dlg.close();
+      dlg.remove();
+    }
+    dlg.appendChild(h('div', { class: 'rule-inner' }, [
+      h('p', { class: 'city-kicker', text: finish ? '🎉 Meta! Cała Polska objechana' : '🏁 Nowe miasto!' }),
+      h('h2', { class: 'city-name', text: name }),
+      h('p', { class: 'city-woj', text: 'województwo ' + info.woj }),
+      h('p', { class: 'city-text', text: info.text }),
+      h('button', { class: 'btn btn-wide', type: 'button', text: finish ? 'Super!' : 'Jedziemy dalej!', onclick: close }),
+    ]));
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); }); // клик по фону
+    dlg.addEventListener('close', function () { dlg.remove(); });                // Esc
+    document.body.appendChild(dlg);
+    if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+    return true;
+  }
+
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function mount(section) {
@@ -378,6 +418,20 @@
       });
     }
 
+    // крючок для локальной дебаг-панели (dev/debug.js грузится только на localhost с ?debug):
+    // двигает малюха и переключает вид — только на экране, в базу ничего не пишет
+    Polski.journey._debug = {
+      set: function (dist) {
+        mode = 'debug';
+        cancelAnimationFrame(anim);
+        map.car.classList.remove('driving');
+        renderInfo(dist, map.set(dist));
+      },
+      drive: function (from, to, done) { mode = 'debug'; drive(from, to, to, done); },
+      locked: function () { showLocked(); },
+      unlocked: function () { mode = 'debug'; section.classList.remove('locked'); overlay.replaceChildren(); },
+    };
+
     acc.ready().then(function (u) {
       if (u) showUser(u); else showLocked();
       acc.onChange(function (user) {
@@ -388,7 +442,7 @@
   }
 
   window.Polski = window.Polski || {};
-  Polski.journey = { segments: segments, locate: locate, advance: advance, fmt: fmt };
+  Polski.journey = { segments: segments, locate: locate, advance: advance, showCity: showCity, fmt: fmt };
 
   function init() {
     var section = document.getElementById('journey');

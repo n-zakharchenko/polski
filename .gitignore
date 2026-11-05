@@ -1,5 +1,7 @@
 .DS_Store
 .scratch/
+# локальный дебаг (панель для карты) — только на этой машине, на сайт не попадает
+dev/
 # логи и кэш Firebase CLI
 firebase-debug.log*
 firestore-debug.log*
