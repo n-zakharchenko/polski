@@ -12,6 +12,8 @@
 (function () {
   'use strict';
 
+  var RETRY_MS = 11000; // правила Firestore: запись не чаще раза в 10 с — повтор чуть позже
+
   function acc() { return window.PolskiAccount; }
   function fmt(n) { return Math.round(n).toLocaleString('pl-PL'); }
 
@@ -103,6 +105,8 @@
       ].filter(Boolean));
     }
 
+    var retried = false;
+
     function save() {
       if (state !== 'idle') return;
       state = 'saving';
@@ -111,6 +115,13 @@
         if (res) saved(res);
         else { state = 'idle'; line.replaceChildren(); }
       }, function (e) {
+        // правила пускают запись не чаще раза в 10 с: очень быстрый тест — подождём и повторим один раз сами
+        if (e && e.code === 'permission-denied' && !retried) {
+          retried = true;
+          line.replaceChildren(h('p', { class: 'pts-sub', text: 'Zapisywanie punktów… (chwilka, za szybko!)' }));
+          setTimeout(function () { state = 'idle'; if (box.isConnected) save(); }, RETRY_MS);
+          return;
+        }
         state = 'idle';
         line.replaceChildren(
           h('p', { class: 'account-error', text: 'Nie udało się zapisać punktów' + (e && e.code ? ' (' + e.code + ')' : '') + '.' }),

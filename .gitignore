@@ -1,2 +1,6 @@
 .DS_Store
 .scratch/
+# логи и кэш Firebase CLI
+firebase-debug.log*
+firestore-debug.log*
+.firebase/

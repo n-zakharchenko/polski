@@ -1,12 +1,14 @@
 rules_version = '2';
 
 // Правила доступа к базе Firestore проекта polski-3f3c1.
-// Вставляются вручную: Firebase Console → Firestore Database → Rules → Publish.
+// Выкладываются командой из корня проекта (в консоли руками не правим):
+//   npx firebase-tools@15.34.1 deploy --only firestore:rules
 //
 // users/{uid} = { points, dist, tests, perfect, updatedAt } — пишет только сам пользователь, один раз за тест.
 //   points — счёт, dist — пробег малюха (растёт не больше, чем очки за этот тест).
 // Сервера нет, очки считает браузер, поэтому правила хотя бы ограничивают накрутку:
-//   очки только растут, не больше MAX_GAIN за запись; пробег не обгоняет очки; tests +1; не чаще раза в 30 с.
+//   очки только растут, не больше MAX_GAIN за запись; пробег не обгоняет очки; tests +1; не чаще раза в 10 с
+//   (тест из 15 заданий быстрее не пройти; при отказе итог теста сам повторяет запись один раз — core/progress.js).
 // MAX_GAIN (5000) должен быть не меньше Polski.balance.maxForTest(rounds) — сейчас 4250 при 15 заданиях.
 // В старых записях нет dist — тогда прежний пробег считается равным points.
 // Всё остальное в базе закрыто.
@@ -40,7 +42,7 @@ service cloud.firestore {
              <= request.resource.data.points - resource.data.points
         && request.resource.data.tests == resource.data.tests + 1
         && request.resource.data.perfect - resource.data.perfect in [0, 1]
-        && request.time > resource.data.updatedAt + duration.value(30, 's');
+        && request.time > resource.data.updatedAt + duration.value(10, 's');
     }
   }
 }

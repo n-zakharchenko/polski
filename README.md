@@ -23,7 +23,8 @@ journey/terrain-light.webp, terrain-dark.webp
                       пастельная раскраска: лес и вода (ESA WorldCover 2021), горы (по высоте); своя картинка на тему
 journey/rivers.js     реки Natural Earth 1:10m (упрощённые), рисуются линиями внутри контура Польши
 journey/journey.js    карта на главной: маршрут, пройденная часть, малюх; locate(points)
-firestore.rules       правила доступа к Firestore (вставляются вручную в консоли Firebase)
+firestore.rules       правила доступа к Firestore (выкладываются командой, см. «Аккаунты»)
+firebase.json, .firebaserc  настройки Firebase CLI: где правила, какой проект
 privacy.html          Polityka prywatności
 tests/manifest.js     дерево разделов и тестов
 tests/<раздел>/<тест>/  бандл теста
@@ -132,6 +133,12 @@ Polski.register({
 
 - Проект Firebase `polski-3f3c1`; конфиг — в `core/account.js`. Он публичный по замыслу Firebase,
   данные защищают правила из `firestore.rules`. Сервисные ключи в репозиторий не кладём.
+- Правила меняем только в `firestore.rules` и выкладываем командой (в консоли руками не правим,
+  иначе файл и база разъедутся). Один раз на машине: `npx firebase-tools@15.34.1 login`. Дальше:
+
+  ```
+  npx firebase-tools@15.34.1 deploy --only firestore:rules
+  ```
 - Без входа Firebase не загружается. SDK (`gstatic.com/firebasejs/<версия>/`) грузится при открытии
   настроек, на итоге теста или сразу, если в браузере уже был вход (`localStorage['polski.account']`).
 - Вход только popup-окном: редирект на чужом домене (github.io) ломается из-за блокировки сторонних cookie.

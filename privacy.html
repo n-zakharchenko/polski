@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Polityka prywatności — Rajd Polskiej Gramatyki</title>
   <!-- версия сайта: метка ?v= у всех наших файлов (защита от кэша); меняет tools/bump-version.js -->
-  <script>window.POLSKI_V = '20261104-2140';</script>
-  <link rel="icon" href="favicon.svg?v=20261104-2140" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20261104-2140">
-  <script src="core/settings.js?v=20261104-2140"></script>
+  <script>window.POLSKI_V = '20261105-0914';</script>
+  <link rel="icon" href="favicon.svg?v=20261105-0914" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css?v=20261105-0914">
+  <script src="core/settings.js?v=20261105-0914"></script>
 </head>
 <body>
   <main>
@@ -19,19 +19,24 @@
     <article class="card prose">
       <h2>Kto prowadzi aplikację</h2>
       <p>„Rajd Polskiej Gramatyki” to prywatny, niekomercyjny projekt do nauki języka polskiego. W sprawach danych osobowych
-        napisz przez <a href="https://github.com/n-zakharchenko/polski/issues">zgłoszenie na GitHubie</a>.</p>
+        napisz na <a href="mailto:nikita.zakharchenko@gmail.com">nikita.zakharchenko@gmail.com</a>.</p>
 
       <h2>Bez logowania</h2>
-      <p>Nic nie wysyłamy. W Twojej przeglądarce (localStorage) zapisujemy tylko ustawienia: motyw,
-        ostatni wybór ćwiczenia i to, czy podpowiedź była już pokazana. Nie używamy plików cookie,
-        analityki ani reklam.</p>
+      <p>Nie zapisujemy o Tobie żadnych danych. W Twojej przeglądarce (localStorage) przechowujemy tylko
+        ustawienia: motyw, ostatni wybór ćwiczenia i to, czy podpowiedź była już pokazana.</p>
+      <p>Gdy otworzysz ustawienia albo skończysz test, przeglądarka pobiera skrypty logowania Firebase
+        z serwerów Google (gstatic.com) — jak przy każdym pobieraniu pliku, Google widzi wtedy Twój adres IP.
+        Sami nie ustawiamy plików cookie i nie używamy analityki ani reklam.</p>
 
       <h2>Z logowaniem przez Google</h2>
       <ul>
         <li>Logowanie obsługuje Google Firebase Authentication. Firebase przechowuje Twój adres e-mail,
           imię i identyfikator konta — wyłącznie po to, żeby rozpoznać Cię przy następnym logowaniu.</li>
-        <li>Wyniki ćwiczeń zapisujemy w bazie Google Firebase Firestore pod identyfikatorem konta,
-          bez adresu e-mail.</li>
+        <li>Wyniki ćwiczeń (punkty, przebieg malucha na mapie, liczbę testów) zapisujemy w bazie
+          Google Firebase Firestore pod identyfikatorem konta, bez adresu e-mail.</li>
+        <li>W przeglądarce zostaje token logowania Firebase (IndexedDB) i dwa pomocnicze znaczniki
+          w localStorage: że jesteś zalogowany i gdzie maluch stał przy ostatniej wizycie.
+          Samo okno logowania należy do Google i podlega polityce prywatności Google.</li>
         <li>Dane są przechowywane na serwerach Google w Unii Europejskiej.</li>
         <li>Podstawa prawna: art. 6 ust. 1 lit. b RODO — zapisywanie postępów to usługa, o którą prosisz,
           logując się.</li>
@@ -58,9 +63,9 @@
       <p>Strona jest hostowana na GitHub Pages. GitHub może zapisywać adresy IP w logach serwera —
         zgodnie z własną polityką prywatności.</p>
 
-      <p class="muted">Ostatnia aktualizacja: 4 listopada 2026</p>
+      <p class="muted">Ostatnia aktualizacja: 5 listopada 2026</p>
     </article>
   </main>
-  <script src="core/account.js?v=20261104-2140" defer></script>
+  <script src="core/account.js?v=20261105-0914" defer></script>
 </body>
 </html>
