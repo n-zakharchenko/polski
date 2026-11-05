@@ -249,7 +249,8 @@
 /* ---------- карта: сепия, маршрут — чернилами ---------- */
 [data-design="02-gazeta"] .journey { padding: 16px; }
 [data-design="02-gazeta"] .journey-lead { font-family: var(--head); font-weight: 600; font-size: 1.1rem; text-align: center; margin-bottom: 10px; }
-[data-design="02-gazeta"] .map-terrain { filter: grayscale(1) sepia(0.45) contrast(0.95) brightness(1.04); }
+/* сепия — SVG-фильтр из journey.js (CSS grayscale()/sepia() Safari внутри SVG не применяет) */
+[data-design="02-gazeta"] .map-terrain { filter: url(#journey-sepia); }
 [data-design="02-gazeta"] .map-done { stroke: var(--ink); }
 [data-design="02-gazeta"] .map-city.reached { fill: var(--ink); stroke: var(--ink); }
 [data-design="02-gazeta"] .map-city.next { stroke: var(--ink); }

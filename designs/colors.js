@@ -54,6 +54,8 @@
 
   var root = document.documentElement;
   var design = root.getAttribute('data-design');
+  // стиль могут переключить на лету («Ustawienia → Styl») — правки должны быть от текущего
+  function syncDesign() { design = root.getAttribute('data-design'); }
 
   function theme() {
     var t = root.getAttribute('data-theme');
@@ -72,8 +74,9 @@
   }
 
   function apply() {
+    syncDesign();
+    TOKENS.forEach(function (t) { setVar(t[0], null); }); // снять правки прежнего стиля/темы
     if (!design) return;
-    TOKENS.forEach(function (t) { setVar(t[0], null); });
     var o = load();
     Object.keys(o).forEach(function (n) { setVar(n, o[n]); });
   }
@@ -232,7 +235,10 @@
 
   apply();
   // тема поменялась (шестерёнка «Motyw» или система) — правки другой темы
-  new MutationObserver(apply).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+  new MutationObserver(function () {
+    apply();
+    if (panel) { panel.remove(); panel = null; } // панель показывала цвета другого стиля/темы
+  }).observe(root, { attributes: true, attributeFilter: ['data-theme', 'data-design'] });
   if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', apply);
 
   window.PolskiColors = { apply: apply, toggle: toggle, css: css };

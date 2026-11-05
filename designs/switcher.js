@@ -24,6 +24,8 @@
       if (d.id === current) o.selected = true;
       sel.appendChild(o);
     });
+    // стиль сменили в «Ustawienia → Styl» — подпись переключателя следом
+    document.addEventListener('polski:style', function (e) { sel.value = e.detail || 'none'; });
     sel.addEventListener('change', function () {
       var u = new URL(location.href);
       u.searchParams.set('design', sel.value);

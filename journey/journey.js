@@ -231,7 +231,17 @@
       class: 'journey-map', viewBox: '0 0 ' + W.toFixed(0) + ' ' + H.toFixed(0),
       role: 'img', 'aria-label': 'Mapa podróży po Polsce',
     }, [
-      s('defs', {}, [s('clipPath', { id: 'journey-poland' }, [s('path', { d: land })])]),
+      s('defs', {}, [
+        s('clipPath', { id: 'journey-poland' }, [s('path', { d: land })]),
+        // сепия «как гравюра» для стиля «Gazeta»: SVG-фильтр, потому что CSS grayscale()/sepia()
+        // Safari к элементам внутри SVG не применяет (CSS: filter: url(#journey-sepia))
+        s('filter', { id: 'journey-sepia', 'color-interpolation-filters': 'sRGB' }, [
+          s('feColorMatrix', {
+            type: 'matrix',
+            values: '0.2445 0.8225 0.0830 0 0.01  0.2296 0.7724 0.0780 0 0.01  0.2041 0.6866 0.0693 0 0.01  0 0 0 1 0',
+          }),
+        ]),
+      ]),
       s('path', { class: 'map-land', d: land }), // запасной цвет суши, пока картинки грузятся
       // пастельная физическая карта: лес, вода, горы (journey/terrain-*.webp) — своя для каждой темы
       s('image', Object.assign({ class: 'map-terrain map-terrain-light', href: Polski.withVersion('journey/terrain-light.webp') }, full)),

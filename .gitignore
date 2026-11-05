@@ -2,6 +2,8 @@
 .scratch/
 # локальный дебаг (панель для карты) — только на этой машине, на сайт не попадает
 dev/
+# кэш Python (tools/*.py)
+__pycache__/
 # логи и кэш Firebase CLI
 firebase-debug.log*
 firestore-debug.log*
