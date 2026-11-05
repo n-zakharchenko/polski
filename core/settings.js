@@ -3,7 +3,7 @@
  * Подключается в <head>, до отрисовки: сразу применяет тему, чтобы не мигала светлая.
  * После загрузки страницы добавляет шестерёнку в правый верхний угол и окно «Ustawienia».
  *
- * Styl: «Pastelowy» (по умолчанию) / «Gazeta» — см. блок STYLES ниже.
+ * Styl: «Pastelowy» (по умолчанию) / «Prosty» / «Gazeta» — см. блок STYLES ниже.
  * Motyw: «Jak na urządzeniu» (как в системе) / «Dzień» / «Noc».
  *   Хранится в localStorage 'polski.theme' ('light' | 'dark'; нет ключа — как в системе).
  *   Применяется атрибутом <html data-theme="light|dark"> — см. style.css.
@@ -43,7 +43,7 @@
   applyTheme(readTheme()); // до отрисовки
 
   /*
-   * Styl — оформление сайта: «Pastelowy» (по умолчанию) или «Gazeta».
+   * Styl — оформление сайта: «Pastelowy» (по умолчанию), «Prosty» (базовый style.css) или «Gazeta».
    *   Оба файла (designs/01-retro-pastel.css, designs/02-gazeta.css) подключены в <head> каждой страницы
    *   и ограничены атрибутом <html data-design="…">, поэтому стиль включается до первой отрисовки,
    *   а переключение в настройках — мгновенное. Выбор — localStorage 'polski.style'.
@@ -55,6 +55,7 @@
    */
   var STYLES = [
     { id: '01-retro-pastel', title: 'Pastelowy' },
+    { id: 'none', title: 'Prosty' },             // самый первый дизайн: style.css без вариантов
     { id: '02-gazeta', title: 'Gazeta' },
   ];
   var DEFAULT_STYLE = STYLES[0].id;
@@ -288,5 +289,7 @@
   window.PolskiSettings = {
     readTheme: readTheme, applyTheme: applyTheme, addSection: addSection,
     styles: STYLES, readStyle: readStyle, applyStyle: applyStyle,
+    // выбрать стиль, как кнопкой в «Ustawienia → Styl»: запомнить и применить сразу
+    setStyle: function (id) { saveStyle(id); applyStyle(id); },
   };
 })();

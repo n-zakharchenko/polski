@@ -53,9 +53,10 @@
   var FOLLOW = { '--accent': ['--accent-2'] };
 
   var root = document.documentElement;
-  var design = root.getAttribute('data-design');
+  // текущий стиль; «Prosty» (базовый style.css) — без атрибута, у нас это 'none'
+  var design = root.getAttribute('data-design') || 'none';
   // стиль могут переключить на лету («Ustawienia → Styl») — правки должны быть от текущего
-  function syncDesign() { design = root.getAttribute('data-design'); }
+  function syncDesign() { design = root.getAttribute('data-design') || 'none'; }
 
   function theme() {
     var t = root.getAttribute('data-theme');
@@ -68,7 +69,8 @@
 
   function setVar(name, value) {
     if (value) root.style.setProperty(name, value); else root.style.removeProperty(name);
-    (FOLLOW[name] || []).forEach(function (n) {
+    // в «Prosty» акцент — градиент из двух цветов, второй не повторяет первый
+    (design === 'none' ? [] : FOLLOW[name] || []).forEach(function (n) {
       if (value) root.style.setProperty(n, value); else root.style.removeProperty(n);
     });
   }
@@ -76,7 +78,6 @@
   function apply() {
     syncDesign();
     TOKENS.forEach(function (t) { setVar(t[0], null); }); // снять правки прежнего стиля/темы
-    if (!design) return;
     var o = load();
     Object.keys(o).forEach(function (n) { setVar(n, o[n]); });
   }
@@ -97,9 +98,8 @@
 
   function css() {
     var lines = TOKENS.map(function (t) { return '  ' + t[0] + ': ' + current(t[0]) + ';'; });
-    var sel = theme() === 'dark'
-      ? ':root[data-design="' + design + '"][data-theme="dark"]'
-      : ':root[data-design="' + design + '"]';
+    var base = design === 'none' ? ':root' : ':root[data-design="' + design + '"]'; // Prosty — в style.css
+    var sel = theme() === 'dark' ? base + '[data-theme="dark"]' : base;
     return '/* ' + design + ', тема: ' + theme() + ' */\n' + sel + ' {\n' + lines.join('\n') + '\n}';
   }
 
@@ -111,7 +111,8 @@
       'box-shadow:0 10px 30px rgba(0,0,0,.35)');
     var head = document.createElement('div');
     head.setAttribute('style', 'display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:700');
-    head.innerHTML = '<span>🎛 Цвета · ' + design + ' · ' + (theme() === 'dark' ? 'тёмная' : 'светлая') + '</span>';
+    head.innerHTML = '<span>🎛 Цвета · ' + (design === 'none' ? 'Prosty' : design) + ' · ' +
+      (theme() === 'dark' ? 'тёмная' : 'светлая') + '</span>';
     var x = document.createElement('button');
     x.textContent = '×';
     x.setAttribute('style', 'background:none;border:none;color:#e5e7eb;font-size:16px;cursor:pointer');

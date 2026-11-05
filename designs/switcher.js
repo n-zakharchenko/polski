@@ -1,12 +1,22 @@
 /*
- * Переключатель вариантов дизайна — маленький 🎨 внизу слева. Только localhost (грузит core/settings.js).
- * Выбор → перезагрузка страницы с ?design=<id> (запоминается для всех страниц).
+ * Панель отладки стилей — внизу слева. ТОЛЬКО localhost (грузит core/settings.js).
+ *   🎨 список — стиль, как в «Ustawienia → Styl»: встроенные (Pastelowy / Prosty / Gazeta) переключаются
+ *              на лету и запоминаются; пробные варианты из designs/list.js — перезагрузкой с ?design=<id>
+ *   ⧉ — страница сравнения designs/compare.html
+ *   🎛 — живой редактор цветов текущего стиля (designs/colors.js), для любого стиля
+ * Панель всегда следует за стилем из настроек — вводить ?design не нужно.
  */
 (function () {
   'use strict';
   var list = window.POLSKI_DESIGNS || [];
   if (!list.length) return;
-  var current = document.documentElement.getAttribute('data-design') || 'none';
+  var root = document.documentElement;
+
+  function current() { return root.getAttribute('data-design') || 'none'; }
+  function builtIn(id) {
+    var S = window.PolskiSettings && window.PolskiSettings.styles;
+    return !!S && S.some(function (s) { return s.id === id; });
+  }
 
   function build() {
     var box = document.createElement('div');
@@ -21,41 +31,45 @@
       o.value = d.id;
       o.textContent = d.title;
       o.style.color = '#111';
-      if (d.id === current) o.selected = true;
       sel.appendChild(o);
     });
-    // стиль сменили в «Ustawienia → Styl» — подпись переключателя следом
-    document.addEventListener('polski:style', function (e) { sel.value = e.detail || 'none'; });
+    sel.value = current();
     sel.addEventListener('change', function () {
-      var u = new URL(location.href);
-      u.searchParams.set('design', sel.value);
-      location.href = u.toString();
+      if (builtIn(sel.value)) {
+        window.PolskiSettings.setStyle(sel.value); // как в настройках: сразу и запомнить
+      } else {
+        var u = new URL(location.href);            // пробный вариант — его файлы подгрузит settings.js
+        u.searchParams.set('design', sel.value);
+        location.href = u.toString();
+      }
     });
+    // стиль сменили в «Ustawienia → Styl» — список следом
+    document.addEventListener('polski:style', function (e) { sel.value = e.detail || 'none'; });
+
     var cmp = document.createElement('a');
     cmp.href = 'designs/compare.html';
     cmp.textContent = '⧉';
     cmp.title = 'Сравнить все варианты';
     cmp.setAttribute('style', 'color:#fff;text-decoration:none;padding:0 4px');
+
+    var tune = document.createElement('button');
+    tune.textContent = '🎛';
+    tune.title = 'Цвета текущего стиля — менять вживую';
+    tune.setAttribute('style', 'font:inherit;background:none;border:none;color:#fff;cursor:pointer;padding:0 2px');
+    tune.onclick = function () { if (window.PolskiColors) window.PolskiColors.toggle(); };
+
     box.appendChild(document.createTextNode('🎨'));
     box.appendChild(sel);
     box.appendChild(cmp);
-    if (current !== 'none') {
-      // живой редактор цветов варианта (designs/colors.js); правки применяются сразу при загрузке
-      var tune = document.createElement('button');
-      tune.textContent = '🎛';
-      tune.title = 'Цвета варианта — менять вживую';
-      tune.setAttribute('style', 'font:inherit;background:none;border:none;color:#fff;cursor:pointer;padding:0 2px');
-      tune.onclick = function () { if (window.PolskiColors) window.PolskiColors.toggle(); };
-      box.appendChild(tune);
-    }
+    box.appendChild(tune);
     document.body.appendChild(box);
   }
 
-  if (current !== 'none') {
-    var s = document.createElement('script');
-    s.src = 'designs/colors.js?t=' + Date.now();
-    document.head.appendChild(s);
-  }
+  // редактор цветов — всегда: правки применяются сразу при загрузке
+  var s = document.createElement('script');
+  s.src = 'designs/colors.js?t=' + Date.now();
+  document.head.appendChild(s);
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build);
   else build();
 })();
