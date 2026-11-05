@@ -41,6 +41,52 @@
 
   applyTheme(readTheme()); // до отрисовки
 
+  /*
+   * Варианты дизайна (ветка redesign) — ТОЛЬКО на localhost:
+   *   ?design=ID   — поверх style.css подключить designs/ID.css и запомнить выбор (localStorage)
+   *   ?design=none — вернуть текущий дизайн
+   *   &compare     — для страницы сравнения: выбор не запоминать, переключатель не показывать
+   * На сайте этот блок ничего не делает.
+   */
+  var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  var DESIGN_KEY = 'polski.design';
+  var params = new URLSearchParams(location.search);
+  var compareMode = LOCAL && params.has('compare');
+
+  function readDesign() {
+    if (!LOCAL) return null;
+    var d = params.get('design');
+    if (d !== null) {
+      if (!compareMode) {
+        try {
+          if (d && d !== 'none') window.localStorage.setItem(DESIGN_KEY, d);
+          else window.localStorage.removeItem(DESIGN_KEY);
+        } catch (e) { /* без хранилища — только на этой странице */ }
+      }
+      return d && d !== 'none' ? d : null;
+    }
+    try { return window.localStorage.getItem(DESIGN_KEY); } catch (e) { return null; }
+  }
+
+  var design = readDesign();
+  if (design && /^[\w-]+$/.test(design)) {
+    document.documentElement.setAttribute('data-design', design);
+    var designLink = document.createElement('link');
+    designLink.rel = 'stylesheet';
+    designLink.href = 'designs/' + design + '.css?t=' + Date.now(); // всегда свежий: варианты правим часто
+    document.head.appendChild(designLink);
+  }
+  if (LOCAL && !compareMode) {
+    // переключатель вариантов (🎨 внизу слева): сначала список, потом сам переключатель
+    var addScript = function (src, then) {
+      var s = document.createElement('script');
+      s.src = src + '?t=' + Date.now();
+      if (then) s.onload = then;
+      document.head.appendChild(s);
+    };
+    addScript('designs/list.js', function () { addScript('designs/switcher.js'); });
+  }
+
   var GEAR_SVG =
     '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" ' +
     'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/>' +
@@ -135,7 +181,9 @@
     dlg.querySelector('.rule-close').addEventListener('click', close);
     dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); }); // клик по фону
 
-    document.body.appendChild(btn);
+    // кнопка — внутри <main>: в основном дизайне она всё равно в углу страницы (main не позиционирован),
+    // а варианты дизайна могут привязать её к углу панели (main { position: relative })
+    (document.querySelector('main') || document.body).appendChild(btn);
     document.body.appendChild(dlg);
   }
 

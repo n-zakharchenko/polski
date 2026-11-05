@@ -1,0 +1,247 @@
+/*
+ * Вариант 01 · Ретро-пастель — по референсу: розовый фон, кремовые панели, терракотово-красный акцент,
+ * мягкий наклонный засечный шрифт в заголовках, пастельные карточки, кнопки-«таблетки».
+ * Подключается поверх style.css только на localhost (?design=01-retro-pastel).
+ * Шрифты — Google Fonts (Fraunces, DM Sans): если вариант пойдёт в продакшен — либо хостить сами,
+ * либо дописать Google Fonts в политику конфиденциальности.
+ */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,500..800,0..100,0..1;1,9..144,500..800,0..100,0..1&display=swap');
+
+/* ---------- палитра (светлая) ---------- */
+:root[data-design="01-retro-pastel"] {
+  --bg: #b1d2e2;               /* фон страницы — голубой */
+  --source-bg: #e5d6c2;        /* блок «Zdanie» — свой цвет, больше не повторяет фон страницы */
+  /* части речи — подобрано в 🎛 (форма вариантов и рамок — как в основном дизайне) */
+  --y-bg: #ffeca8;             /* rzeczownik */
+  --y-border: #ffbd24;
+  --y-text: #86600e;
+  --g-bg: #c0f7b5;             /* czasownik */
+  --g-border: #2eb830;
+  --g-text: #1d683b;
+  --num: #3f6fe8;              /* liczebnik: обводка и число словами */
+  --b-text: #24449e;
+  /* --b-bg: #d3e…  — ждёт точное значение */
+  /* плашки «Dokładnie! / Prawie! / O kurde!» */
+  --verdict-ok: #3f8f5a;
+  --verdict-bad: #ff9500;
+  --verdict-fail: #d04a3a;
+  --panel: #fdf8f1;            /* блоки — чуть светлее фона страницы */
+  --card: #fdf8f1;
+  --card-border: #ecc5ba;
+  --text: #3b2522;
+  --muted: #8a5f57;
+  --accent: #d04a3a;           /* терракота */
+  --accent-2: #d04a3a;
+  --accent-ink: #fbf1e3;       /* текст на акценте */
+  --accent-soft: #f8d8d1;
+  --shadow: none;
+  --shadow-hover: none;
+  --radius: 22px;
+  --ok: #3f8f5a;
+  --ok-soft: #dcefd9;
+  --bad: #d04a3a;
+  --bad-soft: #f8d8d1;
+  --tip-bg: #fff8ee;
+  --map-land: #fbf1e3;
+  --map-border: #e4b9ad;
+  /* пастельные карточки тестов */
+  --pc-1: #ffd97a;             /* жёлтая */
+  --pc-2: #a9cadb;             /* голубая */
+  --pc-3: #ffb6c1;             /* розовая */
+  --pc-4: #f2c4a3;             /* персиковая */
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/*
+ * ---------- палитра (ночная) — выведена из дневной ----------
+ *   голубой фон страницы → глубокий сине-зелёный; кремовые блоки → тёплый тёмный «крем»;
+ *   терракота чуть светлее (контраст на тёмном); пастели карточек и частей речи — те же оттенки, тёмные;
+ *   обводки частей речи — те же яркие, что подобраны днём.
+ * Записано дважды (система в тёмном режиме / «Noc» в настройках) — держите оба блока одинаковыми.
+ */
+@media (prefers-color-scheme: dark) {
+  :root[data-design="01-retro-pastel"]:not([data-theme="light"]) {
+    --bg: #172b35; --source-bg: #303e46; --panel: #27333a; --card: #15252e; --card-border: #3d4a52;
+    --text: #f4e9dc; --muted: #b9a596; --accent: #e8634e; --accent-2: #e8634e; --accent-ink: #fff4ea;
+    --accent-soft: #744c44; --ok: #7fd49a; --ok-soft: #1d3527; --bad: #ff8a75; --bad-soft: #4a2c26;
+    --tip-bg: #27333a; --map-land: #2c2f3a; --map-border: #3d4a52;
+    --pc-1: #5e594a; --pc-2: #234452; --pc-3: #5a2e39; --pc-4: #5b3c2a;
+    --y-bg: #4a3a0e; --y-border: #ffbd24; --y-text: #ffe08a;
+    --g-bg: #173d1f; --g-border: #2eb830; --g-text: #b4f0a8;
+    --b-bg: #1c2a52; --num: #7f9dff; --b-text: #cdd9ff;
+    --verdict-ok: #2f8a55; --verdict-bad: #e88a00; --verdict-fail: #d9533f;
+  }
+}
+:root[data-design="01-retro-pastel"][data-theme="dark"] {
+  --bg: #172b35; --source-bg: #303e46; --panel: #27333a; --card: #15252e; --card-border: #3d4a52;
+  --text: #f4e9dc; --muted: #b9a596; --accent: #e8634e; --accent-2: #e8634e; --accent-ink: #fff4ea;
+  --accent-soft: #744c44; --ok: #7fd49a; --ok-soft: #1d3527; --bad: #ff8a75; --bad-soft: #4a2c26;
+  --tip-bg: #27333a; --map-land: #2c2f3a; --map-border: #3d4a52;
+  --pc-1: #5e594a; --pc-2: #234452; --pc-3: #5a2e39; --pc-4: #5b3c2a;
+  --y-bg: #4a3a0e; --y-border: #ffbd24; --y-text: #ffe08a;
+  --g-bg: #173d1f; --g-border: #2eb830; --g-text: #b4f0a8;
+  --b-bg: #1c2a52; --num: #7f9dff; --b-text: #cdd9ff;
+  --verdict-ok: #2f8a55; --verdict-bad: #e88a00; --verdict-fail: #d9533f;
+}
+
+/* ---------- основа ---------- */
+[data-design="01-retro-pastel"] body {
+  background: var(--bg);
+  font-family: var(--sans);
+}
+/* страница — кремовая панель в тонкой рамке, как в референсе */
+[data-design="01-retro-pastel"] main {
+  background: var(--panel);
+  border: 1.5px solid var(--accent);
+  border-radius: 28px;
+  margin: 12px auto 24px;
+  max-width: 740px;
+  width: calc(100% - 24px);
+  padding: 24px 18px 30px;
+  position: relative;          /* шестерёнка — в правом верхнем углу панели */
+}
+[data-design="01-retro-pastel"] .settings-btn { top: 14px; right: 14px; }
+[data-design="01-retro-pastel"] h1,
+[data-design="01-retro-pastel"] h2,
+[data-design="01-retro-pastel"] .rule-title,
+[data-design="01-retro-pastel"] .city-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 650;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+}
+[data-design="01-retro-pastel"] h1 { font-size: 2.3rem; line-height: 1.05; margin-bottom: 8px; }
+[data-design="01-retro-pastel"] .subtitle { color: var(--text); }
+
+/* ---------- карточки тестов: пастель по кругу ---------- */
+[data-design="01-retro-pastel"] .test-card {
+  background: var(--pc-1);
+  border: none;
+  border-radius: 22px;
+  box-shadow: none;
+}
+[data-design="01-retro-pastel"] .test-list > .test-card:nth-child(4n+2) { background: var(--pc-2); }
+[data-design="01-retro-pastel"] .test-list > .test-card:nth-child(4n+3) { background: var(--pc-3); }
+[data-design="01-retro-pastel"] .test-list > .test-card:nth-child(4n+4) { background: var(--pc-4); }
+[data-design="01-retro-pastel"] .test-card:hover { transform: translateY(-3px) rotate(-0.4deg); box-shadow: none; }
+[data-design="01-retro-pastel"] .test-icon {
+  background: var(--panel);
+  color: var(--accent);
+  border-radius: 18px;
+  box-shadow: none;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.15rem;
+}
+[data-design="01-retro-pastel"] .test-title { font-family: var(--serif); font-weight: 650; font-size: 1.25rem; }
+[data-design="01-retro-pastel"] .test-desc { color: var(--text); opacity: 0.75; }
+/* стрелка — красный кружок, как кнопка корзины в референсе */
+[data-design="01-retro-pastel"] .test-arrow {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 1rem;
+}
+[data-design="01-retro-pastel"] .test-card:hover .test-arrow { color: var(--accent-ink); }
+[data-design="01-retro-pastel"] .test-card.soon { opacity: 1; }
+[data-design="01-retro-pastel"] .test-card.soon .test-text { opacity: 0.65; }
+[data-design="01-retro-pastel"] .test-card.soon .test-icon { background: var(--panel); color: var(--muted); }
+[data-design="01-retro-pastel"] .test-card.soon:hover { transform: none; }
+[data-design="01-retro-pastel"] .badge { background: var(--accent); color: var(--accent-ink); }
+
+/* ---------- кнопки: таблетки ---------- */
+[data-design="01-retro-pastel"] .btn {
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: none;
+  /* текст кнопок — как заголовки: мягкий наклонный Fraunces */
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 650;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-size: 1.15rem;
+  letter-spacing: 0;
+}
+[data-design="01-retro-pastel"] .btn:hover { box-shadow: none; filter: brightness(0.95); }
+[data-design="01-retro-pastel"] .btn-secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+}
+[data-design="01-retro-pastel"] .back,
+[data-design="01-retro-pastel"] .settings-btn {
+  background: var(--panel);
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  box-shadow: none;
+}
+[data-design="01-retro-pastel"] .seg-btn { border-radius: 999px; background: var(--card); }
+/* экран выбора режима — на всю ширину панели, без пустого места справа */
+[data-design="01-retro-pastel"] .chooser { max-width: none; }
+[data-design="01-retro-pastel"] .seg-btn.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+/* ---------- карточки-контейнеры (тест, выбор режима, политика) ---------- */
+[data-design="01-retro-pastel"] .card {
+  background: var(--card);
+  border: 1.5px solid var(--card-border);
+  box-shadow: none;
+}
+
+/* ---------- карта: красная рамка, кремовое окно — как правая панель референса ---------- */
+[data-design="01-retro-pastel"] .journey { background: var(--accent); border: none; padding: 14px; }
+[data-design="01-retro-pastel"] .journey-lead { color: var(--accent-ink); font-family: var(--serif); font-style: italic; font-size: 1.15rem; }
+[data-design="01-retro-pastel"] .journey-frame { background: var(--panel); border-radius: 18px; padding: 6px; }
+[data-design="01-retro-pastel"] .journey-info,
+[data-design="01-retro-pastel"] .journey-info strong,
+[data-design="01-retro-pastel"] .journey-next,
+[data-design="01-retro-pastel"] .journey-cities,
+[data-design="01-retro-pastel"] .journey-alt { color: var(--accent-ink); }
+[data-design="01-retro-pastel"] .journey-cta { background: var(--panel); border: none; box-shadow: none; }
+[data-design="01-retro-pastel"] .journey-cta .btn { background: var(--accent); }
+/* раскраска карты запечена в холодных тонах — слегка утепляем под кремовую палитру */
+[data-design="01-retro-pastel"] .map-terrain-light { filter: sepia(0.25) saturate(1.05); }
+[data-design="01-retro-pastel"] .site-footer a { color: var(--accent); }
+
+/* ---------- тест ---------- */
+/* блок «Zdanie» — свой цвет (в основном дизайне он повторял фон страницы) */
+[data-design="01-retro-pastel"] .slots-source { background: var(--source-bg); }
+/* слово в рамке — цветом текста основного дизайна (форму рамок и вариантов ответов не трогаем) */
+[data-design="01-retro-pastel"] .slot { color: #1d2330; }
+[data-design="01-retro-pastel"][data-theme="dark"] .slot { color: #e9ebf1; }
+@media (prefers-color-scheme: dark) {
+  [data-design="01-retro-pastel"]:not([data-theme="light"]) .slot { color: #e9ebf1; }
+}
+[data-design="01-retro-pastel"] .progress-track { background: var(--accent-soft); }
+[data-design="01-retro-pastel"] .progress-fill { background: var(--accent); }
+/* плашки «Dokładnie! / Prawie! / O kurde!»: крупнее, с мягкой тёплой тенью */
+[data-design="01-retro-pastel"] .verdict {
+  font-family: var(--serif);
+  font-style: italic;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-size: 2.1rem;
+  padding: 16px 40px;
+  box-shadow:
+    0 22px 40px -12px rgba(90, 40, 25, 0.38),
+    0 6px 14px rgba(90, 40, 25, 0.16);
+}
+[data-design="01-retro-pastel"] .verdict.ok { background: var(--verdict-ok); }
+[data-design="01-retro-pastel"] .verdict.bad { background: var(--verdict-bad); }
+[data-design="01-retro-pastel"] .verdict.fail { background: var(--verdict-fail); }
+[data-design="01-retro-pastel"] .info-btn { background: var(--panel); border-color: var(--accent); color: var(--accent); }
+[data-design="01-retro-pastel"] .summary-score { font-family: var(--serif); font-style: italic; color: var(--accent); }
+
+/* ---------- окна (правило, настройки, город) ---------- */
+[data-design="01-retro-pastel"] .rule-dialog {
+  background: var(--panel);
+  border: 1.5px solid var(--accent);
+  border-radius: 24px;
+}
+[data-design="01-retro-pastel"] .city-kicker { font-family: var(--sans); }

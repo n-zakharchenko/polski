@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сравнение дизайнов</title>
+<style>
+  body { margin: 0; padding: 16px; background: #1f2128; color: #e5e7eb; font: 14px system-ui; }
+  h1 { margin: 0 0 4px; font-size: 18px; }
+  p { margin: 0 0 14px; color: #9ca3af; }
+  .bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .bar button { font: inherit; color: #e5e7eb; background: #2b2e37; border: 1px solid #444; border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+  .bar button.on { border-color: #f87171; color: #fff; }
+  .grid { display: flex; gap: 18px; overflow-x: auto; padding-bottom: 10px; }
+  .col { flex: none; }
+  .col h2 { margin: 0 0 8px; font-size: 13px; font-weight: 600; }
+  .col h2 a { color: #fca5a5; }
+  /* телефон 375×812 в масштабе 0,62 */
+  .frame { width: 233px; height: 504px; overflow: hidden; border-radius: 18px; border: 1px solid #444; background: #fff; }
+  .frame iframe { width: 375px; height: 812px; border: 0; transform: scale(0.62); transform-origin: 0 0; }
+</style>
+</head>
+<body>
+<h1>Сравнение дизайнов</h1>
+<p>Только локально. Каждая колонка — вариант из designs/list.js в ширине телефона. Ссылка над колонкой открывает вариант целиком.</p>
+<div class="bar" id="pages"></div>
+<div class="grid" id="grid"></div>
+<script src="list.js"></script>
+<script>
+  var PAGES = [
+    { id: 'home', title: 'Главная', url: '../index.html' },
+    { id: 'test', title: 'Тест', url: '../test.html?id=liczebniki-niemeskoosobowe' },
+    { id: 'privacy', title: 'Политика', url: '../privacy.html' },
+  ];
+  var page = PAGES[0];
+
+  function src(design) {
+    var u = page.url + (page.url.indexOf('?') === -1 ? '?' : '&');
+    return u + 'design=' + encodeURIComponent(design) + '&compare';
+  }
+
+  function render() {
+    document.getElementById('pages').innerHTML = '';
+    PAGES.forEach(function (p) {
+      var b = document.createElement('button');
+      b.textContent = p.title;
+      if (p === page) b.className = 'on';
+      b.onclick = function () { page = p; render(); };
+      document.getElementById('pages').appendChild(b);
+    });
+    var grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    (window.POLSKI_DESIGNS || []).forEach(function (d) {
+      var col = document.createElement('div');
+      col.className = 'col';
+      var h = document.createElement('h2');
+      var a = document.createElement('a');
+      a.href = page.url + (page.url.indexOf('?') === -1 ? '?' : '&') + 'design=' + encodeURIComponent(d.id);
+      a.target = '_blank';
+      a.textContent = d.title;
+      h.appendChild(a);
+      var f = document.createElement('div');
+      f.className = 'frame';
+      var ifr = document.createElement('iframe');
+      ifr.src = src(d.id);
+      f.appendChild(ifr);
+      col.appendChild(h);
+      col.appendChild(f);
+      grid.appendChild(col);
+    });
+  }
+  render();
+</script>
+</body>
+</html>
