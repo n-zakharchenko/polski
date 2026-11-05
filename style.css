@@ -364,7 +364,7 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 /* ---------- Экран выбора (раздел с chooser) ---------- */
 
 .chooser[hidden], .test-list[hidden] { display: none; }
-.chooser { max-width: 600px; }
+.chooser { max-width: none; } /* на всю ширину колонки, как в остальных стилях */
 .chooser-axis { margin-bottom: 22px; }
 .chooser-label {
   margin-bottom: 8px;
