@@ -14,7 +14,11 @@ core/ui.js            экраны: задание → проверка → ит
 core/settings.js      тема и окно «Ustawienia» (PolskiSettings.addSection — свои секции)
 core/account.js       вход через Google (Firebase Auth), секция «Konto», блок входа на итоге теста
 core/balance.js       БАЛАНС: очки за ответы, серии, бонус, стоимость отрезков — все числа игры здесь
-core/progress.js      очки пользователя в Firestore (users/{uid}), блок очков на итоге теста
+core/progress.js      очки и статистика пользователя в Firestore (users/{uid}), блок очков на итоге теста
+core/stats.js         «Twoje statystyki» на главной (только после входа)
+core/pwa.js           кнопка «Zainstaluj aplikację» внизу страниц (только телефоны) и окно с инструкцией iPhone/Android
+manifest.webmanifest  PWA: название «Rajd Polski», иконки icons/ (малюх на пастельном голубом #b1d2e2)
+icons/                иконки PWA: 192, 512, maskable 512 (машина в безопасной зоне), apple-touch-icon 180
 journey/route.js      маршрут малюха: города по кругу (name, lat, lon, major, tier, label)
 journey/poland.js     контур Польши (Natural Earth 1:50m)
 journey/maluch.webp   малюх: 32 изометрических кадра из 3D-модели (Martin Trafas, CC BY 4.0)
@@ -152,6 +156,19 @@ Polski.register({
   Сохраняются один раз — на итоге теста (`Polski.progress.mountSummary`); вошёл прямо на итоге — тест тоже сохранится.
 - Малюх едет непрерывно: сумма очков = пробег по маршруту (`Polski.journey.locate`).
 - Поменяли баланс так, что максимум за тест (`Polski.balance.maxForTest`) больше 5000, — поднимите лимит в `firestore.rules`.
+
+## Статистика на главной («Twoje statystyki»)
+
+- Только после входа: `core/stats.js` рисует блок в `#stats` (без входа секция скрыта). Данные — тот же
+  `Polski.progress.load()`, что у карты (один запрос на страницу).
+- На итоге теста `core/progress.js` дописывает в `users/{uid}` поля статистики: `answered`, `correct`,
+  `bestStreak`, `seconds`, `day`/`dayStreak`/`bestDayStreak`, `week` (тестов по дням, 14 дней) и
+  `byTest[id] = { t, n, err, last }` (название, прохождений, ошибок, % трёх последних попыток).
+  Новые поля — в `firestore.rules` (в `byTest` и `week` за запись меняется один ключ: `lastTest` и `day`).
+- Километры, «Paliwo» (расход по отрезкам: горы, города, длина, разброс — `fuel` в `core/balance.js`), города и воеводства считаются из маршрута.
+- «Czas nauki»: время от показа задания до ответа, не больше `taskSecondsMax` на задание.
+- «Do poprawy»: тесты, у которых средний % последних попыток ниже 80, — до трёх, худшие сверху.
+- Цвет плиток — `--stat-bg` (по умолчанию фон страницы), есть в 🎛.
 
 ## Публикация и кэш
 

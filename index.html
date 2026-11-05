@@ -5,16 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rajd Polskiej Gramatyki</title>
   <!-- версия сайта: метка ?v= у всех наших файлов (защита от кэша); меняет tools/bump-version.js -->
-  <script>window.POLSKI_V = '20261105-1714';</script>
-  <link rel="icon" href="favicon.svg?v=20261105-1714" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20261105-1714">
+  <script>window.POLSKI_V = '20261105-1949';</script>
+  <link rel="icon" href="favicon.svg?v=20261105-1949" type="image/svg+xml">
+  <!-- PWA: «на экран домой» — название Rajd Polski, иконка — малюх (core/pwa.js — инструкция по установке) -->
+  <link rel="manifest" href="manifest.webmanifest?v=20261105-1949">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=20261105-1949">
+  <meta name="apple-mobile-web-app-title" content="Rajd Polski">
+  <meta name="application-name" content="Rajd Polski">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="style.css?v=20261105-1949">
   <!-- стили оформления (Styl в настройках): включается тот, что в <html data-design> -->
-  <link rel="stylesheet" href="designs/01-retro-pastel.css?v=20261105-1714">
-  <link rel="stylesheet" href="designs/02-gazeta.css?v=20261105-1714">
-  <script src="core/settings.js?v=20261105-1714"></script> <!-- тема — до отрисовки; шестерёнка настроек -->
-  <script src="core/account.js?v=20261105-1714" defer></script> <!-- вход через Google; без входа Firebase не грузится -->
-  <script src="core/progress.js?v=20261105-1714" defer></script> <!-- очки в Firestore -->
-  <script src="designs/02-gazeta.js?v=20261105-1714" defer></script> <!-- шапка газеты (стиль «Gazeta») -->
+  <link rel="stylesheet" href="designs/01-retro-pastel.css?v=20261105-1949">
+  <link rel="stylesheet" href="designs/02-gazeta.css?v=20261105-1949">
+  <script src="core/settings.js?v=20261105-1949"></script> <!-- тема — до отрисовки; шестерёнка настроек -->
+  <script src="core/account.js?v=20261105-1949" defer></script> <!-- вход через Google; без входа Firebase не грузится -->
+  <script src="core/progress.js?v=20261105-1949" defer></script> <!-- очки в Firestore -->
+  <script src="designs/02-gazeta.js?v=20261105-1949" defer></script>
+  <script src="core/pwa.js?v=20261105-1949" defer></script> <!-- «Zainstaluj aplikację» — только на телефонах --> <!-- шапка газеты (стиль «Gazeta») -->
 </head>
 <body>
   <main>
@@ -32,19 +40,24 @@
     <!-- карта путешествия малюхом (journey/journey.js); только на главной, под тестами -->
     <section class="journey card" id="journey" hidden></section>
 
+    <!-- статистика (core/stats.js): только на главной, под картой и только после входа -->
+    <section class="stats card" id="stats" hidden></section>
+
     <footer class="site-footer">
       <a href="privacy.html">Polityka prywatności</a>
     </footer>
   </main>
 
-  <script src="core/engine.js?v=20261105-1714"></script>
-  <script src="core/ui.js?v=20261105-1714"></script>
-  <script src="tests/manifest.js?v=20261105-1714"></script>
-  <script src="core/balance.js?v=20261105-1714"></script>
-  <script src="journey/route.js?v=20261105-1714"></script>
-  <script src="journey/poland.js?v=20261105-1714"></script>
-  <script src="journey/rivers.js?v=20261105-1714"></script>
-  <script src="journey/journey.js?v=20261105-1714"></script>
+  <script src="core/engine.js?v=20261105-1949"></script>
+  <script src="core/ui.js?v=20261105-1949"></script>
+  <script src="tests/manifest.js?v=20261105-1949"></script>
+  <script src="core/balance.js?v=20261105-1949"></script>
+  <script src="journey/route.js?v=20261105-1949"></script>
+  <script src="journey/poland.js?v=20261105-1949"></script>
+  <script src="journey/rivers.js?v=20261105-1949"></script>
+  <script src="journey/cities.js?v=20261105-1949"></script> <!-- воеводства для статистики, тексты поп-апа -->
+  <script src="journey/journey.js?v=20261105-1949"></script>
+  <script src="core/stats.js?v=20261105-1949"></script> <!-- «Twoje statystyki» — только после входа -->
   <script>
     // локальный дебаг карты (малюх, маршрут, окна городов): на localhost всегда, кроме превью сравнения
     // и страниц разделов (там нет карты); файла dev/debug.js на сайте нет (.gitignore)
@@ -62,7 +75,8 @@
       var items = Polski.manifest;
 
       if (groupId) {
-        document.getElementById('journey').remove(); // карта — только на главной
+        document.getElementById('journey').remove(); // карта и статистика — только на главной
+        document.getElementById('stats').remove();
         var path = Polski.findPath(groupId);
         var group = path && path[path.length - 1];
         if (!group || !Polski.isGroup(group)) {

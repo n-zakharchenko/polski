@@ -5,13 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Polityka prywatności — Rajd Polskiej Gramatyki</title>
   <!-- версия сайта: метка ?v= у всех наших файлов (защита от кэша); меняет tools/bump-version.js -->
-  <script>window.POLSKI_V = '20261105-1714';</script>
-  <link rel="icon" href="favicon.svg?v=20261105-1714" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20261105-1714">
+  <script>window.POLSKI_V = '20261105-1949';</script>
+  <link rel="icon" href="favicon.svg?v=20261105-1949" type="image/svg+xml">
+  <!-- PWA: «на экран домой» — название Rajd Polski, иконка — малюх (core/pwa.js — инструкция по установке) -->
+  <link rel="manifest" href="manifest.webmanifest?v=20261105-1949">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=20261105-1949">
+  <meta name="apple-mobile-web-app-title" content="Rajd Polski">
+  <meta name="application-name" content="Rajd Polski">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="style.css?v=20261105-1949">
   <!-- стили оформления (Styl в настройках): включается тот, что в <html data-design> -->
-  <link rel="stylesheet" href="designs/01-retro-pastel.css?v=20261105-1714">
-  <link rel="stylesheet" href="designs/02-gazeta.css?v=20261105-1714">
-  <script src="core/settings.js?v=20261105-1714"></script>
+  <link rel="stylesheet" href="designs/01-retro-pastel.css?v=20261105-1949">
+  <link rel="stylesheet" href="designs/02-gazeta.css?v=20261105-1949">
+  <script src="core/settings.js?v=20261105-1949"></script>
 </head>
 <body>
   <main>
@@ -36,8 +43,11 @@
       <ul>
         <li>Logowanie obsługuje Google Firebase Authentication. Firebase przechowuje Twój adres e-mail,
           imię i identyfikator konta — wyłącznie po to, żeby rozpoznać Cię przy następnym logowaniu.</li>
-        <li>Wyniki ćwiczeń (punkty, przebieg malucha na mapie, liczbę testów) zapisujemy w bazie
-          Google Firebase Firestore pod identyfikatorem konta, bez adresu e-mail.</li>
+        <li>Wyniki ćwiczeń zapisujemy w bazie Google Firebase Firestore pod identyfikatorem konta,
+          bez adresu e-mail: punkty, przebieg malucha na mapie, liczbę testów, liczbę odpowiedzi
+          i poprawnych odpowiedzi, czas nauki, najdłuższą serię, dni, w które rozwiązywałeś testy
+          (ostatnie dwa tygodnie i seria dni z rzędu), a dla każdego testu — jego nazwę, liczbę podejść,
+          błędów i wyniki trzech ostatnich podejść. Służą do statystyk widocznych tylko dla Ciebie.</li>
         <li>W przeglądarce zostaje token logowania Firebase (IndexedDB) i pomocnicze znaczniki
           w localStorage: że jesteś zalogowany, gdzie maluch stał przy ostatniej wizycie i opisy których
           miast były już pokazane.
@@ -54,7 +64,7 @@
         <strong>Ustawienia → Konto → Usuń konto</strong>.</p>
 
       <h2>Autorzy</h2>
-      <p>Maluch na mapie to render modelu
+      <p>Maluch na mapie i na ikonie aplikacji to render modelu
         <a href="https://sketchfab.com/3d-models/polski-fiat-fiat-126p-edc1b9d866484e048b4c54d917cca900">„Polski Fiat (Fiat 126p)”</a>
         autorstwa <a href="https://sketchfab.com/Bexxie">Martina Trafasa</a>, licencja
         <a href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> (zmieniony kolor i szyby, bez logotypów).
@@ -68,9 +78,10 @@
       <p>Strona jest hostowana na GitHub Pages. GitHub może zapisywać adresy IP w logach serwera —
         zgodnie z własną polityką prywatności.</p>
 
-      <p class="muted">Ostatnia aktualizacja: 5 listopada 2026 (czcionki Google Fonts)</p>
+      <p class="muted">Ostatnia aktualizacja: 5 listopada 2026 (statystyki, ikona aplikacji)</p>
     </article>
   </main>
-  <script src="core/account.js?v=20261105-1714" defer></script>
+  <script src="core/account.js?v=20261105-1949" defer></script>
+  <script src="core/pwa.js?v=20261105-1949" defer></script>
 </body>
 </html>

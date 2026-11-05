@@ -4,11 +4,16 @@ rules_version = '2';
 // Выкладываются командой из корня проекта (в консоли руками не правим):
 //   npx firebase-tools@15.34.1 deploy --only firestore:rules
 //
-// users/{uid} = { points, dist, tests, perfect, updatedAt } — пишет только сам пользователь, один раз за тест.
+// users/{uid} = { points, dist, tests, perfect, updatedAt, + статистика } — пишет только сам пользователь, один раз за тест.
 //   points — счёт, dist — пробег малюха (растёт не больше, чем очки за этот тест).
+//   Статистика (core/progress.js): answered, correct, bestStreak, seconds, day, dayStreak, bestDayStreak,
+//   week { день: тестов }, lastTest, byTest { id теста: { t, n, err, last } }. Её может не быть (старые записи
+//   и старые страницы из кэша) — тогда поля не проверяются и считаются нулями.
 // Сервера нет, очки считает браузер, поэтому правила хотя бы ограничивают накрутку:
 //   очки только растут, не больше MAX_GAIN за запись; пробег не обгоняет очки; tests +1; не чаще раза в 10 с
-//   (тест из 15 заданий быстрее не пройти; при отказе итог теста сам повторяет запись один раз — core/progress.js).
+//   (тест из 15 заданий быстрее не пройти; при отказе итог теста сам повторяет запись один раз — core/progress.js);
+//   ответов за запись не больше 50, верных не больше ответов, времени не больше часа; в byTest и week
+//   за запись меняется только один ключ (lastTest и day).
 // MAX_GAIN (5000) должен быть не меньше Polski.balance.maxForTest(rounds) — сейчас 4250 при 15 заданиях.
 // В старых записях нет dist — тогда прежний пробег считается равным points.
 // Всё остальное в базе закрыто.
@@ -19,9 +24,45 @@ service cloud.firestore {
         return request.auth != null && request.auth.uid == uid;
       }
       function shape(d) {
-        return d.keys().hasOnly(['points', 'dist', 'tests', 'perfect', 'updatedAt'])
+        return d.keys().hasOnly(['points', 'dist', 'tests', 'perfect', 'updatedAt',
+            'answered', 'correct', 'bestStreak', 'seconds', 'day', 'dayStreak', 'bestDayStreak',
+            'week', 'lastTest', 'byTest'])
           && d.points is int && d.dist is int && d.tests is int && d.perfect is int
-          && d.updatedAt == request.time;
+          && d.updatedAt == request.time
+          && d.get('answered', 0) is int && d.get('correct', 0) is int
+          && d.get('bestStreak', 0) is int && d.get('seconds', 0) is int
+          && d.get('dayStreak', 0) is int && d.get('bestDayStreak', 0) is int
+          && d.get('day', '') is string && d.get('day', '').size() <= 10
+          && d.get('lastTest', '') is string && d.get('lastTest', '').size() <= 100
+          && d.get('week', {}) is map && d.get('week', {}).size() <= 20
+          && d.get('byTest', {}) is map && d.get('byTest', {}).size() <= 200;
+      }
+      // запись о тесте в byTest
+      function entry(e) {
+        return e is map && e.keys().hasOnly(['t', 'n', 'err', 'last'])
+          && e.t is string && e.t.size() <= 120
+          && e.n is int && e.n >= 1 && e.err is int && e.err >= 0
+          && e.last is list && e.last.size() <= 5;
+      }
+      // статистика: n — новая запись, o — прежняя ({} при создании)
+      function stats(n, o) {
+        let dA = n.get('answered', 0) - o.get('answered', 0);
+        let dC = n.get('correct', 0) - o.get('correct', 0);
+        let dS = n.get('seconds', 0) - o.get('seconds', 0);
+        let k = n.get('lastTest', '');
+        let bt = n.get('byTest', {}).diff(o.get('byTest', {}));
+        let wk = n.get('week', {}).diff(o.get('week', {}));
+        return dA >= 0 && dA <= 50 && dC >= 0 && dC <= dA
+          && n.get('correct', 0) <= n.get('answered', 0)
+          && dS >= 0 && dS <= 3600
+          && n.get('bestStreak', 0) >= o.get('bestStreak', 0)
+          && n.get('bestStreak', 0) <= n.get('answered', 0)
+          && n.get('dayStreak', 0) >= 0
+          && n.get('bestDayStreak', 0) >= n.get('dayStreak', 0)
+          && bt.removedKeys().size() == 0
+          && bt.addedKeys().union(bt.changedKeys()).hasOnly([k])
+          && (n.get('byTest', {}).get(k, null) == null || entry(n.get('byTest', {})[k]))
+          && wk.addedKeys().union(wk.changedKeys()).hasOnly([n.get('day', '')]);
       }
 
       allow read, delete: if owner();
@@ -32,7 +73,8 @@ service cloud.firestore {
         && request.resource.data.dist >= 0
         && request.resource.data.dist <= request.resource.data.points
         && request.resource.data.tests == 1
-        && request.resource.data.perfect in [0, 1];
+        && request.resource.data.perfect in [0, 1]
+        && stats(request.resource.data, {});
 
       allow update: if owner() && shape(request.resource.data)
         && request.resource.data.points >= resource.data.points
@@ -42,7 +84,8 @@ service cloud.firestore {
              <= request.resource.data.points - resource.data.points
         && request.resource.data.tests == resource.data.tests + 1
         && request.resource.data.perfect - resource.data.perfect in [0, 1]
-        && request.time > resource.data.updatedAt + duration.value(10, 's');
+        && request.time > resource.data.updatedAt + duration.value(10, 's')
+        && stats(request.resource.data, resource.data);
     }
   }
 }

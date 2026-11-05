@@ -39,6 +39,7 @@ Polski.cityInfo = {
   'Gorzów Wielkopolski': { woj: 'lubuskie', text: 'Miasto nad Wartą, znane w całej Polsce z żużla — tutejsza Stal Gorzów wiele razy zdobywała mistrzostwo kraju.' },
   'Słubice': { woj: 'lubuskie', text: 'Miasto nad Odrą, połączone mostem z niemieckim Frankfurtem nad Odrą. Studenci z obu stron granicy uczą się razem w Collegium Polonicum.' },
   'Świebodzin': { woj: 'lubuskie', text: 'Słynie z pomnika Chrystusa Króla — jednej z najwyższych takich figur na świecie. Niedaleko leżą bunkry i podziemne korytarze Międzyrzeckiego Rejonu Umocnionego.' },
+  'Poznań': { woj: 'wielkopolskie', text: 'Stolica Wielkopolski i jedno z najstarszych miast Polski: w katedrze na Ostrowie Tumskim pochowano pierwszych władców — Mieszka I i Bolesława Chrobrego. Codziennie w południe na wieży ratusza trykają się dwa blaszane koziołki, a 11 listopada całe miasto je rogale świętomarcińskie.' },
   'Zielona Góra': { woj: 'lubuskie', text: 'Polska stolica wina: na okolicznych wzgórzach rosną winnice, a jesienią odbywa się Winobranie. Po mieście rozsianych jest wiele figurek Bachusików.' },
   'Żary': { woj: 'lubuskie', text: 'Jedno z najstarszych miast Łużyc, z zespołem zamkowo-pałacowym rodu Promnitzów i fragmentami średniowiecznych murów.' },
   'Głogów': { woj: 'dolnośląskie', text: 'W 1109 roku jego mieszkańcy obronili się przed wojskami cesarza Henryka V. Dziś słynie z huty miedzi. Urodził się tu barokowy poeta Andreas Gryphius.' },

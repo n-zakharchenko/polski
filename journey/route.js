@@ -46,6 +46,7 @@ Polski.route = {
     { name: 'Gorzów Wielkopolski', lat: 52.731, lon: 15.240 },
     { name: 'Słubice', lat: 52.350, lon: 14.561 },
     { name: 'Świebodzin', lat: 52.247, lon: 15.533 },
+    { name: 'Poznań', lat: 52.406, lon: 16.925, major: true },
     { name: 'Zielona Góra', lat: 51.935, lon: 15.506, major: true },
     { name: 'Żary', lat: 51.642, lon: 15.137, label: 'left' },
     { name: 'Głogów', lat: 51.663, lon: 16.085 },

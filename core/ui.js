@@ -484,7 +484,10 @@
     }
   }
 
-  /** opts.backHref — куда ведёт кнопка на итоговом экране (по умолчанию главная) */
+  /**
+   * opts.backHref — куда ведёт кнопка на итоговом экране (по умолчанию главная)
+   * opts.title    — полное название для статистики («Liczebniki · Męskoosobowe · Liczebnik»)
+   */
   function run(test, root, opts) {
     var backHref = (opts && opts.backHref) || 'index.html';
     var rule = ruleButtonFactory(test);
@@ -521,7 +524,9 @@
 
     function start() {
       // points / streak — очки и серия верных подряд (core/balance.js); видны только после входа
-      state = { rng: Polski.createRng(), round: 0, correct: 0, wrong: 0, session: {}, points: 0, streak: 0, gain: 0 };
+      // bestStreak / ms — для статистики на главной: лучшая серия и время на заданиях (core/stats.js)
+      state = { rng: Polski.createRng(), round: 0, correct: 0, wrong: 0, session: {}, points: 0, streak: 0, gain: 0,
+        bestStreak: 0, ms: 0 };
       nextTask();
     }
 
@@ -556,6 +561,9 @@
           if (res.ok) state.correct += 1; else state.wrong += 1;
           // очки: верно — по серии, «Prawie!» / ошибка — 0 и серия с нуля
           state.streak = res.ok ? state.streak + 1 : 0;
+          state.bestStreak = Math.max(state.bestStreak, state.streak);
+          var maxMs = ((Polski.balance && Polski.balance.config.taskSecondsMax) || 120) * 1000;
+          state.ms += Math.min(maxMs, Math.max(0, Date.now() - state.shownAt));
           state.gain = res.ok && Polski.balance ? Polski.balance.taskPoints(state.streak) : 0;
           state.points += state.gain;
           updateProgress(true);
@@ -586,6 +594,7 @@
       ]));
 
       handler = (TYPES[task.type] || TYPES.input)(task, area, api) || {};
+      state.shownAt = Date.now();
       if (handler.getAnswer) actionBtn.disabled = true;
       else actionBtn.hidden = true; // ответ — по клику в самом задании
 
@@ -691,6 +700,10 @@
       if (Polski.progress) {
         Polski.progress.mountSummary(accountBox, {
           points: state.points + bonus, bonus: bonus, perfect: bonus > 0,
+          // для статистики на главной
+          testId: test.id, title: (opts && opts.title) || test.title,
+          answered: test.rounds, correct: state.correct, bestStreak: state.bestStreak,
+          seconds: Math.round(state.ms / 1000),
         });
       }
     }

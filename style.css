@@ -286,6 +286,24 @@ h1 {
 .site-footer a { color: var(--muted); }
 .site-footer a:hover { color: var(--accent); }
 
+/* ---------- «Zainstaluj aplikację» (core/pwa.js; только на телефонах) ---------- */
+
+.pwa-row { margin-bottom: 14px; }
+.pwa-btn { min-height: 40px; padding: 8px 16px; font-size: 0.95rem; }
+.rule-dialog.pwa-dialog { width: min(440px, calc(100vw - 32px)); }
+.pwa-intro { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
+.pwa-intro p { margin: 0; color: var(--muted); line-height: 1.4; }
+.pwa-icon { flex: none; border-radius: 13px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
+.pwa-steps ol { margin: 14px 0 0; padding-left: 1.3em; display: grid; gap: 8px; line-height: 1.4; }
+.pwa-note { margin: 12px 0 0; color: var(--muted); font-size: 0.85rem; }
+.pwa-install { margin-top: 14px; }
+.pwa-or { margin: 10px 0 -6px; color: var(--muted); font-size: 0.85rem; text-align: center; }
+.pwa-device { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--stat-bg, var(--bg)); font-size: 0.9rem; }
+.pwa-copy { margin-top: 12px; min-height: 36px; padding: 6px 14px; font-size: 0.9rem; }
+.pwa-other { margin-top: 16px; color: var(--muted); font-size: 0.85rem; }
+.pwa-other summary { cursor: pointer; }
+.pwa-picker { margin-top: 8px; width: 100%; padding: 8px; font: inherit; color: var(--text); background: var(--card); border: 1px solid var(--card-border); border-radius: 8px; }
+
 /* ---------- Настройки: шестерёнка в правом верхнем углу ---------- */
 
 .settings-btn {
@@ -636,6 +654,62 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 .journey-login { width: 100%; }
 .journey-login .account { justify-items: center; }
 .journey-login .account-privacy { justify-self: center; }
+
+/* ---------- Статистика на главной (core/stats.js; только после входа) ---------- */
+
+.stats { margin-top: 44px; }
+.stats[hidden] { display: none; }
+.stats-title { margin: 0 0 14px; font-size: 1.15rem; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.stat {
+  background: var(--stat-bg, var(--bg));
+  border-radius: calc(var(--radius) - 6px);
+  padding: 12px 14px;
+  min-width: 0;
+}
+.stat-label { color: var(--muted); font-size: 0.82rem; font-weight: 600; }
+.stat-value { font-size: 1.45rem; font-weight: 800; line-height: 1.25; white-space: nowrap; }
+.stat-sub { color: var(--muted); font-size: 0.8rem; line-height: 1.3; }
+.stats-sub { margin: 20px 0 8px; color: var(--muted); font-size: 0.9rem; font-weight: 600; }
+.stats-sub-note { font-weight: 400; }
+.stats-empty { margin: 0; padding: 12px 0 2px; border-top: 1px solid var(--card-border); color: var(--muted); font-size: 0.9rem; }
+
+.stats-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; max-width: 300px; }
+.week-day { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.week-dot {
+  width: 100%; max-width: 30px; aspect-ratio: 1; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--card-border);
+  font-size: 0.85rem; font-weight: 700;
+}
+.week-dot.on { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.week-name { color: var(--muted); font-size: 0.75rem; }
+.week-day.today .week-name { color: var(--text); font-weight: 700; }
+.week-day.today .week-dot { box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--muted); }
+
+.weak-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 12px; align-items: center;
+  padding: 10px 0; border-top: 1px solid var(--card-border);
+}
+.weak-title { font-weight: 700; overflow-wrap: anywhere; }
+.weak-err { color: var(--muted); font-size: 0.82rem; }
+.weak-results { display: flex; gap: 4px; }
+.res {
+  min-width: 28px; height: 24px; padding: 0 4px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700;
+}
+.res.low { background: var(--bad-soft); color: var(--bad); }
+.res.mid { background: var(--y-bg); color: var(--y-text); }
+.res.good { background: var(--ok-soft); color: var(--ok); }
+.weak-row .btn-sm { min-height: 36px; padding: 6px 14px; font-size: 0.9rem; }
+
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .weak-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .weak-results { grid-column: 1; }
+  .weak-row .btn-sm { grid-column: 2; grid-row: 1 / span 2; }
+}
 @media (prefers-reduced-motion: reduce) {
   .map-car.driving .car-body, .streak.bump { animation: none; }
   .pts-pop { display: none; }
