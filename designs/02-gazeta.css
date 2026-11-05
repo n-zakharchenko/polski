@@ -1,0 +1,299 @@
+/*
+ * Вариант 02 · Газета (воздушная) — от старой газеты остаются бумага, чернила, засечки и тонкие линейки;
+ * без двойных рамок, капители, «отпечатков» и тяжёлых шрифтов. Много воздуха, читаемый текст.
+ * Подключается поверх style.css только на localhost (?design=02-gazeta).
+ * Шрифты — Google Fonts (с польскими буквами): Playfair Display (заголовки), Source Serif 4 (текст),
+ * Oswald (мелкие подписи и кнопки). В продакшен — свои файлы или строка в политике.
+ * Варианты ответов и рамки в заданиях (.chip, .slot и их цвета) не трогаем.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500&family=Oswald:wght@500&family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Rye&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
+
+/* ---------- палитра (день) ---------- */
+:root[data-design="02-gazeta"] {
+  --bg: #f1ead8;               /* бумага — и фон страницы, и лист: без «стола» вокруг */
+  --paper: #f6f0e1;
+  --panel: #f6f0e1;
+  --card: #f6f0e1;
+  --card-border: #d9cfb8;      /* тонкие линии — не чёрные, а «карандаш» */
+  --rule: #2a2722;             /* линейки шапки */
+  --ink: #2a2722;
+  --text: #2a2722;
+  --muted: #7a715f;
+  --accent: #2a2722;
+  --accent-2: #2a2722;
+  --accent-ink: #f6f0e1;
+  --accent-soft: #e4dcc8;
+  --source-bg: #ede5d2;
+  --shadow: none;
+  --shadow-hover: none;
+  --radius: 4px;
+  --ok: #3d6b43;
+  --ok-soft: #e1e6cf;
+  --bad: #9a3a2c;
+  --bad-soft: #efdacd;
+  --tip-bg: #f6f0e1;
+  --map-land: #efe7d3;
+  --map-border: #cfc4ab;
+  --pc-1: #f6f0e1; --pc-2: #f6f0e1; --pc-3: #f6f0e1; --pc-4: #f6f0e1;
+  --verdict-ok: #3d6b43;
+  --verdict-bad: #b0701c;
+  --verdict-fail: #9a3a2c;
+  --head: 'Playfair Display', Georgia, serif;
+  --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --cond: 'Oswald', 'Arial Narrow', sans-serif;
+}
+
+/* ---------- ночь: тёмная бумага, светлые чернила (оба блока одинаковые) ---------- */
+@media (prefers-color-scheme: dark) {
+  :root[data-design="02-gazeta"]:not([data-theme="light"]) {
+    --bg: #1a1916; --paper: #201e1a; --panel: #201e1a; --card: #201e1a; --card-border: #3d3930;
+    --rule: #e6ddc8; --ink: #e6ddc8; --text: #e6ddc8; --muted: #a59c88; --accent: #e6ddc8; --accent-2: #e6ddc8;
+    --accent-ink: #201e1a; --accent-soft: #34302a; --source-bg: #26241f;
+    --ok: #93c495; --ok-soft: #22301f; --bad: #e08a7a; --bad-soft: #3a241f; --tip-bg: #201e1a;
+    --map-land: #26231d; --map-border: #3d3930;
+    --pc-1: #201e1a; --pc-2: #201e1a; --pc-3: #201e1a; --pc-4: #201e1a;
+    --verdict-ok: #93c495; --verdict-bad: #e0a85a; --verdict-fail: #e08a7a;
+  }
+}
+:root[data-design="02-gazeta"][data-theme="dark"] {
+  --bg: #1a1916; --paper: #201e1a; --panel: #201e1a; --card: #201e1a; --card-border: #3d3930;
+  --rule: #e6ddc8; --ink: #e6ddc8; --text: #e6ddc8; --muted: #a59c88; --accent: #e6ddc8; --accent-2: #e6ddc8;
+  --accent-ink: #201e1a; --accent-soft: #34302a; --source-bg: #26241f;
+  --ok: #93c495; --ok-soft: #22301f; --bad: #e08a7a; --bad-soft: #3a241f; --tip-bg: #201e1a;
+  --map-land: #26231d; --map-border: #3d3930;
+  --pc-1: #201e1a; --pc-2: #201e1a; --pc-3: #201e1a; --pc-4: #201e1a;
+  --verdict-ok: #93c495; --verdict-bad: #e0a85a; --verdict-fail: #e08a7a;
+}
+
+/* ---------- лист ---------- */
+[data-design="02-gazeta"] body {
+  background: var(--bg);
+  font-family: var(--serif);
+  line-height: 1.6;
+}
+[data-design="02-gazeta"] main {
+  position: relative;
+  max-width: 720px;
+  padding: 26px 20px 40px;
+}
+[data-design="02-gazeta"] .settings-btn {
+  top: 16px; right: 16px;
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--muted);
+  box-shadow: none;
+}
+
+/* шапка: заголовок между двумя тонкими линейками, по центру, много воздуха */
+[data-design="02-gazeta"] h1 {
+  margin: 44px 0 0;
+  padding: 18px 0 16px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--head);
+  font-weight: 700;
+  font-size: 2.1rem;
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+  text-align: center;
+  color: var(--ink);
+}
+[data-design="02-gazeta"] .subtitle {
+  margin: 12px 0 30px;
+  font-family: var(--cond);
+  font-weight: 500;
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--muted);
+}
+/*
+ * Шапка главной (её строит designs/02-gazeta.js) — как у старой газеты:
+ * строка выпуска · двойная линейка · название нарядным шрифтом · двойная линейка · номер, дата, цена.
+ */
+[data-design="02-gazeta"] .gz-masthead { margin: 40px 0 0; text-align: center; color: var(--ink); }
+[data-design="02-gazeta"] .gz-top,
+[data-design="02-gazeta"] .gz-meta {
+  font-family: 'Grenze Gotisch', var(--head);
+  font-weight: 500;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+[data-design="02-gazeta"] .gz-top { margin-bottom: 8px; }
+/* двойная линейка: толстая + тонкая */
+[data-design="02-gazeta"] .gz-rule {
+  height: 6px;
+  border-top: 2.5px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+[data-design="02-gazeta"] .gz-rule-flip { border-top-width: 1px; border-bottom-width: 2.5px; }
+[data-design="02-gazeta"] .gz-rule-thin { height: 0; border-bottom: none; border-top-width: 2.5px; margin-top: 6px; }
+[data-design="02-gazeta"] .gz-masthead h1 {
+  margin: 0;
+  padding: 14px 0 10px;
+  border: none;
+  font-family: 'Rye', var(--head);
+  font-weight: 400;
+  font-size: clamp(2rem, 7.4vw, 3.3rem);
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+}
+[data-design="02-gazeta"] .gz-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2px 14px;
+  margin-top: 7px;
+}
+@media (max-width: 560px) {
+  /* на телефоне дата — отдельной строкой посередине, номер и цена — по краям под ней */
+  [data-design="02-gazeta"] .gz-meta .gz-date { order: -1; flex-basis: 100%; }
+}
+[data-design="02-gazeta"] .gz-masthead + .subtitle { margin-top: 22px; }
+
+[data-design="02-gazeta"] h2,
+[data-design="02-gazeta"] .rule-title,
+[data-design="02-gazeta"] .city-name { font-family: var(--head); font-weight: 700; color: var(--ink); }
+
+/* ---------- карточки тестов: тонкая линия, много воздуха ---------- */
+[data-design="02-gazeta"] .test-list { gap: 16px; }
+[data-design="02-gazeta"] .test-card {
+  padding: 20px 20px;
+  background: var(--paper);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+[data-design="02-gazeta"] .test-card:hover { transform: none; border-color: var(--ink); box-shadow: none; }
+[data-design="02-gazeta"] .test-icon {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--card-border);
+  box-shadow: none;
+  color: var(--ink);
+  font-family: var(--head);
+  font-weight: 600;
+  font-style: italic;
+  font-size: 1.05rem;
+}
+[data-design="02-gazeta"] .test-title { font-family: var(--head); font-weight: 700; font-size: 1.3rem; }
+[data-design="02-gazeta"] .test-desc { color: var(--muted); }
+/* рука-указатель вместо стрелки — тихая */
+[data-design="02-gazeta"] .test-arrow { font-size: 0; color: var(--muted); }
+[data-design="02-gazeta"] .test-arrow::after { content: '☞'; font-size: 1.5rem; line-height: 1; }
+[data-design="02-gazeta"] .test-card:hover .test-arrow { color: var(--ink); transform: translateX(3px); }
+[data-design="02-gazeta"] .test-card.soon { opacity: 1; }
+[data-design="02-gazeta"] .test-card.soon .test-text,
+[data-design="02-gazeta"] .test-card.soon .test-icon { opacity: 0.5; }
+[data-design="02-gazeta"] .test-card.soon:hover { border-color: var(--card-border); }
+[data-design="02-gazeta"] .test-card.soon .test-icon { background: transparent; }
+/* «Wkrótce» — маленький штамп */
+[data-design="02-gazeta"] .badge {
+  padding: 2px 7px;
+  border: 1.5px solid var(--bad);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--bad);
+  font-family: var(--cond);
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: rotate(-4deg);
+}
+
+/* ---------- кнопки ---------- */
+[data-design="02-gazeta"] .btn {
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--accent-ink);
+  box-shadow: none;
+  font-family: var(--cond);
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+[data-design="02-gazeta"] .btn:hover { box-shadow: none; transform: none; filter: none; opacity: 0.88; }
+[data-design="02-gazeta"] .btn-secondary { background: transparent; color: var(--ink); border: 1px solid var(--card-border); }
+[data-design="02-gazeta"] .back {
+  background: transparent;
+  border: none;
+  padding: 4px 0;
+  color: var(--muted);
+  font-family: var(--cond);
+  font-weight: 500;
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+[data-design="02-gazeta"] .back:hover { color: var(--ink); }
+[data-design="02-gazeta"] .chooser-label,
+[data-design="02-gazeta"] .slots-caption { font-family: var(--cond); font-weight: 500; letter-spacing: 0.18em; color: var(--muted); }
+[data-design="02-gazeta"] .seg-btn { border-radius: var(--radius); border: 1px solid var(--card-border); background: transparent; font-family: var(--serif); font-weight: 600; }
+[data-design="02-gazeta"] .seg-btn:hover { border-color: var(--ink); }
+[data-design="02-gazeta"] .seg-btn.active { background: var(--ink); color: var(--accent-ink); border-color: var(--ink); }
+
+/* ---------- карточки-контейнеры ---------- */
+[data-design="02-gazeta"] .card {
+  background: var(--paper);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+[data-design="02-gazeta"] .chooser { max-width: none; padding: 24px; }
+
+/* ---------- карта: сепия, маршрут — чернилами ---------- */
+[data-design="02-gazeta"] .journey { padding: 16px; }
+[data-design="02-gazeta"] .journey-lead { font-family: var(--head); font-weight: 600; font-size: 1.1rem; text-align: center; margin-bottom: 10px; }
+[data-design="02-gazeta"] .map-terrain { filter: grayscale(1) sepia(0.45) contrast(0.95) brightness(1.04); }
+[data-design="02-gazeta"] .map-done { stroke: var(--ink); }
+[data-design="02-gazeta"] .map-city.reached { fill: var(--ink); stroke: var(--ink); }
+[data-design="02-gazeta"] .map-city.next { stroke: var(--ink); }
+[data-design="02-gazeta"] .journey-points strong { font-family: var(--head); }
+[data-design="02-gazeta"] .journey-cta { border-radius: var(--radius); border: 1px solid var(--card-border); background: var(--paper); box-shadow: none; }
+[data-design="02-gazeta"] .journey-cta-title { font-family: var(--head); font-weight: 700; }
+[data-design="02-gazeta"] .site-footer a { color: var(--muted); }
+
+/* ---------- тест ---------- */
+[data-design="02-gazeta"] .progress-track { height: 4px; background: var(--accent-soft); }
+[data-design="02-gazeta"] .progress-fill { background: var(--ink); }
+[data-design="02-gazeta"] .slots-source { background: var(--source-bg); border-radius: var(--radius); }
+[data-design="02-gazeta"] .slot { color: #1d2330; }
+[data-design="02-gazeta"][data-theme="dark"] .slot { color: #e9ebf1; }
+@media (prefers-color-scheme: dark) {
+  [data-design="02-gazeta"]:not([data-theme="light"]) .slot { color: #e9ebf1; }
+}
+[data-design="02-gazeta"] .info-btn { border-color: var(--card-border); color: var(--muted); background: transparent; }
+[data-design="02-gazeta"] .summary-score { font-family: var(--head); }
+
+/* плашки «Dokładnie! / Prawie! / O kurde!» — аккуратный штамп */
+[data-design="02-gazeta"] .verdict {
+  background: var(--paper) !important;
+  border: 2.5px solid currentColor;
+  border-radius: 6px;
+  box-shadow: 0 12px 30px -14px rgba(0, 0, 0, 0.35);
+  font-family: var(--head);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.9rem;
+  padding: 8px 26px;
+  animation-name: gazeta-stamp;
+}
+[data-design="02-gazeta"] .verdict.ok { color: var(--verdict-ok); }
+[data-design="02-gazeta"] .verdict.bad { color: var(--verdict-bad); }
+[data-design="02-gazeta"] .verdict.fail { color: var(--verdict-fail); }
+@keyframes gazeta-stamp {
+  0%   { opacity: 0; transform: translate(-50%, -50%) rotate(-5deg) scale(1.5); }
+  12%  { opacity: 1; transform: translate(-50%, -50%) rotate(-5deg) scale(0.97); }
+  20%  { transform: translate(-50%, -50%) rotate(-5deg) scale(1); }
+  75%  { opacity: 1; transform: translate(-50%, -50%) rotate(-5deg) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(-5deg) scale(1); }
+}
+
+/* ---------- окна ---------- */
+[data-design="02-gazeta"] .rule-dialog { background: var(--paper); border: 1px solid var(--card-border); border-radius: 8px; }
+[data-design="02-gazeta"] .city-kicker { font-family: var(--cond); font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }

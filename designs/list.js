@@ -6,4 +6,5 @@
 window.POLSKI_DESIGNS = [
   { id: 'none', title: 'Текущий (style.css)' },
   { id: '01-retro-pastel', title: '01 · Ретро-пастель (крем, терракота)' },
+  { id: '02-gazeta', title: '02 · Газета, воздушная (бумага, чернила)' },
 ];
