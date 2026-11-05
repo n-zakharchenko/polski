@@ -65,4 +65,5 @@ Polski.cityInfo = {
   'Leżajsk': { woj: 'podkarpackie', text: 'Słynie z bazyliki z jednymi z najcenniejszych organów w Polsce. Co roku przyjeżdżają tu też chasydzi do grobu cadyka Elimelecha.' },
   'Stalowa Wola': { woj: 'podkarpackie', text: 'Miasto zbudowane od podstaw przed II wojną światową razem z hutą — największa inwestycja Centralnego Okręgu Przemysłowego.' },
   'Sandomierz': { woj: 'świętokrzyskie', text: 'Malownicze miasto na wzgórzach nad Wisłą z Bramą Opatowską i podziemną trasą. To tu kręcono serial „Ojciec Mateusz”.' },
+  'Łódź': { woj: 'łódzkie', text: 'Dawna „ziemia obiecana” przemysłu włókienniczego: fabryki z czerwonej cegły (dziś m.in. Manufaktura), najdłuższa ulica handlowa w Polsce — Piotrkowska — i słynna Szkoła Filmowa. Tu urodził się Julian Tuwim. Na Piotrkowskiej stoi jego ławeczka (potarcie nosa poety ma przynosić szczęście), a na podwórku przy ul. Legionów 2 wisi płaskorzeźba „Dupa Tuwima” z 2013 roku — żart artystów nawiązujący do jego frywolnego wiersza.' },
 };

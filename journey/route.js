@@ -66,6 +66,7 @@ Polski.route = {
     { name: 'Kraków', lat: 50.065, lon: 19.945, major: true, label: 'top' },
     { name: 'Bochnia', lat: 49.969, lon: 20.430, label: 'bottom' },
     { name: 'Busko-Zdrój', lat: 50.470, lon: 20.719, label: 'top' },
+    { name: 'Łódź', lat: 51.759, lon: 19.456, major: true },
     { name: 'Mielec', lat: 50.287, lon: 21.424 },
     { name: 'Dębica', lat: 50.051, lon: 21.411, label: 'bottom' },
     { name: 'Rzeszów', lat: 50.041, lon: 21.999, major: true, label: 'bottom' },
