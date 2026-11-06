@@ -5,66 +5,162 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Polityka prywatności — Rajd Polskiej Gramatyki</title>
   <!-- версия сайта: метка ?v= у всех наших файлов (защита от кэша); меняет tools/bump-version.js -->
-  <script>window.POLSKI_V = '20261106-0946';</script>
-  <link rel="icon" href="favicon.svg?v=20261106-0946" type="image/svg+xml">
+  <script>window.POLSKI_V = '20261106-1014';</script>
+  <link rel="icon" href="favicon.svg?v=20261106-1014" type="image/svg+xml">
   <!-- PWA: «на экран домой» — название Rajd Polski, иконка — малюх (core/pwa.js — инструкция по установке) -->
-  <link rel="manifest" href="manifest.webmanifest?v=20261106-0946">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=20261106-0946">
+  <link rel="manifest" href="manifest.webmanifest?v=20261106-1014">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=20261106-1014">
   <meta name="apple-mobile-web-app-title" content="Rajd Polski">
   <meta name="application-name" content="Rajd Polski">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="stylesheet" href="style.css?v=20261106-0946">
+  <link rel="stylesheet" href="style.css?v=20261106-1014">
   <!-- стили оформления (Styl в настройках): включается тот, что в <html data-design> -->
-  <link rel="stylesheet" href="designs/01-retro-pastel.css?v=20261106-0946">
-  <link rel="stylesheet" href="designs/02-gazeta.css?v=20261106-0946">
-  <script src="core/settings.js?v=20261106-0946"></script>
-  <script src="core/update.js?v=20261106-0946" defer></script> <!-- новая версия сайта вышла — перезагрузиться (и в PWA) -->
+  <link rel="stylesheet" href="designs/01-retro-pastel.css?v=20261106-1014">
+  <link rel="stylesheet" href="designs/02-gazeta.css?v=20261106-1014">
+  <script src="core/settings.js?v=20261106-1014"></script>
+  <script src="core/update.js?v=20261106-1014" defer></script> <!-- новая версия сайта вышла — перезагрузиться (и в PWA) -->
 </head>
 <body>
   <main>
     <a class="back" href="index.html">← Wstecz</a>
     <h1>Polityka prywatności</h1>
-    <p class="subtitle">Krótko i bez drobnego druku</p>
+    <p class="subtitle">Rajd Polskiej Gramatyki · obowiązuje od 6 listopada 2026 r.</p>
 
+    <!--
+      Формальная политика по ст. 13 RODO. Меняется функциональность (новые данные в Firestore, новые ключи
+      в браузере, новые сервисы) — обновить §2, §4, §9 и дату в подзаголовке и внизу.
+    -->
     <article class="card prose">
-      <h2>Kto prowadzi aplikację</h2>
-      <p>„Rajd Polskiej Gramatyki” to prywatny, niekomercyjny projekt do nauki języka polskiego. W sprawach danych osobowych
-        napisz na <a href="mailto:nikita.zakharchenko@gmail.com">nikita.zakharchenko@gmail.com</a>.</p>
+      <h2>§ 1. Administrator danych</h2>
+      <ol>
+        <li>Administratorem danych osobowych przetwarzanych w związku z korzystaniem z aplikacji
+          „Rajd Polskiej Gramatyki”, dostępnej pod adresem
+          <a href="https://n-zakharchenko.github.io/polski/">n-zakharchenko.github.io/polski</a>, także w wersji
+          dodanej do ekranu głównego urządzenia (dalej: „Aplikacja”), jest <strong>Nikita Zakharchenko</strong>
+          (dalej: „Administrator”).</li>
+        <li>Aplikacja jest prywatnym, niekomercyjnym projektem edukacyjnym służącym do nauki języka polskiego.</li>
+        <li>W sprawach dotyczących ochrony danych osobowych można kontaktować się z Administratorem pod adresem
+          e-mail: <a href="mailto:nikita.zakharchenko@gmail.com">nikita.zakharchenko@gmail.com</a>.
+          Administrator nie wyznaczył inspektora ochrony danych.</li>
+      </ol>
 
-      <h2>Bez logowania</h2>
-      <p>Nie zapisujemy o Tobie żadnych danych. W Twojej przeglądarce (localStorage) przechowujemy tylko
-        ustawienia: styl, motyw, ostatni wybór ćwiczenia i to, czy podpowiedź była już pokazana.</p>
-      <p>Czcionki strony pochodzą z Google Fonts — przeglądarka pobiera je z serwerów Google
-        (fonts.googleapis.com, fonts.gstatic.com). Gdy otworzysz ustawienia albo skończysz test, pobiera też
-        skrypty logowania Firebase (gstatic.com). Jak przy każdym pobieraniu pliku, Google widzi wtedy
-        Twój adres IP. Sami nie ustawiamy plików cookie i nie używamy analityki ani reklam.</p>
+      <h2>§ 2. Zakres przetwarzanych danych</h2>
+      <ol>
+        <li><strong>Korzystanie bez logowania.</strong> Administrator nie gromadzi danych pozwalających
+          zidentyfikować Użytkownika. Przy wyświetlaniu Aplikacji dostawcy usług technicznych wskazani w § 4
+          przetwarzają adres IP urządzenia oraz informacje techniczne przesyłane przez przeglądarkę
+          (m.in. rodzaj przeglądarki, czas żądania) — w zakresie niezbędnym do dostarczenia plików strony.</li>
+        <li><strong>Korzystanie z kontem (logowanie przez Google).</strong> Przetwarzane są:
+          <ol type="a">
+            <li>dane konta Google przekazane przy logowaniu: adres e-mail, imię i nazwisko, identyfikator konta
+              oraz zdjęcie profilowe, jeżeli jest przypisane do konta Google; usługa logowania zapisuje ponadto
+              datę utworzenia konta i datę ostatniego logowania;</li>
+            <li>wyniki nauki, zapisywane pod identyfikatorem konta, bez adresu e-mail: liczba punktów i przebieg
+              na mapie podróży, liczba ukończonych testów i testów bez błędów, liczba odpowiedzi i odpowiedzi
+              poprawnych, łączny czas rozwiązywania zadań, najdłuższa seria poprawnych odpowiedzi, dni aktywności
+              z ostatnich dwóch tygodni i liczba dni nauki z rzędu, a dla każdego testu — jego nazwa, liczba
+              podejść, liczba błędów i wyniki trzech ostatnich podejść.</li>
+          </ol>
+        </li>
+        <li><strong>Kontakt e-mail.</strong> Jeżeli Użytkownik napisze do Administratora, przetwarzane są adres
+          e-mail i treść wiadomości.</li>
+      </ol>
 
-      <h2>Z logowaniem przez Google</h2>
-      <ul>
-        <li>Logowanie obsługuje Google Firebase Authentication. Firebase przechowuje Twój adres e-mail,
-          imię i identyfikator konta — wyłącznie po to, żeby rozpoznać Cię przy następnym logowaniu.</li>
-        <li>Wyniki ćwiczeń zapisujemy w bazie Google Firebase Firestore pod identyfikatorem konta,
-          bez adresu e-mail: punkty, przebieg malucha na mapie, liczbę testów, liczbę odpowiedzi
-          i poprawnych odpowiedzi, czas nauki, najdłuższą serię, dni, w które rozwiązywałeś testy
-          (ostatnie dwa tygodnie i seria dni z rzędu), a dla każdego testu — jego nazwę, liczbę podejść,
-          błędów i wyniki trzech ostatnich podejść. Służą do statystyk widocznych tylko dla Ciebie.</li>
-        <li>W przeglądarce zostaje token logowania Firebase (IndexedDB) i pomocnicze znaczniki
-          w localStorage: że jesteś zalogowany, gdzie maluch stał przy ostatniej wizycie i opisy których
-          miast były już pokazane.
-          Samo okno logowania należy do Google i podlega polityce prywatności Google.</li>
-        <li>Dane są przechowywane na serwerach Google w Unii Europejskiej.</li>
-        <li>Podstawa prawna: art. 6 ust. 1 lit. b RODO — zapisywanie postępów to usługa, o którą prosisz,
-          logując się.</li>
-        <li>Dane przechowujemy, dopóki nie usuniesz konta.</li>
-      </ul>
+      <h2>§ 3. Cele i podstawy prawne przetwarzania</h2>
+      <ol>
+        <li>Logowanie, zapisywanie wyników oraz prezentowanie punktów, mapy podróży i statystyk — na podstawie
+          art. 6 ust. 1 lit. b RODO, tj. w zakresie niezbędnym do świadczenia usługi, z której Użytkownik
+          zdecydował się skorzystać, logując się w Aplikacji.</li>
+        <li>Dostarczanie plików strony i czcionek oraz zapewnienie bezpieczeństwa i ciągłości działania Aplikacji —
+          na podstawie art. 6 ust. 1 lit. f RODO, tj. prawnie uzasadnionego interesu Administratora polegającego
+          na udostępnianiu działającej i bezpiecznej strony.</li>
+        <li>Udzielanie odpowiedzi na wiadomości e-mail — na podstawie art. 6 ust. 1 lit. f RODO, tj. prawnie
+          uzasadnionego interesu Administratora polegającego na prowadzeniu korespondencji.</li>
+        <li>Administrator nie wykorzystuje danych do celów marketingowych, nie prowadzi analityki zachowań
+          Użytkowników i nie wyświetla reklam.</li>
+      </ol>
 
-      <h2>Twoje prawa</h2>
-      <p>Masz prawo dostępu do swoich danych, ich poprawienia, usunięcia i przeniesienia, a także skargi
-        do Prezesa Urzędu Ochrony Danych Osobowych. Konto i wszystkie zapisane dane usuniesz sam:
-        <strong>Ustawienia → Konto → Usuń konto</strong>.</p>
+      <h2>§ 4. Odbiorcy danych</h2>
+      <ol>
+        <li>Dane mogą być przekazywane wyłącznie dostawcom usług technicznych, z których korzysta Aplikacja:
+          <ul>
+            <li>Google Ireland Limited i Google LLC — logowanie (Firebase Authentication), przechowywanie wyników
+              (Cloud Firestore, serwery w Warszawie, region europe-central2) oraz czcionki (Google Fonts);</li>
+            <li>GitHub, Inc. — hosting Aplikacji (GitHub Pages).</li>
+          </ul>
+        </li>
+        <li>Okno logowania jest usługą Google i podlega
+          <a href="https://policies.google.com/privacy">polityce prywatności Google</a>.</li>
+        <li>Dane nie są sprzedawane ani udostępniane innym podmiotom.</li>
+      </ol>
 
-      <h2>Autorzy</h2>
+      <h2>§ 5. Przekazywanie danych poza Europejski Obszar Gospodarczy</h2>
+      <p>Wyniki nauki są przechowywane na terytorium Unii Europejskiej. Google i GitHub mogą przetwarzać dane —
+        w szczególności dane logowania i adres IP — również w Stanach Zjednoczonych. Podstawą przekazania jest
+        decyzja Komisji Europejskiej stwierdzająca odpowiedni stopień ochrony danych w ramach EU–US Data Privacy
+        Framework albo standardowe klauzule umowne zatwierdzone przez Komisję Europejską.</p>
+
+      <h2>§ 6. Okres przechowywania danych</h2>
+      <ol>
+        <li>Dane konta i wyniki nauki są przechowywane do czasu usunięcia konta przez Użytkownika. Usunięcie konta
+          (<strong>Ustawienia → Konto → Usuń konto</strong>) trwale usuwa wyniki oraz dane logowania; kopie
+          zapasowe dostawcy są usuwane zgodnie z jego zasadami.</li>
+        <li>Dane techniczne (m.in. adres IP w dziennikach serwerów) są przechowywane przez okres określony przez
+          dostawców usług wskazanych w § 4.</li>
+        <li>Korespondencja e-mail jest przechowywana przez czas niezbędny do jej obsługi.</li>
+      </ol>
+
+      <h2>§ 7. Prawa Użytkownika</h2>
+      <ol>
+        <li>Użytkownikowi przysługuje prawo do: dostępu do danych (art. 15 RODO), ich sprostowania (art. 16),
+          usunięcia (art. 17), ograniczenia przetwarzania (art. 18), przenoszenia danych (art. 20) oraz
+          wniesienia sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym interesie (art. 21).</li>
+        <li>W celu skorzystania z tych praw należy skontaktować się z Administratorem (§ 1 ust. 3).
+          Konto wraz ze wszystkimi wynikami Użytkownik może usunąć samodzielnie w ustawieniach Aplikacji.</li>
+        <li>Użytkownik ma prawo wnieść skargę do Prezesa Urzędu Ochrony Danych Osobowych
+          (ul. Stawki 2, 00-193 Warszawa).</li>
+      </ol>
+
+      <h2>§ 8. Dobrowolność podania danych</h2>
+      <p>Podanie danych jest dobrowolne. Z Aplikacji można korzystać bez logowania; brak logowania oznacza
+        jedynie, że punkty, mapa podróży i statystyki nie są zapisywane.</p>
+
+      <h2>§ 9. Pamięć przeglądarki i pliki cookie</h2>
+      <ol>
+        <li>Aplikacja nie ustawia plików cookie.</li>
+        <li>Do działania Aplikacja wykorzystuje pamięć przeglądarki na urządzeniu Użytkownika (localStorage,
+          sessionStorage, IndexedDB). Informacje te pozostają na urządzeniu i nie są przesyłane Administratorowi:
+          <ul>
+            <li>ustawienia: styl i motyw, ostatnio wybrany wariant ćwiczenia, informacja o wyświetleniu podpowiedzi;</li>
+            <li>po zalogowaniu: token logowania Firebase, znacznik zalogowania, położenie malucha na mapie i liczba
+              punktów z poprzedniej wizyty (usuwane po wylogowaniu) oraz lista miast, których opisy zostały już
+              wyświetlone;</li>
+            <li>dane techniczne przechowywane do zamknięcia karty: informacja o przeładowaniu strony do nowej wersji
+              oraz o podpowiedziach wyświetlonych w bieżącej karcie.</li>
+          </ul>
+        </li>
+        <li>Przechowywanie tych informacji jest niezbędne do świadczenia usługi, z której Użytkownik korzysta,
+          i zgodnie z przepisami ustawy — Prawo komunikacji elektronicznej nie wymaga zgody. Użytkownik może je
+          w każdej chwili usunąć w ustawieniach przeglądarki.</li>
+        <li>Okno logowania Google może ustawiać własne pliki cookie Google zgodnie z polityką prywatności Google.</li>
+      </ol>
+
+      <h2>§ 10. Zautomatyzowane podejmowanie decyzji</h2>
+      <p>Punkty, postęp na mapie i statystyki są obliczane automatycznie, lecz nie wywołują wobec Użytkownika
+        skutków prawnych ani w podobny sposób na niego nie wpływają. Administrator nie podejmuje decyzji
+        w sposób zautomatyzowany w rozumieniu art. 22 RODO i nie profiluje Użytkowników.</p>
+
+      <h2>§ 11. Zmiany polityki prywatności</h2>
+      <p>Administrator może zmienić niniejszą politykę, w szczególności w razie zmiany funkcji Aplikacji.
+        Aktualna wersja wraz z datą obowiązywania jest zawsze dostępna na tej stronie.</p>
+
+      <p class="muted">Ostatnia aktualizacja: 6 listopada 2026 r.</p>
+    </article>
+
+    <!-- лицензии — не часть политики, но CC BY требует указывать авторов -->
+    <section class="card prose licenses">
+      <h2>Licencje i źródła</h2>
       <p>Maluch na mapie i na ikonie aplikacji to render modelu
         <a href="https://sketchfab.com/3d-models/polski-fiat-fiat-126p-edc1b9d866484e048b4c54d917cca900">„Polski Fiat (Fiat 126p)”</a>
         autorstwa <a href="https://sketchfab.com/Bexxie">Martina Trafasa</a>, licencja
@@ -74,15 +170,9 @@
         <i>© ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium</i>.
         Rzeźba terenu: <a href="https://registry.opendata.aws/terrain-tiles/">Terrain Tiles</a> (AWS Open Data),
         m.in. SRTM (NASA) i EU-DEM — <i>produced using Copernicus data and information funded by the European Union</i>.</p>
-
-      <h2>Hosting</h2>
-      <p>Strona jest hostowana na GitHub Pages. GitHub może zapisywać adresy IP w logach serwera —
-        zgodnie z własną polityką prywatności.</p>
-
-      <p class="muted">Ostatnia aktualizacja: 5 listopada 2026 (statystyki, ikona aplikacji)</p>
-    </article>
+    </section>
   </main>
-  <script src="core/account.js?v=20261106-0946" defer></script>
-  <script src="core/pwa.js?v=20261106-0946" defer></script>
+  <script src="core/account.js?v=20261106-1014" defer></script>
+  <script src="core/pwa.js?v=20261106-1014" defer></script>
 </body>
 </html>

@@ -358,8 +358,25 @@
     function readSeen(uid) {
       try { return Number(window.localStorage.getItem(seenKey(uid))) || 0; } catch (e) { return 0; }
     }
-    function writeSeen(uid, p) {
-      try { window.localStorage.setItem(seenKey(uid), String(p)); } catch (e) { /* не страшно */ }
+    // «последний водитель» в этом браузере: { uid, dist, points } — чтобы до восстановления входа
+    // (Firebase грузится 1–2 с) малюх сразу стоял на своём месте, а не на старте
+    var LAST_KEY = 'polski.journey.last';
+    function readLast() {
+      try { return JSON.parse(window.localStorage.getItem(LAST_KEY)) || null; } catch (e) { return null; }
+    }
+    function writeSeen(uid, p, points) {
+      try {
+        window.localStorage.setItem(seenKey(uid), String(p));
+        window.localStorage.setItem(LAST_KEY, JSON.stringify({ uid: uid, dist: p, points: points }));
+      } catch (e) { /* не страшно */ }
+    }
+
+    // в этом браузере уже входили — рисуем малюха там, где он стоял, не дожидаясь Firebase
+    var last = null;
+    try { if (window.localStorage.getItem('polski.account') === '1') last = readLast(); } catch (e) { last = null; }
+    if (last && typeof last.dist === 'number') {
+      section.classList.remove('locked');
+      renderInfo(typeof last.points === 'number' ? last.points : null, map.set(last.dist));
     }
 
     // points — счёт игрока (null — ещё грузится), loc — где малюх по пробегу (dist)
@@ -422,12 +439,14 @@
       section.classList.remove('locked');
       overlay.replaceChildren();
       var seen = readSeen(u.uid); // пробег, на котором малюх стоял при прошлом визите
-      renderInfo(null, map.set(seen));
+      // очки с прошлого раза (тот же водитель) — вместо «…», пока грузятся свежие
+      var shown = last && last.uid === u.uid && typeof last.points === 'number' ? last.points : null;
+      renderInfo(shown, map.set(seen));
       Polski.progress.load().then(function (c) {
         if (mode !== 'user' || !c) return;
         // нет dist (старая запись или старый progress.js из кэша) — пробег = очки
         var dist = c.dist != null ? c.dist : (c.points || 0);
-        drive(Math.min(seen, dist), dist, c.points, function () { writeSeen(u.uid, dist); });
+        drive(Math.min(seen, dist), dist, c.points, function () { writeSeen(u.uid, dist, c.points); });
       }, function () {
         info.replaceChildren(h('p', { class: 'account-error', text: 'Nie udało się wczytać punktów. Odśwież stronę.' }));
       });
@@ -447,11 +466,18 @@
       unlocked: function () { mode = 'debug'; section.classList.remove('locked'); overlay.replaceChildren(); },
     };
 
+    function forgetLast() {
+      last = null;
+      try { window.localStorage.removeItem(LAST_KEY); } catch (e) { /* ничего */ }
+    }
+
     acc.ready().then(function (u) {
-      if (u) showUser(u); else showLocked();
+      if (u) showUser(u); else { showLocked(); forgetLast(); } // входа уже нет — «последнего водителя» не держим
       acc.onChange(function (user) {
         if (user && mode !== 'user') showUser(user);
         else if (!user && mode !== 'locked') showLocked();
+        // вышел (или удалил аккаунт) — «последнего водителя» забываем, чтобы следующему не мелькнул чужой малюх
+        if (!user) forgetLast();
       });
     });
   }

@@ -399,8 +399,12 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 .prose { max-width: 680px; line-height: 1.6; }
 .prose h2 { margin: 22px 0 6px; font-size: 1.1rem; }
 .prose h2:first-child { margin-top: 0; }
-.prose p, .prose ul { margin: 0 0 10px; }
-.prose ul { padding-left: 22px; }
+.prose p, .prose ul, .prose ol { margin: 0 0 10px; }
+.prose ul, .prose ol { padding-left: 22px; }
+.prose li { margin-bottom: 6px; }
+.prose li > ul, .prose li > ol { margin: 6px 0 0; }
+.licenses { margin-top: 20px; font-size: 0.9rem; color: var(--muted); } /* лицензии под политикой (privacy.html) */
+.licenses h2 { color: var(--text); }
 .prose a { color: var(--accent); }
 .prose .muted { color: var(--muted); font-size: 0.9rem; }
 @media (min-width: 768px) {
