@@ -155,6 +155,34 @@
     return v ? url + (url.indexOf('?') === -1 ? '?' : '&') + 'v=' + v : url;
   };
 
+  /**
+   * Канистра у очков — встроенный SVG (вектор в полном разрешении на любом экране; CSS-маска на телефонах
+   * мылилась). Цвет — currentColor = --fuel стиля (.ico-fuel в style.css). Контур тот же, что в icons/canister.svg.
+   */
+  var FUEL_PATH = 'M8.9 1.8H17a3.2 3.2 0 0 1 3.2 3.2v15.1a2 2 0 0 1-2 2H5.9a2 2 0 0 1-2-2V7.7c0-.6.2-1.1.6-1.5L8 2.3c.3-.3.6-.5.9-.5Z' +
+    'M12.35 3.5H15.65A1.15 1.15 0 0 1 15.65 5.8H12.35A1.15 1.15 0 0 1 12.35 3.5Z' +
+    'M9.05 12.95L6.84 10.74A0.78 0.78 0 0 1 7.94 9.64L10.15 11.85L13.95 11.85L16.16 9.64A0.78 0.78 0 0 1 17.26 10.74' +
+    'L15.05 12.95L15.05 16.75L17.26 18.96A0.78 0.78 0 0 1 16.16 20.06L13.95 17.85L10.15 17.85L7.94 20.06' +
+    'A0.78 0.78 0 0 1 6.84 18.96L9.05 16.75Z' +
+    'M10.6 13.4H13.5V16.3H10.6Z' +
+    'M3.27 5.67L6.67 2.27A0.95 0.95 0 0 0 5.33 0.93L1.93 4.33A0.95 0.95 0 0 0 3.27 5.67Z';
+  Polski.fuelIcon = function () {
+    var NS = 'http://www.w3.org/2000/svg';
+    var span = document.createElement('span');
+    span.className = 'ico-fuel';
+    span.setAttribute('aria-hidden', 'true');
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('focusable', 'false');
+    var path = document.createElementNS(NS, 'path');
+    path.setAttribute('fill', 'currentColor');
+    path.setAttribute('fill-rule', 'evenodd');
+    path.setAttribute('d', FUEL_PATH);
+    svg.appendChild(path);
+    span.appendChild(svg);
+    return span;
+  };
+
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
       var s = document.createElement('script');

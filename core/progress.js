@@ -183,7 +183,7 @@
       var capped = arrived && res.distAfter - res.distBefore < r.points;
       // replaceChildren печатает null строкой «null» — пустые элементы отбрасываем
       line.replaceChildren.apply(line, [
-        h('p', { class: 'pts-total' }, [h('span', { class: 'ico-fuel', 'aria-hidden': 'true' }), ' ', h('strong', { text: '+' + fmt(r.points) + ' pkt' })]),
+        h('p', { class: 'pts-total' }, [Polski.fuelIcon(), ' ', h('strong', { text: '+' + fmt(r.points) + ' pkt' })]),
         r.bonus ? h('p', { class: 'pts-sub', text: 'w tym +' + fmt(r.bonus) + ' za test bez błędów' }) : null,
         arrived ? h('p', { class: 'pts-city' }, loc.done
           ? ['🎉 Meta: ', h('strong', { text: was.seg.to.name }), '! Cała Polska objechana.']

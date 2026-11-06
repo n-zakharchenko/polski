@@ -366,7 +366,7 @@
     function renderInfo(points, loc) {
       info.replaceChildren(
         h('div', { class: 'journey-stats' }, [
-          h('span', { class: 'journey-points' }, [h('span', { class: 'ico-fuel', 'aria-hidden': 'true' }), ' ', h('strong', { text: points == null ? '…' : fmt(points) }), ' pkt']),
+          h('span', { class: 'journey-points' }, [Polski.fuelIcon(), ' ', h('strong', { text: points == null ? '…' : fmt(points) }), ' pkt']),
           h('span', { class: 'journey-cities', text: '🏙 ' + loc.reached + ' / ' + loc.cities + ' miast' }),
         ]),
         loc.done

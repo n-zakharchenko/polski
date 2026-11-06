@@ -672,7 +672,7 @@
       state.ui.okEl.textContent = '✓ ' + state.correct;
       state.ui.badEl.textContent = '✗ ' + state.wrong;
       if (state.ui.ptsEl) {
-        state.ui.ptsEl.replaceChildren(el('span', { class: 'ico-fuel', 'aria-hidden': 'true' }), ' ' + state.points.toLocaleString('pl-PL'));
+        state.ui.ptsEl.replaceChildren(Polski.fuelIcon(), ' ' + state.points.toLocaleString('pl-PL'));
         if (answered && state.gain) {
           var pop = el('span', { class: 'pts-pop', text: '+' + state.gain, 'aria-hidden': 'true' });
           pop.addEventListener('animationend', function () { pop.remove(); });

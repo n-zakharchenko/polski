@@ -264,3 +264,8 @@
   border-bottom: none;
   border-radius: 28px 28px 0 0;
 }
+/* если «резинка» всё же сработает — за краем страницы цвет панели, а не голубой;
+   отступ над панелью — у body, чтобы сверху не проступил кремовый фон */
+:root[data-design="01-retro-pastel"]:has(> body.test-page) { background: var(--panel); }
+[data-design="01-retro-pastel"] body.test-page { padding-top: 12px; }
+[data-design="01-retro-pastel"] .test-page main { margin-top: 0; min-height: calc(100vh - 12px); min-height: calc(100dvh - 12px); }
