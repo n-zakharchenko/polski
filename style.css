@@ -218,6 +218,12 @@ h1 {
 }
 .back[hidden] { display: none; }
 
+/* iOS: невидимая подпись переключателя во всю кнопку — касание даёт системный щелчок (core/haptics.js).
+   Стоит раньше .chip / .ghost, чтобы их position (летящее слово — fixed) брал верх. */
+.haptic-host { position: relative; }
+.haptic-hit { position: absolute; inset: 0; border-radius: inherit; -webkit-tap-highlight-color: transparent; }
+.ghost .haptic-hit { display: none; }
+
 /* ---------- Обычная кнопка (для тестов) ---------- */
 
 .btn {

@@ -17,6 +17,7 @@ core/balance.js       БАЛАНС: очки за ответы, серии, бо
 core/progress.js      очки и статистика пользователя в Firestore (users/{uid}), блок очков на итоге теста
 core/stats.js         «Twoje statystyki» на главной (только после входа)
 core/pwa.js           кнопка «Zainstaluj aplikację» внизу страниц (только телефоны) и окно с инструкцией iPhone/Android
+core/haptics.js       вибрация на телефонах (Polski.haptic) и секция «Wibracje» в настройках — только где поддерживается
 manifest.webmanifest  PWA: название «Rajd Polski», иконки icons/ (малюх на пастельном голубом #b1d2e2)
 icons/                иконки PWA: 192, 512, maskable 512 (машина в безопасной зоне), apple-touch-icon 180
 journey/route.js      маршрут малюха: города по кругу (name, lat, lon, major, tier, label)
@@ -169,6 +170,18 @@ Polski.register({
 - «Czas nauki»: время от показа задания до ответа, не больше `taskSecondsMax` на задание.
 - «Do poprawy»: тесты, у которых средний % последних попыток ниже 80, — до трёх, худшие сверху.
 - Цвет плиток — `--stat-bg` (по умолчанию фон страницы), есть в 🎛.
+
+## Вибрация (core/haptics.js)
+
+- `Polski.haptic('tap' | 'ok' | 'err' | 'city')`: слово легло в рамку, верный ответ, ошибка, поп-ап «Nowe miasto».
+- Android — `navigator.vibrate` (ошибка — двойной импульс, город — тройной).
+- iPhone (iOS 18+) — `vibrate` нет; системный щелчок даёт `<input type="checkbox" switch>`, но на iOS 27 только
+  от касания пальцем. Поэтому `Polski.haptic.touch(кнопка)` вкладывает в варианты слов (и «Sprawdź») невидимую
+  подпись такого переключателя: щелчок — в момент касания, верно/ошибка не различаются, у поп-апа города щелчка нет.
+  Приём неофициальный — закроют, будет просто тишина.
+- Компьютеры и старые iOS — без отклика, и секции «Wibracje» в настройках нет. Выключение — `polski.haptics = '0'`.
+- localhost: `?haptics` — считать поддержку есть и писать вызовы в консоль; `?haptics=ios` — режим iPhone.
+- `dev/haptics-test.html` (не в git) — проба способов щелчка на телефоне.
 
 ## Публикация и кэш
 

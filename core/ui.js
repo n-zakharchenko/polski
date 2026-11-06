@@ -202,6 +202,7 @@
         });
         if (!res.ok) b.classList.add('wrong');
       });
+      if (Polski.haptic) Polski.haptic.touch(b); // iOS: щелчок при касании (core/haptics.js)
       opts.appendChild(b);
     });
     area.appendChild(opts);
@@ -260,6 +261,7 @@
           var tr = typeof cfg.tr === 'string' ? cfg.tr : (cfg.tr && cfg.tr[opt]);
           var chip = el('button', { class: 'chip chip-' + cfg.color, type: 'button', 'data-tr': tr, text: opt });
           chip.addEventListener('click', function () { pick(name, chip, opt); });
+          if (Polski.haptic) Polski.haptic.touch(chip); // iOS: щелчок при касании (core/haptics.js)
           return chip;
         })),
       ]);
@@ -272,6 +274,7 @@
       var prev = filled[name];
       if (prev && prev.chip === chip) return;
       if (prev) prev.chip.classList.remove('used');
+      if (Polski.haptic) Polski.haptic('tap'); // слово легло в рамку (core/haptics.js)
       filled[name] = { chip: chip, value: value };
       flyTo(chip, slotEls[name], value).then(maybeSubmit);
     }
@@ -566,6 +569,7 @@
           stopIdleHint();
           Polski.busy = true; // идёт тест — автообновление (core/update.js) подождёт итога
           var res = Polski.checkAnswer(test, task, answer);
+          if (Polski.haptic) Polski.haptic(res.ok ? 'ok' : 'err'); // вибрация на телефоне (core/haptics.js)
           if (res.ok) state.correct += 1; else state.wrong += 1;
           // очки: верно — по серии, «Prawie!» / ошибка — 0 и серия с нуля
           state.streak = res.ok ? state.streak + 1 : 0;
@@ -578,6 +582,7 @@
           if (handler.onResult) handler.onResult(res);
           if (!handler.ownFeedback) showFeedback(feedback, res, task);
           area.classList.add('locked');
+          // textContent заодно убирает и щелчок iOS (.haptic-hit из core/haptics.js): у «Dalej» его нет
           actionBtn.textContent = state.round >= test.rounds ? 'Wynik' : 'Dalej';
           showAction(true);
           actionBtn.disabled = false;
@@ -603,8 +608,10 @@
 
       handler = (TYPES[task.type] || TYPES.input)(task, area, api) || {};
       state.shownAt = Date.now();
-      if (handler.getAnswer) actionBtn.disabled = true;
-      else showAction(false); // ответ — по клику в самом задании
+      if (handler.getAnswer) {
+        actionBtn.disabled = true;
+        if (Polski.haptic) Polski.haptic.touch(actionBtn); // iOS: щелчок при касании «Sprawdź»
+      } else showAction(false); // ответ — по клику в самом задании
 
       armIdleHint();
       if (firstHintPending) {

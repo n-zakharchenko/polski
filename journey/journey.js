@@ -327,6 +327,7 @@
     dlg.addEventListener('close', function () { dlg.remove(); });                // Esc
     document.body.appendChild(dlg);
     if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+    if (Polski.haptic) Polski.haptic('city'); // вибрация на телефоне (core/haptics.js)
     return true;
   }
 
