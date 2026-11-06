@@ -547,6 +547,10 @@
       trTips.hide(0);
       var feedback = el('div', { class: 'feedback', 'aria-live': 'polite' });
       var actionBtn = el('button', { class: 'btn btn-wide', type: 'button', text: 'Sprawdź' });
+      // «Sprawdź / Dalej» — не под заданием (у заданий разная высота, кнопка прыгала),
+      // а закреплена у нижнего края экрана, поверх лёгкого градиента (.action-bar в style.css)
+      var actionBar = el('div', { class: 'action-bar' }, [actionBtn]);
+      function showAction(on) { actionBtn.hidden = !on; actionBar.hidden = !on; }
       var area = el('div', { class: 'answer-area' });
       var handler;
 
@@ -571,7 +575,7 @@
           if (!handler.ownFeedback) showFeedback(feedback, res, task);
           area.classList.add('locked');
           actionBtn.textContent = state.round >= test.rounds ? 'Wynik' : 'Dalej';
-          actionBtn.hidden = false;
+          showAction(true);
           actionBtn.disabled = false;
           actionBtn.focus({ preventScroll: true });
           return res;
@@ -589,14 +593,14 @@
       ]) : null;
 
       root.replaceChildren(el('div', {}, [
-        progressBar(), header, area, feedback, actionBtn,
+        progressBar(), header, area, feedback, actionBar,
         makeRuleButton(),
       ]));
 
       handler = (TYPES[task.type] || TYPES.input)(task, area, api) || {};
       state.shownAt = Date.now();
       if (handler.getAnswer) actionBtn.disabled = true;
-      else actionBtn.hidden = true; // ответ — по клику в самом задании
+      else showAction(false); // ответ — по клику в самом задании
 
       armIdleHint();
       if (firstHintPending) {
@@ -622,15 +626,33 @@
       return !!(Polski.balance && window.PolskiAccount && window.PolskiAccount.user());
     }
 
+    // очки и серия видны только после входа. Вход восстанавливается не сразу (Firebase) —
+    // поэтому счётчик есть всегда, но скрыт, и показывается, как только вход подтвердится
+    function syncPoints() {
+      if (!state || !state.ui || !Polski.balance) return;
+      var on = showPoints();
+      state.ui.ptsEl.hidden = !on;
+      state.ui.streakEl.hidden = !on;
+    }
+    function hookAccount() {
+      var a = window.PolskiAccount;
+      if (!a) return;
+      a.ready().then(syncPoints);
+      if (a.onChange) a.onChange(syncPoints);
+    }
+    if (window.PolskiAccount) hookAccount();
+    else document.addEventListener('DOMContentLoaded', hookAccount); // account.js грузится с defer
+
     function progressBar() {
-      var pts = showPoints();
+      var withPts = !!Polski.balance;
       state.ui = {
         okEl: el('span', { class: 'count-ok', title: 'Dobrze' }),
         badEl: el('span', { class: 'count-bad', title: 'Błędy' }),
         fill: el('div', { class: 'progress-fill' }),
-        ptsEl: pts ? el('span', { class: 'count-pts', title: 'Punkty' }) : null,
-        streakEl: pts ? el('span', { class: 'streak', title: 'Seria poprawnych odpowiedzi' }) : null,
+        ptsEl: withPts ? el('span', { class: 'count-pts', title: 'Punkty' }) : null,
+        streakEl: withPts ? el('span', { class: 'streak', title: 'Seria poprawnych odpowiedzi' }) : null,
       };
+      syncPoints();
       updateProgress(false);
       return el('div', { class: 'progress' }, [
         el('div', { class: 'progress-text' }, [
@@ -650,7 +672,7 @@
       state.ui.okEl.textContent = '✓ ' + state.correct;
       state.ui.badEl.textContent = '✗ ' + state.wrong;
       if (state.ui.ptsEl) {
-        state.ui.ptsEl.replaceChildren('⭐ ' + state.points.toLocaleString('pl-PL'));
+        state.ui.ptsEl.replaceChildren(el('span', { class: 'ico-fuel', 'aria-hidden': 'true' }), ' ' + state.points.toLocaleString('pl-PL'));
         if (answered && state.gain) {
           var pop = el('span', { class: 'pts-pop', text: '+' + state.gain, 'aria-hidden': 'true' });
           pop.addEventListener('animationend', function () { pop.remove(); });

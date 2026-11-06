@@ -346,6 +346,10 @@
     );
     section.hidden = false;
     map.set(0);
+    // пришли по «Zobacz mapę» с итога теста (index.html#journey): карта появилась только сейчас — докручиваем
+    if (location.hash === '#journey') {
+      setTimeout(function () { section.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' }); }, 50);
+    }
 
     var mode = null; // 'locked' | 'user'
     var anim = 0;
@@ -362,7 +366,7 @@
     function renderInfo(points, loc) {
       info.replaceChildren(
         h('div', { class: 'journey-stats' }, [
-          h('span', { class: 'journey-points' }, ['⭐ ', h('strong', { text: points == null ? '…' : fmt(points) }), ' pkt']),
+          h('span', { class: 'journey-points' }, [h('span', { class: 'ico-fuel', 'aria-hidden': 'true' }), ' ', h('strong', { text: points == null ? '…' : fmt(points) }), ' pkt']),
           h('span', { class: 'journey-cities', text: '🏙 ' + loc.reached + ' / ' + loc.cities + ' miast' }),
         ]),
         loc.done

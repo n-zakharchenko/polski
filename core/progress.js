@@ -161,7 +161,15 @@
     if (!a || !a.supported) return;
     var line = h('div', { class: 'summary-points' });
     var login = h('div');
-    box.replaceChildren(line, login);
+    // кнопка внизу: вошёл — «Zobacz mapę» (к карте на главной), не вошёл — «Na główną»
+    var go = h('div', { class: 'summary-go' });
+    function setGo(user) {
+      go.replaceChildren(h('a', {
+        class: 'btn btn-secondary btn-wide', href: user ? 'index.html#journey' : 'index.html',
+        text: user ? 'Zobacz mapę' : 'Na główną',
+      }));
+    }
+    box.replaceChildren(line, login, go);
     box.hidden = false;
     var state = 'idle'; // idle | saving | saved
 
@@ -175,7 +183,7 @@
       var capped = arrived && res.distAfter - res.distBefore < r.points;
       // replaceChildren печатает null строкой «null» — пустые элементы отбрасываем
       line.replaceChildren.apply(line, [
-        h('p', { class: 'pts-total' }, ['⭐ ', h('strong', { text: '+' + fmt(r.points) + ' pkt' })]),
+        h('p', { class: 'pts-total' }, [h('span', { class: 'ico-fuel', 'aria-hidden': 'true' }), ' ', h('strong', { text: '+' + fmt(r.points) + ' pkt' })]),
         r.bonus ? h('p', { class: 'pts-sub', text: 'w tym +' + fmt(r.bonus) + ' za test bez błędów' }) : null,
         arrived ? h('p', { class: 'pts-city' }, loc.done
           ? ['🎉 Meta: ', h('strong', { text: was.seg.to.name }), '! Cała Polska objechana.']
@@ -184,7 +192,6 @@
         loc && !arrived ? h('p', { class: 'pts-sub' }, loc.done
           ? ['Podróż ukończona! 🎉']
           : ['Następny przystanek: ', h('strong', { text: loc.seg.to.name }), ' · zostało ' + fmt(loc.left) + ' pkt']) : null,
-        h('a', { class: 'pts-map', href: 'index.html', text: 'Zobacz mapę →' }),
       ].filter(Boolean));
 
       // доехал до города — поп-ап «чем знаменит» (один раз на город; финиш — «Meta!»)
@@ -222,12 +229,17 @@
     }
 
     a.ready().then(function (u) {
+      setGo(u);
       if (u) { save(); return; }
       a.mountLogin(login, r.points > 0
         ? 'Zaloguj się, żeby zapisać +' + fmt(r.points) + ' pkt i ruszyć maluchem w podróż po Polsce.'
         : null);
       // вошёл прямо на итоге — сохраняем этот тест
-      a.onChange(function (user) { if (user && box.isConnected) save(); });
+      a.onChange(function (user) {
+        if (!box.isConnected) return;
+        setGo(user);
+        if (user) save();
+      });
     });
   }
 

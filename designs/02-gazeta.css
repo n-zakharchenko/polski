@@ -298,3 +298,10 @@
 /* ---------- окна ---------- */
 [data-design="02-gazeta"] .rule-dialog { background: var(--paper); border: 1px solid var(--card-border); border-radius: 8px; }
 [data-design="02-gazeta"] .city-kicker { font-family: var(--cond); font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+
+/* канистра у очков (.ico-fuel) — коричневая сепия; полоса «Dalej» (.action-bar) — по ширине колонки (style.css) */
+:root[data-design="02-gazeta"] { --fuel: #7a5a36; --bar-width: 720px; }
+@media (prefers-color-scheme: dark) {
+  :root[data-design="02-gazeta"]:not([data-theme="light"]) { --fuel: #c9a97a; }
+}
+:root[data-design="02-gazeta"][data-theme="dark"] { --fuel: #c9a97a; }

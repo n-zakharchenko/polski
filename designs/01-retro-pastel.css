@@ -205,6 +205,7 @@
 [data-design="01-retro-pastel"] .journey-next,
 [data-design="01-retro-pastel"] .journey-cities,
 [data-design="01-retro-pastel"] .journey-alt { color: var(--accent-ink); }
+[data-design="01-retro-pastel"] .journey { --fuel: var(--accent-ink); } /* канистра на терракоте — светлая, как текст */
 [data-design="01-retro-pastel"] .journey-cta { background: var(--panel); border: none; box-shadow: none; }
 [data-design="01-retro-pastel"] .journey-cta .btn { background: var(--accent); }
 /* раскраска карты запечена в холодных тонах — слегка утепляем под кремовую палитру */
@@ -246,3 +247,20 @@
   border-radius: 24px;
 }
 [data-design="01-retro-pastel"] .city-kicker { font-family: var(--sans); }
+
+/* канистра у очков (.ico-fuel) — пастельный коричневый; полоса «Dalej» (.action-bar) — по ширине панели,
+   градиент в цвет панели (style.css) */
+:root[data-design="01-retro-pastel"] { --fuel: #b5875a; --bar-fade: var(--panel); }
+@media (prefers-color-scheme: dark) {
+  :root[data-design="01-retro-pastel"]:not([data-theme="light"]) { --fuel: #d9b38c; }
+}
+:root[data-design="01-retro-pastel"][data-theme="dark"] { --fuel: #d9b38c; }
+[data-design="01-retro-pastel"] .action-bar { width: min(calc(100% - 27px), 737px); }
+/* в тесте панель — «лист» до низа экрана: кнопка «Dalej» внизу всегда лежит на панели, а не на голубом фоне */
+[data-design="01-retro-pastel"] .test-page main {
+  min-height: 100vh; /* + отступ сверху 12px = до самого низа страницы, без голубой щели под кнопкой */
+  min-height: 100dvh;
+  margin-bottom: 0;
+  border-bottom: none;
+  border-radius: 28px 28px 0 0;
+}
