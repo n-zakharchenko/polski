@@ -1147,5 +1147,3 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
   .subtitle { margin-bottom: 32px; }
 }
 
-/* тест: без «резинки» прокрутки за край (iOS показывал под кнопкой «Dalej» фон страницы) */
-html:has(> body.test-page) { overscroll-behavior-y: none; }
