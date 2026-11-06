@@ -52,7 +52,7 @@
       id: t.id,
       title: t.title,
       icon: t.icon,
-      rounds: 15,
+      rounds: 10,
       rule: RULE,
       generate: makeGenerate(t.nm, t.mo),
     });

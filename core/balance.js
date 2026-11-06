@@ -17,11 +17,11 @@
   'use strict';
 
   var CONFIG = {
-    perTask: 100,
+    perTask: 150,         // тест — 10 заданий: очки за ответ и серии подобраны так, что тест приносит столько же, сколько прежние 15 по 100
     streak: [            // { from: сколько верных подряд, mult: множитель }
       { from: 3, mult: 1.5 },
-      { from: 6, mult: 2 },
-      { from: 10, mult: 3 },
+      { from: 5, mult: 2 },
+      { from: 8, mult: 3 },
     ],
     perfectBonus: 1000,
     segmentCost: { 1: 1400, 2: 2600, 3: 3800 },

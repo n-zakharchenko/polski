@@ -194,7 +194,7 @@
       id: t.id,
       title: t.title,
       icon: t.icon,
-      rounds: 15,
+      rounds: 10,
       rule: L.ruleMeskoosobowe,   // кнопка (i) внизу карточки
       generate: makeGenerate(t.mode),
     });

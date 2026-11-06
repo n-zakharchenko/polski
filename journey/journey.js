@@ -373,7 +373,8 @@
           ? h('p', { class: 'journey-next', text: 'Podróż ukończona! 🎉 Cała Polska objechana.' })
           : h('p', { class: 'journey-next' }, [
             'Następny przystanek: ', h('strong', { text: loc.seg.to.name }),
-            ' · zostało ' + fmt(loc.left) + ' pkt',
+            // «zostało …» — всегда своей строкой: пока малюх едет, число меняется, и перенос не прыгает
+            h('br'), 'zostało ' + fmt(loc.left) + ' pkt',
           ])
       );
     }
