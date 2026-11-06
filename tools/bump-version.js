@@ -8,6 +8,8 @@
  * Метка — дата и время UTC: ГГГГММДД-ЧЧММ. Новые адреса файлов → браузер и кэш GitHub Pages
  * берут свежие версии, а старый HTML из кэша тянет согласованный старый набор, без смеси.
  * Бандлы тестов и картинки карты получают ту же метку в коде (Polski.withVersion).
+ * И пишет version.json = { "v": метка } — по нему уже открытые страницы и PWA узнают о новой
+ * версии и перезагружаются сами (core/update.js).
  */
 'use strict';
 const fs = require('fs');
@@ -32,4 +34,6 @@ for (const page of PAGES) {
   fs.writeFileSync(file, out);
   console.log(page + ': ' + n + ' меток');
 }
+fs.writeFileSync(path.join(ROOT, 'version.json'), JSON.stringify({ v: version }) + '\n');
+console.log('version.json: ' + version);
 console.log('версия ' + version);

@@ -52,10 +52,11 @@
     var hills = Math.max(0, Math.min(1, (f.hillsLat - lat) / f.hillsSpan));
     var noise = Math.sin((s.index + 1) * 12.9898) * 43758.5453;
     noise = noise - Math.floor(noise) - 0.5; // −0,5…0,5, у каждого отрезка свой и постоянный
-    return f.base + f.hills * hills
+    var rate = f.base + f.hills * hills
       + (s.from.major || s.to.major ? f.city : 0)
       + (s.tier === 1 ? f.short : s.tier === 3 ? f.long : 0)
       + noise * 2 * f.jitter;
+    return Math.max(f.min, Math.min(f.max, rate)); // правдоподобно для малюха, что бы ни накрутили выше
   }
 
   /** что видно из маршрута при пробеге dist: километры, топливо, города и воеводства */

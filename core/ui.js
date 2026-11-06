@@ -527,6 +527,9 @@
       // bestStreak / ms — для статистики на главной: лучшая серия и время на заданиях (core/stats.js)
       state = { rng: Polski.createRng(), round: 0, correct: 0, wrong: 0, session: {}, points: 0, streak: 0, gain: 0,
         bestStreak: 0, ms: 0 };
+      // новый проход, ещё ничего не отвечено — если ждали новую версию сайта, сейчас самое время (core/update.js)
+      Polski.busy = false;
+      document.dispatchEvent(new Event('polski:idle'));
       nextTask();
     }
 
@@ -561,6 +564,7 @@
           if (state.answered) return null;
           state.answered = true;
           stopIdleHint();
+          Polski.busy = true; // идёт тест — автообновление (core/update.js) подождёт итога
           var res = Polski.checkAnswer(test, task, answer);
           if (res.ok) state.correct += 1; else state.wrong += 1;
           // очки: верно — по серии, «Prawie!» / ошибка — 0 и серия с нуля
@@ -695,6 +699,8 @@
 
     function showSummary() {
       stopIdleHint();
+      // на итоге не перезагружаемся (сохраняются очки, человек смотрит результат): Polski.busy остаётся,
+      // новая версия подхватится на следующей странице или в начале следующего прохода (start)
       var pct = Math.round((state.correct / test.rounds) * 100);
       var msg = pct === 100 ? 'Perfekcyjnie! 🎉'
         : pct >= 80 ? 'Świetnie!'
