@@ -290,14 +290,14 @@ h1 {
 .test-page main { padding-bottom: 120px; } /* последнее в задании не прячется под кнопкой */
 
 /* канистра вместо звёздочки у очков: встроенный SVG (Polski.fuelIcon в core/engine.js), цвет — --fuel стиля */
-.ico-fuel {
+.ico-fuel, .ico-pin {
   display: inline-block;
   width: 1.1em;
   height: 1.1em;
   vertical-align: -0.2em;
   color: var(--fuel, var(--accent));
 }
-.ico-fuel svg { display: block; width: 100%; height: 100%; }
+.ico-fuel svg, .ico-pin svg { display: block; width: 100%; height: 100%; } /* .ico-pin — пин у счётчика городов (journey.js) */
 .btn-secondary {
   background: var(--card);
   color: var(--text);

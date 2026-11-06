@@ -384,7 +384,7 @@
       info.replaceChildren(
         h('div', { class: 'journey-stats' }, [
           h('span', { class: 'journey-points' }, [Polski.fuelIcon(), ' ', h('strong', { text: points == null ? '…' : fmt(points) }), ' pkt']),
-          h('span', { class: 'journey-cities', text: '🏙 ' + loc.reached + ' / ' + loc.cities + ' miast' }),
+          h('span', { class: 'journey-cities' }, [Polski.pinIcon(), ' ' + loc.reached + ' / ' + loc.cities + ' miast']),
         ]),
         loc.done
           ? h('p', { class: 'journey-next', text: 'Podróż ukończona! 🎉 Cała Polska objechana.' })
