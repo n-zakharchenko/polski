@@ -144,6 +144,13 @@
   font-size: 1.15rem;
 }
 [data-design="01-retro-pastel"] .test-title { font-family: var(--serif); font-weight: 650; font-size: 1.25rem; }
+/* узкие телефоны: см. style.css — компактная карточка; заголовок страницы чуть меньше, чтобы слова не рвались */
+@media (max-width: 360px) {
+  [data-design="01-retro-pastel"] .test-title { font-size: 1.05rem; }
+  [data-design="01-retro-pastel"] .test-icon { border-radius: 12px; font-size: 0.95rem; }
+  [data-design="01-retro-pastel"] .test-arrow { width: 28px; height: 28px; font-size: 0.85rem; }
+  [data-design="01-retro-pastel"] h1 { font-size: 1.9rem; }
+}
 [data-design="01-retro-pastel"] .test-desc { color: var(--text); opacity: 0.75; }
 /* стрелка — красный кружок, как кнопка корзины в референсе */
 [data-design="01-retro-pastel"] .test-arrow {
@@ -157,6 +164,11 @@
   font-size: 1rem;
 }
 [data-design="01-retro-pastel"] .test-card:hover .test-arrow { color: var(--accent-ink); }
+/* совсем узко (≤320px): без стрелки — карточка и так целиком ссылка, длинному слову нужно место
+   (после правила выше, иначе его display: grid перебивает) */
+@media (max-width: 320px) {
+  [data-design="01-retro-pastel"] .test-arrow { display: none; }
+}
 [data-design="01-retro-pastel"] .test-card.soon { opacity: 1; }
 [data-design="01-retro-pastel"] .test-card.soon .test-text { opacity: 0.65; }
 [data-design="01-retro-pastel"] .test-card.soon .test-icon { background: var(--panel); color: var(--muted); }

@@ -38,6 +38,7 @@ var IMIESLOWY_FILES = [
   'imieslowy/common.js',
   'imieslowy/czynne.js',
   'imieslowy/bierne.js',
+  'imieslowy/dict.js',   // перевод слов по долгому нажатию (общий механизм — core/dict.js)
   'imieslowy/test.js',
 ];
 
@@ -94,37 +95,27 @@ Polski.manifest = [
     desc: 'czytający, przeczytany',
     icon: 'ący',
 
-    // тот же экран выбора, что у Liczebników; задания «Czynny czy bierny?» — только в Mix
+    // экран выбора с одним рядом: Czynne / Bierne / Mix; в каждом тесте оба вида заданий
+    // («который → причастие» и «инфинитив в рамке»), в Mix ещё «czynny czy bierny»
     chooser: {
       axes: [
         { key: 'kind', label: 'Imiesłowy', options: [
           { id: 'cz', title: 'Czynne', hint: 'czytający, czytająca, czytające' },
           { id: 'bi', title: 'Bierne', hint: 'czytany, zrobiony, umyty' },
-          { id: 'mix', title: 'Mix', hint: 'czynne i bierne razem + „czynny czy bierny?”' },
-        ] },
-        { key: 'mode', label: 'Co ćwiczyć', options: [
-          { id: 'a', title: 'Przekształć', hint: 'kobieta, która czyta → kobieta czytająca' },
-          { id: 'b', title: 'Uzupełnij', hint: 'ciasto … (upiec) → ciasto upieczone' },
-          { id: 'ab', title: 'Wszystko', hint: 'oba rodzaje zadań' },
+          { id: 'mix', title: 'Mix', hint: 'czynne i bierne razem' },
         ] },
       ],
       tests: {
-        'cz.a': 'imieslowy-cz-a', 'cz.b': 'imieslowy-cz-b', 'cz.ab': 'imieslowy-cz-ab',
-        'bi.a': 'imieslowy-bi-a', 'bi.b': 'imieslowy-bi-b', 'bi.ab': 'imieslowy-bi-ab',
-        'mix.a': 'imieslowy-mix-a', 'mix.b': 'imieslowy-mix-b', 'mix.ab': 'imieslowy-mix-ab',
+        'cz': 'imieslowy-cz',
+        'bi': 'imieslowy-bi',
+        'mix': 'imieslowy-mix',
       },
     },
 
     items: [
-      { id: 'imieslowy-cz-a', files: IMIESLOWY_FILES },
-      { id: 'imieslowy-cz-b', files: IMIESLOWY_FILES },
-      { id: 'imieslowy-cz-ab', files: IMIESLOWY_FILES },
-      { id: 'imieslowy-bi-a', files: IMIESLOWY_FILES },
-      { id: 'imieslowy-bi-b', files: IMIESLOWY_FILES },
-      { id: 'imieslowy-bi-ab', files: IMIESLOWY_FILES },
-      { id: 'imieslowy-mix-a', files: IMIESLOWY_FILES },
-      { id: 'imieslowy-mix-b', files: IMIESLOWY_FILES },
-      { id: 'imieslowy-mix-ab', files: IMIESLOWY_FILES },
+      { id: 'imieslowy-cz', files: IMIESLOWY_FILES },
+      { id: 'imieslowy-bi', files: IMIESLOWY_FILES },
+      { id: 'imieslowy-mix', files: IMIESLOWY_FILES },
     ],
   },
 ];

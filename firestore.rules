@@ -7,7 +7,8 @@ rules_version = '2';
 // users/{uid} = { points, dist, tests, perfect, updatedAt, + статистика } — пишет только сам пользователь, один раз за тест.
 //   points — счёт, dist — пробег малюха (растёт не больше, чем очки за этот тест).
 //   Статистика (core/progress.js): answered, correct, bestStreak, seconds, day, dayStreak, bestDayStreak,
-//   week { день: тестов }, lastTest, byTest { id теста: { t, n, err, last } }. Её может не быть (старые записи
+//   week { день: тестов }, lastTest, byTest { id теста: { t, n, err, last } },
+//   today { d, t, p, a, c, s, pf, d0 } — итоги за сегодня (не больше общих счётчиков). Её может не быть (старые записи
 //   и старые страницы из кэша) — тогда поля не проверяются и считаются нулями.
 // Сервера нет, очки считает браузер, поэтому правила хотя бы ограничивают накрутку:
 //   очки только растут, не больше MAX_GAIN за запись; пробег не обгоняет очки; tests +1; не чаще раза в 10 с
@@ -26,7 +27,7 @@ service cloud.firestore {
       function shape(d) {
         return d.keys().hasOnly(['points', 'dist', 'tests', 'perfect', 'updatedAt',
             'answered', 'correct', 'bestStreak', 'seconds', 'day', 'dayStreak', 'bestDayStreak',
-            'week', 'lastTest', 'byTest'])
+            'week', 'lastTest', 'byTest', 'today'])
           && d.points is int && d.dist is int && d.tests is int && d.perfect is int
           && d.updatedAt == request.time
           && d.get('answered', 0) is int && d.get('correct', 0) is int
@@ -35,7 +36,20 @@ service cloud.firestore {
           && d.get('day', '') is string && d.get('day', '').size() <= 10
           && d.get('lastTest', '') is string && d.get('lastTest', '').size() <= 100
           && d.get('week', {}) is map && d.get('week', {}).size() <= 20
-          && d.get('byTest', {}) is map && d.get('byTest', {}).size() <= 200;
+          && d.get('byTest', {}) is map && d.get('byTest', {}).size() <= 200
+          && (d.get('today', null) == null || todayOk(d.today, d));
+      }
+      // итоги за сегодня: не больше общих счётчиков, день — тот же, что в day
+      function todayOk(t, d) {
+        return t is map && t.keys().hasOnly(['d', 't', 'p', 'a', 'c', 's', 'pf', 'd0'])
+          && t.d is string && t.d == d.get('day', '')
+          && t.t is int && t.t >= 1 && t.t <= d.tests
+          && t.p is int && t.p >= 0 && t.p <= d.points
+          && t.a is int && t.a >= 0 && t.a <= d.get('answered', 0)
+          && t.c is int && t.c >= 0 && t.c <= t.a
+          && t.s is int && t.s >= 0 && t.s <= d.get('seconds', 0)
+          && t.pf is int && t.pf >= 0 && t.pf <= t.t
+          && t.d0 is int && t.d0 >= 0 && t.d0 <= d.dist;
       }
       // запись о тесте в byTest
       function entry(e) {

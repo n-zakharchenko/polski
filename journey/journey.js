@@ -380,6 +380,27 @@
       renderInfo(typeof last.points === 'number' ? last.points : null, map.set(last.dist));
     }
 
+    // только что прошли тест: итог уже сохранил снимок с новым пробегом (core/progress.js) — едем сразу,
+    // не ждём входа и Firestore (раньше малюх пару секунд стоял). Вход восстановится во время езды —
+    // showUser подождёт её конца (pendingUser) и только сверит с базой.
+    var early = null, pendingUser = null;
+    var snap = Polski.progress && Polski.progress.peek ? Polski.progress.peek() : null;
+    if (snap) {
+      var from = readSeen(snap.uid);
+      if (!from && last && last.uid === snap.uid) from = last.dist;
+      section.classList.remove('locked');
+      if (snap.data.dist > from) {
+        early = snap.uid;
+        drive(from, snap.data.dist, snap.data.points, function () {
+          writeSeen(snap.uid, snap.data.dist, snap.data.points);
+          early = null;
+          if (pendingUser) { var pu = pendingUser; pendingUser = null; showUser(pu); }
+        });
+      } else {
+        renderInfo(snap.data.points, map.set(snap.data.dist));
+      }
+    }
+
     // points — счёт игрока (null — ещё грузится), loc — где малюх по пробегу (dist)
     function renderInfo(points, loc) {
       info.replaceChildren(
@@ -418,6 +439,7 @@
     function showLocked() {
       mode = 'locked';
       cancelAnimationFrame(anim);
+      map.car.classList.remove('driving');
       map.set(0);
       section.classList.add('locked');
       info.replaceChildren(h('p', { class: 'journey-alt', text: 'albo ćwicz bez logowania — bez punktów i podróży ↑' }));
@@ -436,6 +458,8 @@
     }
 
     function showUser(u) {
+      if (early && early === u.uid) { pendingUser = u; return; } // малюх уже едет по снимку — после доезда
+      if (early) { early = null; cancelAnimationFrame(anim); map.car.classList.remove('driving'); } // другой водитель
       mode = 'user';
       section.classList.remove('locked');
       overlay.replaceChildren();
@@ -469,7 +493,9 @@
 
     function forgetLast() {
       last = null;
+      early = null; pendingUser = null;
       try { window.localStorage.removeItem(LAST_KEY); } catch (e) { /* ничего */ }
+      if (Polski.progress && Polski.progress.forget) Polski.progress.forget(); // и снимок статистики
     }
 
     acc.ready().then(function (u) {

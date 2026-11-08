@@ -1,17 +1,18 @@
 /*
- * Imiesłowy przymiotnikowe — тест: Czynne / Bierne / Mix × Przekształć / Uzupełnij / Wszystko.
+ * Imiesłowy przymiotnikowe — тест: Czynne / Bierne / Mix (3 теста; режимы «Przekształć/Uzupełnij» убраны —
+ * оба вида заданий всегда вперемешку).
  *
  * Виды заданий (тип 'slots', одна оранжевая рамка «Imiesłów»):
  *   A «Przekształć» — сверху исходное предложение с подчёркнутым «który …»,
  *                     ниже то же предложение с рамкой на месте причастия;
  *   B «Uzupełnij»   — предложение с рамкой, в пустой рамке — инфинитив (upiec);
- *   C «Czynny czy bierny?» — только в Mix: два варианта, причастие и противоположная форма
- *                     того же рода/числа/падежа (zwiedzający / zwiedzani).
+ *   C «czynny czy bierny» — только в Mix: два варианта, причастие и противоположная форма
+ *                     того же рода/числа/падежа (zwiedzający / zwiedzani); без текста-вопроса.
  * Варианты в A и B: ответ + 3 ловушки — настоящие формы того же причастия в другом роде/числе/падеже;
  * в Mix одна из ловушек иногда — противоположная форма.
  *
- * За проход (10 заданий): в Mix czynne и bierne поровну, не больше 2 подряд, и 3 задания C;
- * в «Wszystko» A и B поровну. Предложения и глаголы в проходе не повторяются.
+ * За проход (10 заданий): A и B поровну; в Mix czynne и bierne поровну, не больше 2 подряд, и 3 задания C
+ * (тогда A и B — 4 и 3). Предложения и глаголы в проходе не повторяются.
  */
 (function () {
   'use strict';
@@ -94,7 +95,6 @@
 
     return {
       type: 'slots',
-      question: type === 'C' ? 'Czynny czy bierny?' : null,
       source: source,
       sentence: words(it.before).concat([{ slot: 'imi' }], words(it.after)),
       slots: {
@@ -126,26 +126,19 @@
     };
   }
 
-  var KINDS = [
+  // в каждом тесте A и B вперемешку (поровну), в Mix ещё 3 задания C
+  [
     { id: 'cz', title: 'Czynne', rule: I.rules.cz },
     { id: 'bi', title: 'Bierne', rule: I.rules.bi },
     { id: 'mix', title: 'Mix', rule: I.rules.mix },
-  ];
-  var MODES = [
-    { id: 'a', title: 'Przekształć' },
-    { id: 'b', title: 'Uzupełnij' },
-    { id: 'ab', title: 'Wszystko' },
-  ];
-  KINDS.forEach(function (k) {
-    MODES.forEach(function (m) {
-      Polski.register({
-        id: 'imieslowy-' + k.id + '-' + m.id,
-        title: k.title + ' · ' + m.title,
-        icon: 'ący',
-        rounds: 10,
-        rule: k.rule,
-        generate: makeGenerate(k.id, m.id),
-      });
+  ].forEach(function (k) {
+    Polski.register({
+      id: 'imieslowy-' + k.id,
+      title: k.title,
+      icon: 'ący',
+      rounds: 10,
+      rule: k.rule,
+      generate: makeGenerate(k.id, 'ab'),
     });
   });
 

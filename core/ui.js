@@ -41,15 +41,28 @@
     return [].concat(task.answer)[0];
   }
 
-  /** 'текст' или { text, tr, mark } → <span>, с переводом в data-tr; mark — подчеркнуть (фрагмент «który …») */
+  /**
+   * 'текст' или { text, tr, mark } → <span>. С tr — перевод всего фрагмента (data-tr, как у Liczebników);
+   * без tr — каждое слово своим <span class="w">: долгое нажатие переводит его по общему словарю (core/dict.js).
+   * mark — подчеркнуть (фрагмент «który …»).
+   */
   function wordSpan(part, cls) {
-    if (typeof part === 'string') return el('span', { class: cls, text: part });
+    if (typeof part === 'string') return wordsSpan(part, cls);
+    if (part.tr == null) return wordsSpan(part.text, cls + (part.mark ? ' slots-mark' : ''));
     return el('span', { class: cls + (part.mark ? ' slots-mark' : ''), 'data-tr': part.tr, text: part.text });
+  }
+  function wordsSpan(text, cls) {
+    var bits = String(text).split(/(\s+)/);
+    if (bits.length === 1) return el('span', { class: cls + ' w', text: text });
+    return el('span', { class: cls }, bits.map(function (b) {
+      return /^\s+$/.test(b) ? b : el('span', { class: 'w', text: b });
+    }));
   }
 
   /* ======================================================================
    * Перевод по долгому нажатию (1 с) — пальцем или кнопкой мыши.
-   * Работает для любого элемента с атрибутом data-tr.
+   * Работает для любого элемента с атрибутом data-tr, а без него — для слова (.w), варианта (.chip)
+   * и заполненной рамки (.slot), если перевод нашёлся в общем словаре (Polski.dict, core/dict.js).
    * Наведение ничего не показывает: фича почти незаметна и не мешает основному флоу.
    * После долгого нажатия следующий click гасится — вариант не выбирается.
    * ==================================================================== */
@@ -64,12 +77,27 @@
     var start = null;
     var suppressClick = false;
 
+    /** перевод элемента: свой data-tr, иначе — словарь (у рамки — только её слово, без облачка-подсказки) */
+    function trOf(node) {
+      var own = node.getAttribute('data-tr');
+      if (own) return own;
+      if (!Polski.dict) return null;
+      var text = node.classList.contains('slot')
+        ? (node.firstChild && node.firstChild.nodeType === 3 ? node.firstChild.textContent : '')
+        : node.textContent;
+      return Polski.dict.lookup(text);
+    }
+
     function target(e) {
-      return e.target && e.target.closest ? e.target.closest('[data-tr]') : null;
+      if (!e.target || !e.target.closest) return null;
+      var own = e.target.closest('[data-tr]');
+      if (own) return own;
+      var node = e.target.closest('.w, .chip, .slot');
+      return node && trOf(node) ? node : null;
     }
 
     function show(node) {
-      var text = node.getAttribute('data-tr');
+      var text = trOf(node);
       if (!text) return;
       if (!tip) {
         tip = el('div', { class: 'tr-tip bubble', role: 'tooltip' });

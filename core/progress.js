@@ -10,6 +10,9 @@
  *     day, dayStreak, bestDayStreak — последний день с тестом (ГГГГ-ММ-ДД, местное время) и серия дней подряд
  *     week = { 'ГГГГ-ММ-ДД': тестов }  — последние WEEK_DAYS дней (старые ключи удаляем)
  *     lastTest, byTest = { <id теста>: { t: название, n: прохождений, err: ошибок, last: [% последних LAST_N] } }
+ *     today = { d: 'ГГГГ-ММ-ДД', t: тестов, p: очков, a: ответов, c: верных, s: секунд, pf: без ошибок,
+ *               d0: пробег на начало дня } — итоги за сегодня (переключатель «Dziś / Cały czas» в статистике)
+ *   Снимок последних данных — в localStorage (peek / forget), чтобы главная рисовалась сразу.
  * Пишем один раз — в конце теста. Прирост за запись ограничен правилами (firestore.rules).
  *
  *   Polski.progress.load()                 — Promise<данные | null> (null — не вошли); см. normalize()
@@ -40,7 +43,50 @@
       answered: d.answered || 0, correct: d.correct || 0, bestStreak: d.bestStreak || 0, seconds: d.seconds || 0,
       day: d.day || '', dayStreak: d.dayStreak || 0, bestDayStreak: d.bestDayStreak || 0,
       week: d.week || {}, byTest: d.byTest || {},
+      today: d.today || null,
     };
+  }
+
+  /* ---------- снимок статистики в браузере ----------
+   * Чтобы карта и «Twoje statystyki» на главной рисовались сразу, не дожидаясь входа и Firestore (1–3 с),
+   * последние данные пользователя лежат в localStorage 'polski.progress.snap' = { uid, data }.
+   * Пишем при каждом чтении из Firestore и сразу после записи результата теста (данные «после» считаем сами).
+   * Стираем при выходе из аккаунта (forget). Это та же статистика, что видит сам пользователь, — на его устройстве. */
+  var SNAP_KEY = 'polski.progress.snap';
+
+  function saveSnap(uid, data) {
+    try { window.localStorage.setItem(SNAP_KEY, JSON.stringify({ uid: uid, data: data })); } catch (e) { /* не страшно */ }
+  }
+  /** снимок, если в этом браузере уже входили: { uid, data } или null */
+  function peek() {
+    try {
+      if (window.localStorage.getItem('polski.account') !== '1') return null;
+      var s = JSON.parse(window.localStorage.getItem(SNAP_KEY));
+      return s && s.uid && s.data ? { uid: s.uid, data: normalize(s.data) } : null;
+    } catch (e) { return null; }
+  }
+  function forget() {
+    try { window.localStorage.removeItem(SNAP_KEY); } catch (e) { /* ничего */ }
+  }
+
+  // для подсчёта данных «после» теста локально: те же statsUpdate(), но вместо команд Firestore — метки
+  var LOCAL_F = {
+    increment: function (n) { return { __inc: n }; },
+    deleteField: function () { return { __del: true }; },
+  };
+  /** применить запись (как её отправляем в Firestore с merge) к данным c — получить данные после неё */
+  function applyLocal(c, doc) {
+    var out = JSON.parse(JSON.stringify(c));
+    Object.keys(doc).forEach(function (k) {
+      var v = doc[k];
+      if (k === 'updatedAt') return;
+      if (v && v.__inc != null) out[k] = (out[k] || 0) + v.__inc;
+      else if (k === 'week' || k === 'byTest') { // merge по ключам, как setDoc(..., { merge: true })
+        out[k] = out[k] || {};
+        Object.keys(v).forEach(function (kk) { if (v[kk] && v[kk].__del) delete out[k][kk]; else out[k][kk] = v[kk]; });
+      } else out[k] = v;
+    });
+    return out;
   }
 
   /** серия дней на сегодня: последний тест сегодня или вчера — серия жива, иначе 0 */
@@ -61,7 +107,9 @@
       var p = a.firestore().then(function (st) {
         return st.F.getDoc(st.F.doc(st.db, 'users', u.uid));
       }).then(function (snap) {
-        return normalize(snap.exists() ? snap.data() : {});
+        var data = normalize(snap.exists() ? snap.data() : {});
+        saveSnap(u.uid, data);
+        return data;
       });
       cache = { uid: u.uid, promise: p };
       p.catch(function () { cache = null; });
@@ -81,7 +129,15 @@
     var oldest = dayKey(shiftDay(now, -(WEEK_DAYS - 1)));
     Object.keys(c.week).forEach(function (k) { if (k < oldest) week[k] = F.deleteField(); });
 
+    // итоги за сегодня (переключатель «Dziś / Cały czas»): d0 — пробег на начало дня (км, топливо, города за день)
+    var t = c.today && c.today.d === today ? c.today : { d: today, t: 0, p: 0, a: 0, c: 0, s: 0, pf: 0, d0: c.dist };
+    var todayOut = {
+      d: today, t: t.t + 1, p: t.p + Math.round(Math.max(0, r.points || 0)), a: t.a + answered, c: t.c + correct,
+      s: t.s + Math.min(3600, Math.max(0, Math.round(r.seconds || 0))), pf: t.pf + (r.perfect ? 1 : 0), d0: t.d0,
+    };
+
     var out = {
+      today: todayOut,
       answered: F.increment(answered),
       correct: F.increment(correct),
       bestStreak: Math.max(c.bestStreak, Math.min(r.bestStreak || 0, correct)),
@@ -113,7 +169,7 @@
     if (!a) return Promise.resolve(null);
     return a.ready().then(function (u) {
       if (!u) return null;
-      var before = 0, distBefore = 0, distAfter = 0, c = null;
+      var before = 0, distBefore = 0, distAfter = 0, c = null, now = new Date();
       return load().then(function (data) {
         c = data || normalize({});
         before = c.points;
@@ -129,11 +185,17 @@
           perfect: F.increment(r.perfect ? 1 : 0),
           updatedAt: F.serverTimestamp(),
         };
-        var s = statsUpdate(c, r, new Date(), F);
+        var s = statsUpdate(c, r, now, F);
         Object.keys(s).forEach(function (k) { doc[k] = s[k]; });
         return F.setDoc(F.doc(st.db, 'users', u.uid), doc, { merge: true });
       }).then(function () {
         cache = null;
+        // данные «после» — в снимок, чтобы главная сразу показала новую статистику и поехала малюхом
+        var local = { points: LOCAL_F.increment(r.points), dist: Math.round(distAfter), tests: LOCAL_F.increment(1),
+          perfect: LOCAL_F.increment(r.perfect ? 1 : 0) };
+        var ls = statsUpdate(c, r, now, LOCAL_F);
+        Object.keys(ls).forEach(function (k) { local[k] = ls[k]; });
+        saveSnap(u.uid, normalize(applyLocal(c, local)));
         return { before: before, after: before + r.points, distBefore: distBefore, distAfter: distAfter };
       });
     });
@@ -247,6 +309,7 @@
   Polski.progress = {
     load: load, addResult: addResult, mountSummary: mountSummary,
     dayKey: dayKey, dayStreakNow: dayStreakNow,
-    _statsUpdate: statsUpdate, _normalize: normalize, // для проверок
+    peek: peek, forget: forget, // снимок статистики в браузере (сразу рисовать главную)
+    _statsUpdate: statsUpdate, _normalize: normalize, _applyLocal: applyLocal, LOCAL_F: LOCAL_F, // для проверок
   };
 })();

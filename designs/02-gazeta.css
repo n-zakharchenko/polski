@@ -185,6 +185,15 @@
 [data-design="02-gazeta"] .test-arrow { font-size: 0; color: var(--muted); }
 [data-design="02-gazeta"] .test-arrow::after { content: '☞'; font-size: 1.5rem; line-height: 1; }
 [data-design="02-gazeta"] .test-card:hover .test-arrow { color: var(--ink); transform: translateX(3px); }
+/* узкие телефоны: компактнее, чтобы «przymiotnikowe» помещалось целиком (≤320px — ещё и без руки-указателя) */
+@media (max-width: 360px) {
+  [data-design="02-gazeta"] .test-card { padding: 14px 12px; }
+  [data-design="02-gazeta"] .test-icon { width: 42px; height: 42px; font-size: 0.9rem; }
+  [data-design="02-gazeta"] .test-title { font-size: 1.1rem; }
+}
+@media (max-width: 320px) {
+  [data-design="02-gazeta"] .test-arrow { display: none; }
+}
 [data-design="02-gazeta"] .test-card.soon { opacity: 1; }
 [data-design="02-gazeta"] .test-card.soon .test-text,
 [data-design="02-gazeta"] .test-card.soon .test-icon { opacity: 0.5; }

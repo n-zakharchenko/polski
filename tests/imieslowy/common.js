@@ -25,7 +25,8 @@
     '<b>3. os. lm. czasu teraźniejszego</b> <span class="rule-q">(co oni robią? — <i>czytają</i>)</span> ',
     'dodajemy <mark>-cy</mark>, <mark>-ca</mark>, <mark>-ce</mark>.</p>',
 
-    '<table class="rule-flow"><thead><tr>',
+    // narrow-drop1: на узком телефоне без столбца инфинитива — остаётся главное «czytają → czytający»
+    '<table class="rule-flow narrow-drop1"><thead><tr>',
     '<th>Bezokolicznik</th><th></th><th>oni (teraz)</th><th></th><th>imiesłów czynny</th>',
     '</tr></thead><tbody>',
     '<tr><td>czytać</td><td class="arr">→</td><td>czytają</td><td class="arr">→</td><td>czytają<mark>cy</mark><span class="tail">, -ca, -ce</span></td></tr>',
@@ -57,7 +58,7 @@
 
     '<tr class="g1">',
     '<td data-label="Przyrostek"><mark>-ny, -na, -ne</mark></td>',
-    '<td data-label="Bezokolicznik na"><b>-a-</b> <span class="nw">(czyta-ć)</span>, <b>-e-</b> <span class="nw">(widzie-ć)</span><br><b>Wyjątki:</b> trzeć, drzeć → <span class="nw">-ty</span> (tarty, darty)</td>',
+    '<td data-label="Bezokolicznik na"><b>-ać</b> (czytać), <b>-eć</b> (widzieć)<br><b>Wyjątki:</b> trzeć, drzeć → <span class="nw">-ty</span> (tarty, darty)</td>',
     '<td data-label="Bierzemy formę"><span class="rule-q">co on (z)robił?</span><br>3. os. lp. czasu przeszłego, bez <b>-ł</b></td>',
     '<td data-label="Przykłady">czyta-ł → czyta<mark>ny</mark><br>widzia-ł → widzia<mark>ny</mark><br>obejrza-ł → obejrza<mark>ny</mark></td>',
     '</tr>',
@@ -65,7 +66,7 @@
 
     '<tr class="g1">',
     '<td data-label="Przyrostek"><mark>-ony, -ona, -one</mark></td>',
-    '<td data-label="Bezokolicznik na"><b>-y-</b> <span class="nw">(liczy-ć)</span>, <b>-i-</b> <span class="nw">(zrobi-ć)</span>;<br><b>-ść</b> (nieść), <b>-źć</b> (wieźć), <b>-c</b> (piec)</td>',
+    '<td data-label="Bezokolicznik na"><b>-yć</b> (liczyć), <b>-ić</b> (zrobić);<br><b>-ść</b> (nieść), <b>-źć</b> (wieźć), <b>-c</b> (piec)</td>',
     // как в учебнике пользователя: «do tematu czasu teraźniejszego w 2. osobie l.p. dodajemy przyrostek -ony»
     // и примеры с той же нарезкой (zrob-isz → zrobi-ony). Форма «ty»: у ndk. — teraźniejszy (robisz), у dk. — przyszły prosty (zrobisz)
     '<td data-label="Bierzemy formę"><span class="rule-q">co ty (z)robisz?</span><br>do tematu 2. os. lp. <span class="nw">(ty robisz / zrobisz)</span> ',
@@ -74,20 +75,9 @@
     '<b>Wyjątki:</b><br>lubić → lubi<mark>any</mark><br>jeść → jedz<mark>ony</mark><br>kraść → kradzi<mark>ony</mark></td>',
     '</tr>',
     '<tr class="rule-example"><td colspan="4"><span class="imi">Zrobione</span> zadanie leży na biurku.</td></tr>',
-
-    '<tr class="g1">',
-    '<td data-label="Przyrostek"><mark>-ty, -ta, -te</mark></td>',
-    '<td data-label="Bezokolicznik na"><b>-ą-</b> <span class="nw">(zaczą-ć)</span>, <b>-y-, -i-, -u-</b> z rdzenia — czasowniki <b>jednosylabowe</b>: <span class="nw">pić, myć, bić, kuć, szyć</span> (też z przedrostkiem: <span class="nw">wypić, umyć</span>); <b>trzeć, drzeć</b></td>',
-    '<td data-label="Bierzemy formę"><span class="rule-q">co oni (z)robili?</span><br>3. os. lm. czasu przeszłego, bez <b>-li</b></td>',
-    '<td data-label="Przykłady">zaczę-li → zaczę<mark>ty</mark><br>my-li → my<mark>ty</mark><br>bi-li → bi<mark>ty</mark><br>tar-li → tar<mark>ty</mark><br>',
-    'też: zamknąć → zamknię<mark>ty</mark></td>',
-    '</tr>',
-    '<tr class="rule-example"><td colspan="4"><span class="imi">Umyte</span> okna lśnią w słońcu.</td></tr>',
-
-    '</tbody></table>',
-
-    // чередования перед -ony (polskinawynos.com, «Imiesłów przymiotnikowy bierny»; формы сверены по Wiktionary)
-    '<div class="rule-uwaga"><strong>Wymiany przed -ony:</strong>',
+    // чередования перед -ony — сразу под своей строкой (polskinawynos.com, «Imiesłów przymiotnikowy bierny»;
+    // формы сверены по Wiktionary)
+    '<tr class="rule-wym"><td colspan="4"><div class="rule-uwaga"><strong>Wymiany przed -ony:</strong>',
     '<table class="rule-flow wym"><tbody>',
     '<tr><td><b>si → sz</b></td><td>zaprosić → zapro<mark>sz</mark>ony</td></tr>',
     '<tr><td><b>zi → ż</b></td><td>wozić → wo<mark>ż</mark>ony</td></tr>',
@@ -96,7 +86,18 @@
     '<tr><td><b>li → l</b></td><td>szkolić → szko<mark>l</mark>ony</td></tr>',
     '<tr><td><b>ści → szcz</b></td><td>ugościć → ugo<mark>szcz</mark>ony</td></tr>',
     '<tr><td><b>i → j</b></td><td>kroić → kro<mark>j</mark>ony</td></tr>',
-    '</tbody></table></div>',
+    '</tbody></table></div></td></tr>',
+
+    '<tr class="g1">',
+    '<td data-label="Przyrostek"><mark>-ty, -ta, -te</mark></td>',
+    '<td data-label="Bezokolicznik na"><b>-ąć</b> (zacząć, wziąć); <b>-yć, -ić, -uć</b> w czasownikach <b>jednosylabowych</b>: <span class="nw">pić, myć, bić, kuć, szyć</span> (też z przedrostkiem: <span class="nw">wypić, umyć</span>); <b>trzeć, drzeć</b></td>',
+    '<td data-label="Bierzemy formę"><span class="rule-q">co oni (z)robili?</span><br>3. os. lm. czasu przeszłego, bez <b>-li</b></td>',
+    '<td data-label="Przykłady">zaczę-li → zaczę<mark>ty</mark><br>my-li → my<mark>ty</mark><br>bi-li → bi<mark>ty</mark><br>tar-li → tar<mark>ty</mark><br>',
+    'też: zamknąć → zamknię<mark>ty</mark></td>',
+    '</tr>',
+    '<tr class="rule-example"><td colspan="4"><span class="imi">Umyte</span> okna lśnią w słońcu.</td></tr>',
+
+    '</tbody></table>',
 
     // табличка — внутри блока «Uwaga!» (отдельной подложкой она слипалась с ним)
     '<div class="rule-uwaga"><strong>Uwaga!</strong> Odmienia się jak przymiotnik: <i>zbudowany dom, zbudowanego domu, zbudowane domy</i>. ',

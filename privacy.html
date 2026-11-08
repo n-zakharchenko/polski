@@ -5,21 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Polityka prywatności — Rajd Polskiej Gramatyki</title>
   <!-- версия сайта: метка ?v= у всех наших файлов (защита от кэша); меняет tools/bump-version.js -->
-  <script>window.POLSKI_V = '20261108-1230';</script>
-  <link rel="icon" href="favicon.svg?v=20261108-1230" type="image/svg+xml">
+  <script>window.POLSKI_V = '20261108-1633';</script>
+  <link rel="icon" href="favicon.svg?v=20261108-1633" type="image/svg+xml">
   <!-- PWA: «на экран домой» — название Rajd Polski, иконка — малюх (core/pwa.js — инструкция по установке) -->
-  <link rel="manifest" href="manifest.webmanifest?v=20261108-1230">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=20261108-1230">
+  <link rel="manifest" href="manifest.webmanifest?v=20261108-1633">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=20261108-1633">
   <meta name="apple-mobile-web-app-title" content="Rajd Polski">
   <meta name="application-name" content="Rajd Polski">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="stylesheet" href="style.css?v=20261108-1230">
+  <link rel="stylesheet" href="style.css?v=20261108-1633">
   <!-- стили оформления (Styl в настройках): включается тот, что в <html data-design> -->
-  <link rel="stylesheet" href="designs/01-retro-pastel.css?v=20261108-1230">
-  <link rel="stylesheet" href="designs/02-gazeta.css?v=20261108-1230">
-  <script src="core/settings.js?v=20261108-1230"></script>
-  <script src="core/update.js?v=20261108-1230" defer></script> <!-- новая версия сайта вышла — перезагрузиться (и в PWA) -->
+  <link rel="stylesheet" href="designs/01-retro-pastel.css?v=20261108-1633">
+  <link rel="stylesheet" href="designs/02-gazeta.css?v=20261108-1633">
+  <script src="core/settings.js?v=20261108-1633"></script>
+  <script src="core/update.js?v=20261108-1633" defer></script> <!-- новая версия сайта вышла — перезагрузиться (и в PWA) -->
 </head>
 <body>
   <main>
@@ -132,10 +132,11 @@
         <li>Do działania Aplikacja wykorzystuje pamięć przeglądarki na urządzeniu Użytkownika (localStorage,
           sessionStorage, IndexedDB). Informacje te pozostają na urządzeniu i nie są przesyłane Administratorowi:
           <ul>
-            <li>ustawienia: styl i motyw, ostatnio wybrany wariant ćwiczenia, informacja o wyświetleniu podpowiedzi;</li>
-            <li>po zalogowaniu: token logowania Firebase, znacznik zalogowania, położenie malucha na mapie i liczba
-              punktów z poprzedniej wizyty (usuwane po wylogowaniu) oraz lista miast, których opisy zostały już
-              wyświetlone;</li>
+            <li>ustawienia: styl i motyw, ostatnio wybrany wariant ćwiczenia, zakres statystyk („Dziś” / „Cały czas”),
+              informacja o wyświetleniu podpowiedzi;</li>
+            <li>po zalogowaniu: token logowania Firebase, znacznik zalogowania, położenie malucha na mapie, liczba
+              punktów i kopia statystyk z ostatniej wizyty — aby mapa i statystyki wyświetlały się od razu (usuwane
+              po wylogowaniu) oraz lista miast, których opisy zostały już wyświetlone;</li>
             <li>dane techniczne przechowywane do zamknięcia karty: informacja o przeładowaniu strony do nowej wersji
               oraz o podpowiedziach wyświetlonych w bieżącej karcie.</li>
           </ul>
@@ -172,8 +173,8 @@
         m.in. SRTM (NASA) i EU-DEM — <i>produced using Copernicus data and information funded by the European Union</i>.</p>
     </section>
   </main>
-  <script src="core/haptics.js?v=20261108-1230"></script>
-  <script src="core/account.js?v=20261108-1230" defer></script>
-  <script src="core/pwa.js?v=20261108-1230" defer></script>
+  <script src="core/haptics.js?v=20261108-1633"></script>
+  <script src="core/account.js?v=20261108-1633" defer></script>
+  <script src="core/pwa.js?v=20261108-1633" defer></script>
 </body>
 </html>
