@@ -5,26 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rajd Polskiej Gramatyki</title>
   <!-- версия сайта: метка ?v= у всех наших файлов (защита от кэша); меняет tools/bump-version.js -->
-  <script>window.POLSKI_V = '20261108-1633';</script>
-  <link rel="icon" href="favicon.svg?v=20261108-1633" type="image/svg+xml">
+  <script>window.POLSKI_V = '20261108-1645';</script>
+  <link rel="icon" href="favicon.svg?v=20261108-1645" type="image/svg+xml">
   <!-- PWA: «на экран домой» — название Rajd Polski, иконка — малюх (core/pwa.js — инструкция по установке) -->
-  <link rel="manifest" href="manifest.webmanifest?v=20261108-1633">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=20261108-1633">
+  <link rel="manifest" href="manifest.webmanifest?v=20261108-1645">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=20261108-1645">
   <meta name="apple-mobile-web-app-title" content="Rajd Polski">
   <meta name="application-name" content="Rajd Polski">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="stylesheet" href="style.css?v=20261108-1633">
+  <link rel="stylesheet" href="style.css?v=20261108-1645">
   <!-- стили оформления (Styl в настройках): включается тот, что в <html data-design> -->
-  <link rel="stylesheet" href="designs/01-retro-pastel.css?v=20261108-1633">
-  <link rel="stylesheet" href="designs/02-gazeta.css?v=20261108-1633">
-  <script src="core/settings.js?v=20261108-1633"></script> <!-- тема — до отрисовки; шестерёнка настроек -->
-  <script src="core/update.js?v=20261108-1633" defer></script> <!-- новая версия сайта вышла — перезагрузиться (и в PWA) -->
-  <script src="core/haptics.js?v=20261108-1633"></script> <!-- вибрация на телефонах; до account.js — «Wibracje» в настройках выше «Konto» -->
-  <script src="core/account.js?v=20261108-1633" defer></script> <!-- вход через Google; без входа Firebase не грузится -->
-  <script src="core/progress.js?v=20261108-1633" defer></script> <!-- очки в Firestore -->
-  <script src="designs/02-gazeta.js?v=20261108-1633" defer></script>
-  <script src="core/pwa.js?v=20261108-1633" defer></script> <!-- «Zainstaluj aplikację» — только на телефонах --> <!-- шапка газеты (стиль «Gazeta») -->
+  <link rel="stylesheet" href="designs/01-retro-pastel.css?v=20261108-1645">
+  <link rel="stylesheet" href="designs/02-gazeta.css?v=20261108-1645">
+  <script src="core/settings.js?v=20261108-1645"></script> <!-- тема — до отрисовки; шестерёнка настроек -->
+  <script src="core/update.js?v=20261108-1645"></script> <!-- новая версия сайта вышла — перезагрузиться (и в PWA) -->
+  <script src="core/haptics.js?v=20261108-1645"></script> <!-- вибрация на телефонах; до account.js — «Wibracje» в настройках выше «Konto» -->
+  <script src="core/account.js?v=20261108-1645" defer></script> <!-- вход через Google; без входа Firebase не грузится -->
+  <script src="core/progress.js?v=20261108-1645" defer></script> <!-- очки в Firestore -->
+  <script src="designs/02-gazeta.js?v=20261108-1645" defer></script>
+  <script src="core/pwa.js?v=20261108-1645" defer></script> <!-- «Zainstaluj aplikację» — только на телефонах --> <!-- шапка газеты (стиль «Gazeta») -->
 </head>
 <body>
   <main>
@@ -50,17 +50,17 @@
     </footer>
   </main>
 
-  <script src="core/engine.js?v=20261108-1633"></script>
-  <script src="core/dict.js?v=20261108-1633"></script> <!-- общий словарь (файлы тестов кладут в него слова) -->
-  <script src="core/ui.js?v=20261108-1633"></script>
-  <script src="tests/manifest.js?v=20261108-1633"></script>
-  <script src="core/balance.js?v=20261108-1633"></script>
-  <script src="journey/route.js?v=20261108-1633"></script>
-  <script src="journey/poland.js?v=20261108-1633"></script>
-  <script src="journey/rivers.js?v=20261108-1633"></script>
-  <script src="journey/cities.js?v=20261108-1633"></script> <!-- воеводства для статистики, тексты поп-апа -->
-  <script src="journey/journey.js?v=20261108-1633"></script>
-  <script src="core/stats.js?v=20261108-1633"></script> <!-- «Twoje statystyki» — только после входа -->
+  <script src="core/engine.js?v=20261108-1645"></script>
+  <script src="core/dict.js?v=20261108-1645"></script> <!-- общий словарь (файлы тестов кладут в него слова) -->
+  <script src="core/ui.js?v=20261108-1645"></script>
+  <script src="tests/manifest.js?v=20261108-1645"></script>
+  <script src="core/balance.js?v=20261108-1645"></script>
+  <script src="journey/route.js?v=20261108-1645"></script>
+  <script src="journey/poland.js?v=20261108-1645"></script>
+  <script src="journey/rivers.js?v=20261108-1645"></script>
+  <script src="journey/cities.js?v=20261108-1645"></script> <!-- воеводства для статистики, тексты поп-апа -->
+  <script src="journey/journey.js?v=20261108-1645"></script>
+  <script src="core/stats.js?v=20261108-1645"></script> <!-- «Twoje statystyki» — только после входа -->
   <script>
     // локальный дебаг карты (малюх, маршрут, окна городов): на localhost всегда, кроме превью сравнения
     // и страниц разделов (там нет карты); файла dev/debug.js на сайте нет (.gitignore)

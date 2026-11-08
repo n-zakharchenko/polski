@@ -5,7 +5,7 @@
  *
  * Styl: «Pastelowy» (по умолчанию) / «Prosty» / «Gazeta» — см. блок STYLES ниже.
  * Motyw: «Jak na urządzeniu» (как в системе) / «Dzień» / «Noc».
- *   Хранится в localStorage 'polski.theme' ('light' | 'dark'; нет ключа — как в системе).
+ *   Хранится в localStorage 'polski.theme' ('light' | 'dark' | 'system'; нет ключа — «Dzień», по умолчанию).
  *   Применяется атрибутом <html data-theme="light|dark"> — см. style.css.
  */
 (function () {
@@ -18,19 +18,21 @@
     { id: 'dark', title: 'Noc' },
   ];
 
+  // по умолчанию (ничего не выбрано) — дневная тема; «Jak na urządzeniu» хранится явно ('system')
+  var DEFAULT_THEME = 'light';
+
   function readTheme() {
     try {
       var v = window.localStorage.getItem(KEY);
-      return v === 'light' || v === 'dark' ? v : 'system';
+      return v === 'light' || v === 'dark' || v === 'system' ? v : DEFAULT_THEME;
     } catch (e) {
-      return 'system';
+      return DEFAULT_THEME;
     }
   }
 
   function saveTheme(theme) {
     try {
-      if (theme === 'system') window.localStorage.removeItem(KEY);
-      else window.localStorage.setItem(KEY, theme);
+      window.localStorage.setItem(KEY, theme);
     } catch (e) { /* без хранилища тема действует до перезагрузки */ }
   }
 
