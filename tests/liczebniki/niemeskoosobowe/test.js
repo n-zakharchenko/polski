@@ -101,6 +101,9 @@
       var group = s.plan[i % s.plan.length];
       var tense = s.tenses[i % s.tenses.length];
       var aspect = tense === 'pres' ? 'impf' : (rng.chance(0.5) ? 'impf' : 'perf');
+      // одно задание прохода — с числом на «jeden» (21, 31 … 101); «Obie» может заранее поставить -1 (см. mix/test.js)
+      if (s.jedenAt === undefined) s.jedenAt = L.jedenRound(rng, s.plan, 'B');
+      var jeden = i === s.jedenAt;
 
       var e = takeEntry(s);
       var pair = VERBS[e.verb];
@@ -127,7 +130,7 @@
       if (m === 'numeral') {
         // «pięcioro cieląt» — правильно, поэтому для cielę собирательное не предлагаем
         var allowCollective = e.sg !== 'cielę';
-        n = L.numeralNumberNm(rng, group, allowCollective);
+        n = jeden ? L.randomX1(rng) : L.numeralNumberNm(rng, group, allowCollective);
         var numList = L.numeralOptionsNm(n, e.gender, allowCollective).map(L.capitalize);
         var numTr = {};
         numList.forEach(function (x) { numTr[x] = String(n); });
@@ -145,7 +148,7 @@
           rest,
         ];
       } else {
-        n = L.randomNumber(rng, group);
+        n = jeden ? L.randomX1(rng) : L.randomNumber(rng, group);
         slots = { noun: nounSlot, verb: verbSlot };
         sentence = [
           { num: n, words: L.capitalize(L.numberWords(n, e.gender)) },

@@ -362,6 +362,24 @@
     return out;
   }
 
+  /* ---------- число на «jeden» — хотя бы одно за проход ---------- */
+
+  // 21, 31 … 191 (без 111) и 101: «dwadzieścia jeden kobiet», «dwudziestu jeden studentów»
+  var X1_POOL = uniq(NM_NUM_POOL.B.filter(isX1));
+
+  function randomX1(rng) { return rng.pick(X1_POOL); }
+
+  /**
+   * Номер задания прохода (от 0), где число будет на «jeden»: случайное среди заданий группы group
+   * (niemęskoosobowe — 'B', męskoosobowe — 'C'). -1 — в плане такой группы нет.
+   * Без этого такие числа выпадали редко (около 1 из 18 в группе), и за тест их часто не было вовсе.
+   */
+  function jedenRound(rng, plan, group) {
+    var idx = [];
+    plan.forEach(function (g, i) { if (g === group) idx.push(i); });
+    return idx.length ? rng.pick(idx) : -1;
+  }
+
   /* ---------- правило для кнопки (i) ---------- */
 
   var RULE_MESKOOSOBOWE = {
@@ -449,6 +467,9 @@
     numeralOptionsNm: numeralOptionsNm,
     numeralOptionsMo: numeralOptionsMo,
     randomNumberMo: randomNumberMo,
+    randomX1: randomX1,
+    jedenRound: jedenRound,
+    isX1: isX1,
     parseEntryMo: parseEntryMo,
     nounTrapsMo: nounTrapsMo,
     groupOf: groupOf,

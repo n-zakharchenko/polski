@@ -114,10 +114,12 @@
       var tense = s.tenses[i % s.tenses.length];
       var aspect = tense === 'pres' ? 'impf' : (rng.chance(0.5) ? 'impf' : 'perf');
       var who = whoFor(group);
+      // одно задание прохода — с числом на «jeden» (dwudziestu jeden …); «Obie» может заранее поставить -1 (см. mix/test.js)
+      if (s.jedenAt === undefined) s.jedenAt = L.jedenRound(rng, s.plan, 'C');
 
       var e = takeEntry(s);
       var pair = VERBS[e.verb];
-      var n = L.randomNumberMo(rng, group);
+      var n = i === s.jedenAt ? L.randomX1(rng) : L.randomNumberMo(rng, group);
       var verbs = verbOptions(rng, pair, aspect, tense, who);
       var nouns = nounOptions(rng, e);
       var rest = { text: e.rest + '.', tr: e.restRu };
