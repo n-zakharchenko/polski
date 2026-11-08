@@ -41,10 +41,10 @@
     return [].concat(task.answer)[0];
   }
 
-  /** 'текст' или { text, tr } → <span>, с переводом в data-tr */
+  /** 'текст' или { text, tr, mark } → <span>, с переводом в data-tr; mark — подчеркнуть (фрагмент «który …») */
   function wordSpan(part, cls) {
     if (typeof part === 'string') return el('span', { class: cls, text: part });
-    return el('span', { class: cls, 'data-tr': part.tr, text: part.text });
+    return el('span', { class: cls + (part.mark ? ' slots-mark' : ''), 'data-tr': part.tr, text: part.text });
   }
 
   /* ======================================================================
@@ -223,12 +223,13 @@
 
     area.classList.add('slots-area');
 
-    // исходное предложение: строка или части [{ text, tr }] — tr показывается по долгому нажатию
+    // исходное предложение: строка или части [{ text, tr }] — tr показывается по долгому нажатию;
+    // { glue: true } — без пробела перед частью (точка сразу за подчёркнутым фрагментом)
     var sourceParts = task.source == null ? null : [].concat(task.source);
     var source = sourceParts == null ? null : el('div', { class: 'slots-source' }, [
       el('span', { class: 'slots-caption', text: task.sourceLabel || 'Zdanie' }),
       el('p', { class: 'slots-source-text' }, sourceParts.reduce(function (acc, part, i) {
-        if (i > 0) acc.push(' ');
+        if (i > 0 && !(part && part.glue)) acc.push(' ');
         acc.push(wordSpan(part, 'slots-word'));
         return acc;
       }, [])),

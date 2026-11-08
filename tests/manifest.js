@@ -33,6 +33,14 @@ var MIX_FILES = [
   'liczebniki/mix/test.js',
 ];
 
+// Imiesłowy przymiotnikowe: правило и склонение, базы czynne/bierne, генератор (9 режимов)
+var IMIESLOWY_FILES = [
+  'imieslowy/common.js',
+  'imieslowy/czynne.js',
+  'imieslowy/bierne.js',
+  'imieslowy/test.js',
+];
+
 Polski.manifest = [
   {
     id: 'liczebniki',
@@ -78,6 +86,45 @@ Polski.manifest = [
       { id: 'liczebniki-mix',                 files: MIX_FILES },
       { id: 'liczebniki-mix-num',             files: MIX_FILES },
       { id: 'liczebniki-mix-mix',             files: MIX_FILES },
+    ],
+  },
+  {
+    id: 'imieslowy',
+    title: 'Imiesłowy przymiotnikowe',
+    desc: 'czytający, przeczytany',
+    icon: 'ący',
+
+    // тот же экран выбора, что у Liczebników; задания «Czynny czy bierny?» — только в Mix
+    chooser: {
+      axes: [
+        { key: 'kind', label: 'Imiesłowy', options: [
+          { id: 'cz', title: 'Czynne', hint: 'czytający, czytająca, czytające' },
+          { id: 'bi', title: 'Bierne', hint: 'czytany, zrobiony, umyty' },
+          { id: 'mix', title: 'Mix', hint: 'czynne i bierne razem + „czynny czy bierny?”' },
+        ] },
+        { key: 'mode', label: 'Co ćwiczyć', options: [
+          { id: 'a', title: 'Przekształć', hint: 'kobieta, która czyta → kobieta czytająca' },
+          { id: 'b', title: 'Uzupełnij', hint: 'ciasto … (upiec) → ciasto upieczone' },
+          { id: 'ab', title: 'Wszystko', hint: 'oba rodzaje zadań' },
+        ] },
+      ],
+      tests: {
+        'cz.a': 'imieslowy-cz-a', 'cz.b': 'imieslowy-cz-b', 'cz.ab': 'imieslowy-cz-ab',
+        'bi.a': 'imieslowy-bi-a', 'bi.b': 'imieslowy-bi-b', 'bi.ab': 'imieslowy-bi-ab',
+        'mix.a': 'imieslowy-mix-a', 'mix.b': 'imieslowy-mix-b', 'mix.ab': 'imieslowy-mix-ab',
+      },
+    },
+
+    items: [
+      { id: 'imieslowy-cz-a', files: IMIESLOWY_FILES },
+      { id: 'imieslowy-cz-b', files: IMIESLOWY_FILES },
+      { id: 'imieslowy-cz-ab', files: IMIESLOWY_FILES },
+      { id: 'imieslowy-bi-a', files: IMIESLOWY_FILES },
+      { id: 'imieslowy-bi-b', files: IMIESLOWY_FILES },
+      { id: 'imieslowy-bi-ab', files: IMIESLOWY_FILES },
+      { id: 'imieslowy-mix-a', files: IMIESLOWY_FILES },
+      { id: 'imieslowy-mix-b', files: IMIESLOWY_FILES },
+      { id: 'imieslowy-mix-ab', files: IMIESLOWY_FILES },
     ],
   },
 ];

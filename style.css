@@ -27,6 +27,11 @@
   --num: #3f6fe8;   /* число словами */
   --b-bg: #e8efff;  /* рамка и варианты числительного */
   --b-text: #24449e;
+  /* imiesłów (причастие) — оранжевый во всём приложении: рамка, варианты, выделения в правиле */
+  --o-bg: #ffedd5;
+  --o-border: #f97316;
+  --o-text: #9a3412;
+  --imi: #ea580c;   /* причастие в тексте правила, подсказка в пустой рамке */
   /* карта путешествия */
   --map-land: #f1f3f8;
   --map-border: #d3d8e3;
@@ -71,6 +76,10 @@
     --num: #8aa8ff;
     --b-bg: #17223f;
     --b-text: #c9d7ff;
+    --o-bg: #3b1f0b;
+    --o-border: #f08a3c;
+    --o-text: #fed7aa;
+    --imi: #ff9a52;
     --map-land: #242833;
     --map-border: #3a4050;
     --terrain-light: none;
@@ -106,6 +115,10 @@
   --num: #8aa8ff;
   --b-bg: #17223f;
   --b-text: #c9d7ff;
+  --o-bg: #3b1f0b;
+  --o-border: #f08a3c;
+  --o-text: #fed7aa;
+  --imi: #ff9a52;
   --map-land: #242833;
   --map-border: #3a4050;
   --terrain-light: none;
@@ -217,6 +230,8 @@ h1 {
   font-weight: 700;
 }
 .back[hidden] { display: none; }
+/* длинное слово в заголовке («przymiotnikowe») на узком телефоне — перенос по слогам, а не за край */
+h1 { overflow-wrap: break-word; hyphens: auto; }
 
 /* iOS: невидимая подпись переключателя во всю кнопку — касание даёт системный щелчок (core/haptics.js).
    Стоит раньше .chip / .ghost, чтобы их position (летящее слово — fixed) брал верх. */
@@ -770,7 +785,8 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 }
 .caption-yellow::before,
 .caption-green::before,
-.caption-blue::before {
+.caption-blue::before,
+.caption-orange::before {
   content: "";
   display: inline-block;
   width: 10px;
@@ -782,6 +798,7 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 .caption-yellow::before { background: var(--y-border); }
 .caption-green::before { background: var(--g-border); }
 .caption-blue::before { background: var(--num); }
+.caption-orange::before { background: var(--o-border); }
 
 .slots-source {
   padding: 12px 16px;
@@ -789,6 +806,13 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
   background: var(--bg);
 }
 .slots-source-text { margin: 0; font-size: 1.15rem; font-weight: 600; }
+/* подчёркнутый фрагмент исходного предложения («który czyta» → imiesłów) */
+.slots-mark {
+  text-decoration: underline;
+  text-decoration-color: var(--o-border);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
 
 .slots-sentence {
   display: flex;
@@ -828,10 +852,12 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 .slot-yellow { border-color: var(--y-border); }
 .slot-green { border-color: var(--g-border); }
 .slot-blue { border-color: var(--num); }
+.slot-orange { border-color: var(--o-border); }
 .slot.filled { border-style: solid; }
 .slot-yellow.filled { background: var(--y-bg); color: var(--y-text); }
 .slot-green.filled { background: var(--g-bg); color: var(--g-text); }
 .slot-blue.filled { background: var(--b-bg); color: var(--b-text); }
+.slot-orange.filled { background: var(--o-bg); color: var(--o-text); }
 /* подсказка в пустой рамке (цифра числительного) */
 .slot:empty::before {
   content: attr(data-placeholder);
@@ -839,6 +865,7 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
   font-weight: 800;
   opacity: 0.55;
 }
+.slot-orange:empty::before { color: var(--imi); font-weight: 700; } /* инфинитив в рамке imiesłowu: (upiec) */
 .slot.landing { color: transparent; background: transparent; border-style: dashed; }
 .slot.pop { animation: slot-pop 0.28s ease; }
 .slot.right { box-shadow: 0 0 0 3px var(--ok); }
@@ -875,6 +902,7 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 .chip-yellow { background: var(--y-bg); border-color: var(--y-border); color: var(--y-text); }
 .chip-green { background: var(--g-bg); border-color: var(--g-border); color: var(--g-text); }
 .chip-blue { background: var(--b-bg); border-color: var(--num); color: var(--b-text); }
+.chip-orange { background: var(--o-bg); border-color: var(--o-border); color: var(--o-text); }
 .chip.used { visibility: hidden; }
 
 /* слово в полёте к рамке */
@@ -1116,6 +1144,54 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
   font-size: 0.95rem;
 }
 .rule-uwaga strong { color: var(--accent); }
+
+/* компактная табличка «как образуется» (bezokolicznik → oni → imiesłów), не превращается в карточки на телефоне */
+.rule-flow {
+  border-collapse: collapse;
+  margin: 0 0 14px;
+  font-size: 0.95rem;
+  background: var(--bg);
+  border-radius: 12px;
+}
+.rule-flow th {
+  padding: 10px 12px 4px;
+  text-align: left;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.rule-flow td { padding: 3px 12px; white-space: nowrap; }
+.rule-flow td.arr { padding: 3px 0; color: var(--muted); }
+.rule-flow tbody tr:last-child td { padding-bottom: 10px; }
+.rule-flow mark, .rule-uwaga mark, .rule-lead mark { padding: 0 3px; border-radius: 4px; background: var(--y-bg); color: inherit; }
+.rule-flow.wide { width: 100%; }
+.rule-flow.wide td { white-space: normal; vertical-align: top; }
+.rule-flow.wym td:first-child { white-space: nowrap; }   /* «dzi → dz» — одной строкой */
+/* табличка внутри «Uwaga!» — без своей подложки, вровень с текстом */
+.rule-uwaga .rule-flow { margin: 8px 0 0; background: none; }
+.rule-uwaga .rule-flow th:first-child, .rule-uwaga .rule-flow td:first-child { padding-left: 0; }
+.rule-uwaga .rule-flow th { padding-top: 0; }
+.rule-uwaga .rule-flow tbody tr:last-child td { padding-bottom: 0; }
+.rule-no { color: var(--bad); font-weight: 700; }
+
+/* правило imiesłowów (tests/imieslowy/common.js): все выделения оранжевые; причастие в тексте — .imi, как .num */
+.rule-body .rule-imi mark { background: var(--o-bg); }
+.rule-body .rule-imi td mark { padding: 0 1px; }   /* окончание внутри слова — без зазора */
+.rule-body .rule-imi .rule-sub { color: var(--imi); }
+.rule-body .imi { color: var(--imi); font-weight: 700; }
+.rule-imi .rule-table tr.g1 td:first-child,
+.rule-imi .rule-table tr.g1 td:last-child,
+.rule-imi .rule-table b, .rule-imi .nw { white-space: nowrap; }   /* не рвать «-y-» и «my-ć» на дефисе */
+
+@media (max-width: 600px) {
+  .rule-flow { font-size: 0.85rem; }
+  .rule-flow th, .rule-flow td { padding-left: 6px; padding-right: 6px; white-space: normal; }
+  .rule-flow td.arr { padding-left: 0; padding-right: 0; }
+  .rule-flow .tail { display: none; }   /* «, -ca, -ce» — уже есть в тексте над табличкой */
+  .rule-flow.wide th, .rule-flow.wide td { padding-left: 4px; padding-right: 4px; }
+}
 
 /* узкий экран: строки таблицы — карточками */
 @media (max-width: 600px) {

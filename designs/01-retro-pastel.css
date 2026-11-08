@@ -22,6 +22,10 @@
   --num: #3f6fe8;              /* liczebnik: обводка и число словами */
   --b-text: #24449e;
   /* --b-bg: #d3e…  — ждёт точное значение */
+  --o-bg: #ffd9b8;             /* imiesłów: оранжевый */
+  --o-border: #ff7a1a;
+  --o-text: #8f3f0a;
+  --imi: #f06a0a;
   /* плашки «Dokładnie! / Prawie! / O kurde!» */
   --verdict-ok: #3f8f5a;
   --verdict-bad: #ff9500;
@@ -71,6 +75,7 @@
     --y-bg: #4a3a0e; --y-border: #ffbd24; --y-text: #ffe08a;
     --g-bg: #173d1f; --g-border: #2eb830; --g-text: #b4f0a8;
     --b-bg: #1c2a52; --num: #7f9dff; --b-text: #cdd9ff;
+    --o-bg: #4a2810; --o-border: #ff8a2a; --o-text: #ffd0a1; --imi: #ffa25c;
     --verdict-ok: #2f8a55; --verdict-bad: #e88a00; --verdict-fail: #d9533f;
   }
 }
@@ -83,6 +88,7 @@
   --y-bg: #4a3a0e; --y-border: #ffbd24; --y-text: #ffe08a;
   --g-bg: #173d1f; --g-border: #2eb830; --g-text: #b4f0a8;
   --b-bg: #1c2a52; --num: #7f9dff; --b-text: #cdd9ff;
+  --o-bg: #4a2810; --o-border: #ff8a2a; --o-text: #ffd0a1; --imi: #ffa25c;
   --verdict-ok: #2f8a55; --verdict-bad: #e88a00; --verdict-fail: #d9533f;
 }
 
