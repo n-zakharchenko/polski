@@ -113,16 +113,42 @@
     ];
   }
 
-  /** ссылка «Powtórz»: старые id режимов Imiesłowy (imieslowy-mix-ab …) → новые (imieslowy-mix); теста нет — без кнопки */
+  /** старые id режимов Imiesłowy (imieslowy-mix-ab, -a, -b …) → нынешние (imieslowy-mix) */
+  function canonical(id) { return id.replace(/^(imieslowy-(?:cz|bi|mix))-(?:a|b|ab)$/, '$1'); }
+
+  /** ссылка «Powtórz»; теста нет — без кнопки */
   function testHref(id) {
-    var real = id.replace(/^(imieslowy-(?:cz|bi|mix))-(?:a|b|ab)$/, '$1');
+    var real = canonical(id);
     if (Polski.findPath && Polski.manifest && Polski.manifest.length && !Polski.findPath(real)) return null;
     return 'test.html?id=' + encodeURIComponent(real);
   }
 
+  /**
+   * byTest с объединёнными старыми и нынешними id одного теста. Переписать старые записи в Firestore нельзя
+   * (правила: за запись меняется один ключ), поэтому сводим при показе: прохождения и ошибки — сумма,
+   * последние результаты — сначала старые (они раньше), потом новые, последние LAST; название — нынешнее.
+   */
+  function mergedByTest(byTest) {
+    var LAST = 3, out = {};
+    var ids = Object.keys(byTest).sort(function (a, b) { // старые id раньше нынешних
+      return (canonical(a) === a ? 1 : 0) - (canonical(b) === b ? 1 : 0);
+    });
+    ids.forEach(function (id) {
+      var e = byTest[id] || {}, cid = canonical(id), m = out[cid];
+      var title = cid === id ? e.t : (e.t || '').replace(/ · (Wszystko|Przekształć|Uzupełnij)$/, '');
+      if (!m) { out[cid] = { t: title, n: e.n || 0, err: e.err || 0, last: (e.last || []).slice() }; return; }
+      m.n += e.n || 0;
+      m.err += e.err || 0;
+      m.last = m.last.concat(e.last || []).slice(-LAST);
+      if (cid === id && e.t) m.t = e.t;
+    });
+    return out;
+  }
+
   function weak(data) {
-    var rows = Object.keys(data.byTest).map(function (id) {
-      var e = data.byTest[id] || {}, last = e.last || [];
+    var byTest = mergedByTest(data.byTest);
+    var rows = Object.keys(byTest).map(function (id) {
+      var e = byTest[id] || {}, last = e.last || [];
       if (!last.length) return null;
       var avg = last.reduce(function (a, b) { return a + b; }, 0) / last.length;
       return { id: id, e: e, last: last, avg: avg };

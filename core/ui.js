@@ -428,7 +428,8 @@
     var body = el('div', { class: 'rule-body' });
     body.innerHTML = test.rule.html; // доверенный контент из бандла, не пользовательский ввод
 
-    var dlg = el('dialog', { class: 'rule-dialog', 'aria-label': title });
+    // autofocus: при открытии фокус — на само окно, а не на крестик (иначе вокруг него рамка фокуса)
+    var dlg = el('dialog', { class: 'rule-dialog', 'aria-label': title, autofocus: true });
     var inner = el('div', { class: 'rule-inner' }, [
       el('div', { class: 'rule-head' }, [
         el('h2', { class: 'rule-title', text: title }),
@@ -450,6 +451,9 @@
       writeSession(openedKey);
       if (typeof dlg.showModal === 'function') dlg.showModal();
       else dlg.setAttribute('open', '');
+      // фокус — на само окно, а не на крестик (браузеры по-разному понимают autofocus у <dialog>)
+      dlg.tabIndex = -1;
+      dlg.focus({ preventScroll: true });
     }
     function closeDlg() {
       if (typeof dlg.close === 'function') dlg.close();

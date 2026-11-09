@@ -311,7 +311,8 @@
     if (shown.indexOf(id) === -1) shown.push(id);
     try { window.localStorage.setItem(key, JSON.stringify(shown)); } catch (e) { /* покажем, но не запомним */ }
 
-    var dlg = h('dialog', { class: 'rule-dialog city-dialog', 'aria-label': name });
+    // autofocus: фокус при открытии — на окно, а не на кнопку (без рамки фокуса вокруг неё)
+    var dlg = h('dialog', { class: 'rule-dialog city-dialog', 'aria-label': name, autofocus: '' });
     function close() {
       if (typeof dlg.close === 'function' && dlg.open) dlg.close();
       dlg.remove();
@@ -327,6 +328,8 @@
     dlg.addEventListener('close', function () { dlg.remove(); });                // Esc
     document.body.appendChild(dlg);
     if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+    dlg.tabIndex = -1; // фокус — на само окно, а не на кнопку
+    dlg.focus({ preventScroll: true });
     if (Polski.haptic) Polski.haptic('city'); // вибрация на телефоне (core/haptics.js)
     return true;
   }

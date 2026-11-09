@@ -230,7 +230,8 @@
     ]);
     picker.addEventListener('change', function () { current = picker.value; render(); });
 
-    var dlg = h('dialog', { class: 'rule-dialog pwa-dialog', 'aria-label': 'Zainstaluj aplikację' }, [
+    // autofocus: фокус при открытии — на окно, а не на крестик (без рамки фокуса)
+    var dlg = h('dialog', { class: 'rule-dialog pwa-dialog', 'aria-label': 'Zainstaluj aplikację', autofocus: '' }, [
       h('div', { class: 'rule-inner' }, [
         h('div', { class: 'rule-head' }, [
           h('h2', { class: 'rule-title', text: 'Rajd Polski na telefonie' }),
@@ -252,6 +253,8 @@
     render();
     document.body.appendChild(dlg);
     if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+    dlg.tabIndex = -1; // фокус — на само окно, а не на крестик
+    dlg.focus({ preventScroll: true });
   }
 
   function mount() {

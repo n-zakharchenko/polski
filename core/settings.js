@@ -209,6 +209,7 @@
     var dlg = document.createElement('dialog');
     dlg.className = 'rule-dialog settings-dialog';
     dlg.setAttribute('aria-label', 'Ustawienia');
+    dlg.setAttribute('autofocus', ''); // при открытии фокус — на окно, а не на крестик (без рамки фокуса)
     dlg.innerHTML =
       '<div class="rule-inner">' +
       '<div class="rule-head"><h2 class="rule-title">Ustawienia</h2>' +
@@ -269,6 +270,9 @@
       sections.forEach(function (s) { if (s.onOpen) s.onOpen(); });
       if (typeof dlg.showModal === 'function') dlg.showModal();
       else dlg.setAttribute('open', '');
+      // фокус — на само окно, а не на крестик (браузеры по-разному понимают autofocus у <dialog>)
+      dlg.tabIndex = -1;
+      dlg.focus({ preventScroll: true });
     }
     function close() {
       if (typeof dlg.close === 'function') dlg.close();

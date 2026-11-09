@@ -121,6 +121,9 @@
   color: var(--accent);
 }
 [data-design="01-retro-pastel"] h1 { font-size: 2.3rem; line-height: 1.05; margin-bottom: 8px; }
+/* режим под заголовком теста («Mix», «Obie · Wszystko»): у плотного курсивного заголовка хвосты p, y уходят
+   ниже строки — базовые −12px сажали подзаголовок прямо на них («przymiotnikowe») */
+[data-design="01-retro-pastel"] .test-page .test-mode { margin-top: -2px; }
 [data-design="01-retro-pastel"] .subtitle { color: var(--text); }
 
 /* ---------- карточки тестов: пастель по кругу ---------- */

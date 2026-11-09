@@ -1125,18 +1125,40 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
   margin-bottom: 12px;
 }
 .rule-title { margin: 0; font-size: 1.25rem; }
+/* кнопка закрытия окон (правило, настройки, установка): кружок с обводкой цвета темы (--accent: красный
+   в Pastelowy, чернила в Gazeta) и крестик из двух линий — строго по центру (символ «×» в шрифте сидел криво) */
 .rule-close {
+  position: relative;
+  flex: none;
   width: 34px;
   height: 34px;
-  border: none;
+  padding: 0;
+  border: 1.5px solid var(--accent);
   border-radius: 50%;
-  background: var(--bg);
-  color: var(--muted);
-  font-size: 1.4rem;
-  line-height: 1;
+  background: transparent;
+  color: var(--accent);
+  font-size: 0; /* «×» в разметке остаётся для доступности, видим только линии */
   cursor: pointer;
+  transition: background 0.15s ease;
 }
-.rule-close:hover { color: var(--text); }
+.rule-close::before,
+.rule-close::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.rule-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.rule-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
+.rule-close:hover { background: var(--accent-soft); }
+.rule-close:focus { outline: none; }
+.rule-close:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+/* окно при открытии берёт фокус на себя (autofocus), а не на крестик — без рамки фокуса на нём */
+.rule-dialog:focus { outline: none; }
 
 .rule-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
 .rule-table th {
