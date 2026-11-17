@@ -7,6 +7,7 @@
   --accent: #dc143c;            /* польский красный */
   --accent-2: #ff4d6d;
   --accent-soft: #fde8ec;
+  --rodzaj-bg: #e1e8f5;   /* полоса рода в правиле (Rodzaj męski / żeński / nijaki) */
   --shadow: 0 1px 2px rgba(20, 24, 40, 0.06), 0 4px 14px rgba(20, 24, 40, 0.06);
   --shadow-hover: 0 2px 4px rgba(20, 24, 40, 0.08), 0 12px 28px rgba(220, 20, 60, 0.16);
   --radius: 18px;
@@ -32,6 +33,10 @@
   --o-border: #f97316;
   --o-text: #9a3412;
   --imi: #ea580c;   /* причастие в тексте правила, подсказка в пустой рамке */
+  /* przymiotnik (прилагательное) — нежно-розовый во всём приложении: рамка, варианты, выделения в правиле */
+  --p-bg: #fde4ef;
+  --p-border: #ec6fa6;
+  --p-text: #9d174d;
   /* карта путешествия */
   --map-land: #f1f3f8;
   --map-border: #d3d8e3;
@@ -59,6 +64,7 @@
     --text: #e9ebf1;
     --muted: #9aa1ad;
     --accent-soft: #3a1820;
+    --rodzaj-bg: #222a3a;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 14px rgba(0, 0, 0, 0.25);
     --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(220, 20, 60, 0.22);
     --ok: #4ade80;
@@ -80,6 +86,9 @@
     --o-border: #f08a3c;
     --o-text: #fed7aa;
     --imi: #ff9a52;
+    --p-bg: #3d1a2b;
+    --p-border: #f08bb8;
+    --p-text: #fbcfe2;
     --map-land: #242833;
     --map-border: #3a4050;
     --terrain-light: none;
@@ -98,6 +107,7 @@
   --text: #e9ebf1;
   --muted: #9aa1ad;
   --accent-soft: #3a1820;
+  --rodzaj-bg: #222a3a;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 14px rgba(0, 0, 0, 0.25);
   --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(220, 20, 60, 0.22);
   --ok: #4ade80;
@@ -119,6 +129,9 @@
   --o-border: #f08a3c;
   --o-text: #fed7aa;
   --imi: #ff9a52;
+  --p-bg: #3d1a2b;
+  --p-border: #f08bb8;
+  --p-text: #fbcfe2;
   --map-land: #242833;
   --map-border: #3a4050;
   --terrain-light: none;
@@ -818,7 +831,8 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 .caption-yellow::before,
 .caption-green::before,
 .caption-blue::before,
-.caption-orange::before {
+.caption-orange::before,
+.caption-pink::before {
   content: "";
   display: inline-block;
   width: 10px;
@@ -831,6 +845,7 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 .caption-green::before { background: var(--g-border); }
 .caption-blue::before { background: var(--num); }
 .caption-orange::before { background: var(--o-border); }
+.caption-pink::before { background: var(--p-border); }
 
 .slots-source {
   padding: 12px 16px;
@@ -887,11 +902,13 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 .slot-green { border-color: var(--g-border); }
 .slot-blue { border-color: var(--num); }
 .slot-orange { border-color: var(--o-border); }
+.slot-pink { border-color: var(--p-border); }
 .slot.filled { border-style: solid; }
 .slot-yellow.filled { background: var(--y-bg); color: var(--y-text); }
 .slot-green.filled { background: var(--g-bg); color: var(--g-text); }
 .slot-blue.filled { background: var(--b-bg); color: var(--b-text); }
 .slot-orange.filled { background: var(--o-bg); color: var(--o-text); }
+.slot-pink.filled { background: var(--p-bg); color: var(--p-text); }
 /* подсказка в пустой рамке (цифра числительного) */
 .slot:empty::before {
   content: attr(data-placeholder);
@@ -937,6 +954,7 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 .chip-green { background: var(--g-bg); border-color: var(--g-border); color: var(--g-text); }
 .chip-blue { background: var(--b-bg); border-color: var(--num); color: var(--b-text); }
 .chip-orange { background: var(--o-bg); border-color: var(--o-border); color: var(--o-text); }
+.chip-pink { background: var(--p-bg); border-color: var(--p-border); color: var(--p-text); }
 .chip.used { visibility: hidden; }
 
 /* слово в полёте к рамке */
@@ -1236,6 +1254,22 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 .rule-body .rule-imi mark { background: var(--o-bg); }
 .rule-body .rule-imi td mark { padding: 0 1px; }   /* окончание внутри слова — без зазора */
 .rule-body .rule-imi .rule-sub { color: var(--imi); }
+/* Liczba mnoga: окончание внутри слова — без зазора, «-y-» не рвётся на дефисе */
+.rule-body .rule-lm td mark { padding: 0 1px; }
+.rule-lm .rule-table b { white-space: nowrap; }
+/* подзаголовок рода (Rodzaj męski / żeński / nijaki) — цветная полоса во всю ширину таблицы */
+.rule-table tr.rule-rodzaj td {
+  padding: 6px 12px;
+  border-top: none;
+  background: var(--rodzaj-bg);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.rule-table tbody tr.rule-rodzaj:not(:first-child) td { border-top: 10px solid var(--card); }  /* отступ над полосой */
+.rule-body .rule-przym mark { background: var(--p-bg); }      /* правило о прилагательных — розовые окончания */
+.rule-body .rule-przym .rule-sub { color: var(--p-border); }
 .rule-body .imi { color: var(--imi); font-weight: 700; }
 /* «Wymiany przed -ony» — строка таблицы сразу под своей группой */
 .rule-table tr.rule-wym td { border-top: none; padding: 0 0 10px; }
@@ -1273,6 +1307,9 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
     background: var(--bg);
   }
   .rule-table td { border-top: none; padding: 6px 12px; }
+  .rule-table tr.rule-rodzaj { margin-top: 18px; border-radius: 8px; overflow: hidden; }
+  .rule-table tbody tr.rule-rodzaj:first-child { margin-top: 0; }
+  .rule-table tbody tr.rule-rodzaj:not(:first-child) td { border-top: none; }
   .rule-table tr.g1 td[data-label]::before,
   .rule-table tr.g2 td[data-label]::before {
     content: attr(data-label);

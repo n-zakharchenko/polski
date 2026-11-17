@@ -42,6 +42,13 @@ var IMIESLOWY_FILES = [
   'imieslowy/test.js',
 ];
 
+// Liczba mnoga: правило (i) и ловушки, база слов, генератор (14 тестов: часть речи × падеж × группа)
+var LICZBA_MNOGA_FILES = [
+  'liczba-mnoga/common.js',
+  'liczba-mnoga/words.js',
+  'liczba-mnoga/test.js',
+];
+
 Polski.manifest = [
   {
     id: 'liczebniki',
@@ -117,5 +124,55 @@ Polski.manifest = [
       { id: 'imieslowy-bi', files: IMIESLOWY_FILES },
       { id: 'imieslowy-mix', files: IMIESLOWY_FILES },
     ],
+  },
+  {
+    id: 'liczba-mnoga',
+    title: 'Liczba mnoga',
+    desc: 'koty, studenci, Polacy',
+    icon: 'oni',
+
+    // экран выбора: часть речи × падеж × группа; в задании одно слово в рамке (rzeczownik — жёлтая,
+    // przymiotnik — розовая); в Mix ровно одна национальность; у прилагательных национальностей нет
+    chooser: {
+      axes: [
+        { key: 'pos', label: 'Część mowy', options: [
+          { id: 'rz', title: 'Rzeczownik', hint: 'student → studenci' },
+          { id: 'przym', title: 'Przymiotnik', hint: 'dobry lekarz → dobrzy lekarze' },
+        ] },
+        { key: 'case', label: 'Przypadek', options: [
+          { id: 'mian', title: 'Mianownik', hint: 'są — studenci, dobre rady' },
+          { id: 'dop', title: 'Dopełniacz', hint: 'nie ma — studentów, dobrych rad' },
+        ] },
+        { key: 'group', label: 'Grupa', options: [
+          { id: 'nm', title: 'Niemęskoosobowe', hint: 'rzeczy, zwierzęta, kobiety' },
+          { id: 'mo', title: 'Męskoosobowe', hint: 'mężczyźni, mieszkańcy miast' },
+          { id: 'nar', title: 'Narodowości', hint: 'Polacy, Niemcy, Włosi', only: { pos: ['rz'] } },
+          { id: 'mix', title: 'Mix', hint: 'wszystko razem' },
+        ] },
+      ],
+      tests: {
+        'rz.mian.nm': 'liczba-mnoga-rz-mian-nm',
+        'rz.mian.mo': 'liczba-mnoga-rz-mian-mo',
+        'rz.mian.nar': 'liczba-mnoga-rz-mian-nar',
+        'rz.mian.mix': 'liczba-mnoga-rz-mian-mix',
+        'rz.dop.nm': 'liczba-mnoga-rz-dop-nm',
+        'rz.dop.mo': 'liczba-mnoga-rz-dop-mo',
+        'rz.dop.nar': 'liczba-mnoga-rz-dop-nar',
+        'rz.dop.mix': 'liczba-mnoga-rz-dop-mix',
+        'przym.mian.nm': 'liczba-mnoga-przym-mian-nm',
+        'przym.mian.mo': 'liczba-mnoga-przym-mian-mo',
+        'przym.mian.mix': 'liczba-mnoga-przym-mian-mix',
+        'przym.dop.nm': 'liczba-mnoga-przym-dop-nm',
+        'przym.dop.mo': 'liczba-mnoga-przym-dop-mo',
+        'przym.dop.mix': 'liczba-mnoga-przym-dop-mix',
+      },
+    },
+
+    items: [
+      'rz-mian-nm', 'rz-mian-mo', 'rz-mian-nar', 'rz-mian-mix',
+      'rz-dop-nm', 'rz-dop-mo', 'rz-dop-nar', 'rz-dop-mix',
+      'przym-mian-nm', 'przym-mian-mo', 'przym-mian-mix',
+      'przym-dop-nm', 'przym-dop-mo', 'przym-dop-mix',
+    ].map(function (m) { return { id: 'liczba-mnoga-' + m, files: LICZBA_MNOGA_FILES }; }),
   },
 ];

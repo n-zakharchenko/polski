@@ -35,6 +35,8 @@ tests/manifest.js     дерево разделов и тестов
 tests/<раздел>/<тест>/  бандл теста
 tests/imieslowy/      Imiesłowy przymiotnikowe: common.js (правило (i), склонение, ловушки), czynne.js / bierne.js
                       (базы предложений), test.js (9 режимов: Czynne/Bierne/Mix × Przekształć/Uzupełnij/Wszystko)
+tests/liczba-mnoga/   Liczba mnoga: common.js (правило (i), генератор ловушек), words.js (база слов и сочетаний
+                      с переводом), test.js (14 тестов: Rzeczownik/Przymiotnik × Mianownik/Dopełniacz × группа)
 ```
 
 ## Манифест
@@ -209,6 +211,37 @@ Polski.register({
   (формат — в шапке `common.js`). 290 предложений: 140 czynne, 150 bierne; каждое проверено вручную
   (правильность, естественность, ни одна ловушка не подходит, противоположная форма точно неверна).
 - Окно (i) показывает только часть правила текущего режима (в Mix — сравнение и обе части).
+
+## Liczba mnoga (tests/liczba-mnoga/)
+
+- Экран выбора из трёх рядов: **Część mowy** (Rzeczownik / Przymiotnik) × **Przypadek** (Mianownik / Dopełniacz) ×
+  **Grupa** (Niemęskoosobowe / Męskoosobowe / Narodowości / Mix) — 14 тестов
+  `liczba-mnoga-<rz|przym>-<mian|dop>-<nm|mo|nar|mix>`; у Przymiotnik нет Narodowości. Вариант ряда с
+  `only: { pos: ['rz'] }` (manifest.js) виден только при этом выборе в другом ряду — это умеет экран выбора
+  (index.html), если выбранное прячется, выбор переходит на первый видимый.
+- В задании всегда одно слово в рамке, цвет — часть речи:
+  - **Rzeczownik** — жёлтая рамка: сверху слово в lp. («Liczba pojedyncza»), ниже пустая рамка «Mianownik lm.» /
+    «Dopełniacz lm.», 4 варианта;
+  - **Przymiotnik** — нежно-розовая рамка (розовый — цвет прилагательных во всём приложении, токены `--p-bg`,
+    `--p-border`, `--p-text`; классы `slot-pink`, `chip-pink`, `caption-pink`): сверху «dobry lekarz»,
+    ниже «[ ___ ] lekarze» — существительное уже в нужной форме, выбирается только прилагательное.
+- За проход (10): Narodowości — только национальности; Mix у существительных — NM и MO поровну и ровно одна
+  национальность; Mix у прилагательных — NM и MO поровну. Жители городов (warszawianin → warszawianie) —
+  в Męskoosobowe. Слово в проходе не повторяется (у прилагательных — само прилагательное: nowy один раз).
+- База (`words.js`): `'lp | mian. lm. | dop. lm. = перевод lp.; перевод mian.; перевод dop.'`; прилагательные —
+  сочетаниями (`dobry lekarz | dobrzy lekarze | …`). Все формы базы (и отдельно прилагательное и существительное
+  из сочетаний) попадают в общий словарь — перевод по долгому нажатию.
+- Ловушки не хранятся — их строит `common.js` по типу слова (окончание + чередование): **несуществующие** (чужое
+  окончание *studenty, *talerzów; ошибка чередования *studenti, *Beldzy; нет внутренней перемены *budyneki,
+  *łazienk, *Niemieców) и **настоящие формы не того падежа** (talerzy / talerze, studentach, studencie, Włochy —
+  страна). В задании одна настоящая + несуществующие. У прилагательных — формы того же прилагательного:
+  настоящие не те (dobrych, dobre, dobry, dobrym) и ошибки (*dobri, *dobrzi, *wysoke, *dobrich, *dobrzych);
+  niemęskoosobowa форма при существительном на -e (lekarze, goście) ловушкой не даётся — «dobre lekarze»
+  существует как пренебрежительная. `EXTRA` в `common.js` — ручные поправки: формы с двумя нормами в бан
+  (koszów, biologowie …) и свои ловушки для исключений (dziecko, człowiek, brat …).
+- Проверка: `node dev/lm-dump.js` выводит все ловушки каждого слова, `node dev/lm-check.js` — 50 сборок каждого
+  слова и 2000 проходов каждого теста (dev/ в .gitignore).
+- Окно (i): только часть правила для выбранной части речи, падежа и группы.
 
 ## Вибрация (core/haptics.js)
 

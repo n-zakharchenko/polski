@@ -23,6 +23,7 @@
   --accent-2: #2a2722;
   --accent-ink: #f6f0e1;
   --accent-soft: #e4dcc8;
+  --rodzaj-bg: var(--accent-soft);  /* полоса рода в правиле — бумажный бежевый, ночью — свой (accent-soft) */
   --source-bg: #ede5d2;
   --shadow: none;
   --shadow-hover: none;

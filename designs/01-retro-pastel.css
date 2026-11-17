@@ -26,6 +26,9 @@
   --o-border: #ff7a1a;
   --o-text: #8f3f0a;
   --imi: #f06a0a;
+  --p-bg: #ffd6e8;             /* przymiotnik: нежно-розовый */
+  --p-border: #f06aa8;
+  --p-text: #8e2456;
   /* плашки «Dokładnie! / Prawie! / O kurde!» */
   --verdict-ok: #3f8f5a;
   --verdict-bad: #ff9500;
@@ -39,6 +42,7 @@
   --accent-2: #d04a3a;
   --accent-ink: #fbf1e3;       /* текст на акценте */
   --accent-soft: #f8d8d1;
+  --rodzaj-bg: #8fbdd3;        /* полоса рода в правиле — голубая, насыщеннее карточек (--bg) */
   --shadow: none;
   --shadow-hover: none;
   --radius: 22px;
@@ -69,26 +73,28 @@
   :root[data-design="01-retro-pastel"]:not([data-theme="light"]) {
     --bg: #172b35; --source-bg: #303e46; --panel: #27333a; --card: #15252e; --card-border: #3d4a52;
     --text: #f4e9dc; --muted: #b9a596; --accent: #e8634e; --accent-2: #e8634e; --accent-ink: #fff4ea;
-    --accent-soft: #744c44; --ok: #7fd49a; --ok-soft: #1d3527; --bad: #ff8a75; --bad-soft: #4a2c26;
+    --accent-soft: #744c44; --rodzaj-bg: #24485a; --ok: #7fd49a; --ok-soft: #1d3527; --bad: #ff8a75; --bad-soft: #4a2c26;
     --tip-bg: #27333a; --map-land: #2c2f3a; --map-border: #3d4a52;
     --pc-1: #5e594a; --pc-2: #234452; --pc-3: #5a2e39; --pc-4: #5b3c2a;
     --y-bg: #4a3a0e; --y-border: #ffbd24; --y-text: #ffe08a;
     --g-bg: #173d1f; --g-border: #2eb830; --g-text: #b4f0a8;
     --b-bg: #1c2a52; --num: #7f9dff; --b-text: #cdd9ff;
     --o-bg: #4a2810; --o-border: #ff8a2a; --o-text: #ffd0a1; --imi: #ffa25c;
+    --p-bg: #4a2036; --p-border: #ff86bd; --p-text: #ffd0e4;
     --verdict-ok: #2f8a55; --verdict-bad: #e88a00; --verdict-fail: #d9533f;
   }
 }
 :root[data-design="01-retro-pastel"][data-theme="dark"] {
   --bg: #172b35; --source-bg: #303e46; --panel: #27333a; --card: #15252e; --card-border: #3d4a52;
   --text: #f4e9dc; --muted: #b9a596; --accent: #e8634e; --accent-2: #e8634e; --accent-ink: #fff4ea;
-  --accent-soft: #744c44; --ok: #7fd49a; --ok-soft: #1d3527; --bad: #ff8a75; --bad-soft: #4a2c26;
+  --accent-soft: #744c44; --rodzaj-bg: #24485a; --ok: #7fd49a; --ok-soft: #1d3527; --bad: #ff8a75; --bad-soft: #4a2c26;
   --tip-bg: #27333a; --map-land: #2c2f3a; --map-border: #3d4a52;
   --pc-1: #5e594a; --pc-2: #234452; --pc-3: #5a2e39; --pc-4: #5b3c2a;
   --y-bg: #4a3a0e; --y-border: #ffbd24; --y-text: #ffe08a;
   --g-bg: #173d1f; --g-border: #2eb830; --g-text: #b4f0a8;
   --b-bg: #1c2a52; --num: #7f9dff; --b-text: #cdd9ff;
   --o-bg: #4a2810; --o-border: #ff8a2a; --o-text: #ffd0a1; --imi: #ffa25c;
+    --p-bg: #4a2036; --p-border: #ff86bd; --p-text: #ffd0e4;
   --verdict-ok: #2f8a55; --verdict-bad: #e88a00; --verdict-fail: #d9533f;
 }
 
