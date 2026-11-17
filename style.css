@@ -1257,6 +1257,7 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 /* Liczba mnoga: окончание внутри слова — без зазора, «-y-» не рвётся на дефисе */
 .rule-body .rule-lm td mark { padding: 0 1px; }
 .rule-lm .rule-table b { white-space: nowrap; }
+.rule-lm .lm-ex { display: block; }   /* примеры: на компьютере столбиком (на телефоне — в строку, ниже) */
 /* подзаголовок рода (Rodzaj męski / żeński / nijaki) — цветная полоса во всю ширину таблицы */
 .rule-table tr.rule-rodzaj td {
   padding: 6px 12px;
@@ -1320,6 +1321,24 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
+  /* Liczba mnoga — компактные карточки: «-k, -g → -i» одной строкой, под ней примеры через «·», без подписей */
+  .rule-lm .rule-table tr.g1 { margin-top: 6px; padding: 9px 12px; border-radius: 12px; }
+  .rule-lm .rule-table tr.g1 td { display: inline; width: auto; padding: 0; }
+  .rule-lm .rule-table tr.g1 td[data-label]::before { content: none; }
+  .rule-lm .rule-table tr.g1 td:nth-child(2)::before {
+    content: '\00a0→\00a0';   /* неразрывные пробелы: «→ -y» не отрывается от правила */
+    display: inline;
+    color: var(--muted);
+    font-size: inherit;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .rule-lm .rule-table tr.g1 td:nth-child(3) { display: block; margin-top: 4px; font-size: 0.92rem; }
+  .rule-lm .rule-table mark { white-space: nowrap; }
+  .rule-lm .lm-ex { display: inline; white-space: nowrap; }
+  /* точка — в конце примера: при переносе строка не начинается с «·» */
+  .rule-lm .lm-ex:not(:last-child)::after { content: '·'; margin: 0 2px 0 6px; color: var(--muted); }
 }
 
 .summary { text-align: center; padding: 12px 0; }

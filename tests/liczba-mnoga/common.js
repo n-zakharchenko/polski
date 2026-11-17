@@ -18,9 +18,11 @@
 
   /* ---------- правило (i): в каждом режиме — только своя часть ---------- */
 
+  /** примеры — каждый своим <span class="lm-ex">: на компьютере столбиком, на телефоне в строку через «·» */
   function row(endsLabel, ends, plLabel, pl, exLabel, ex) {
+    var exs = ex.split('<br>').map(function (e) { return '<span class="lm-ex">' + e + '</span>'; }).join(' ');
     return '<tr class="g1"><td data-label="' + endsLabel + '">' + ends + '</td><td data-label="' + plLabel + '">' + pl +
-      '</td><td data-label="' + exLabel + '">' + ex + '</td></tr>';
+      '</td><td data-label="' + exLabel + '">' + exs + '</td></tr>';
   }
   /** строка ['§', 'Rodzaj męski'] — подзаголовок рода на цветной полосе во всю ширину таблицы */
   function table(h1, h2, h3, rows) {
@@ -74,7 +76,7 @@
       ['<b>-k</b>', '<mark>-cy</mark>', 'rolnik → rolni<mark>cy</mark><br>pracownik → pracowni<mark>cy</mark>'],
       ['<b>-g</b>, <b>-ga</b>', '<mark>-dzy</mark>', 'biolog → biolo<mark>dzy</mark><br>kolega → kole<mark>dzy</mark>'],
       ['<b>-ca</b>, <b>-ec</b>', '<mark>-cy</mark>', 'kierowca → kierow<mark>cy</mark><br>chłopiec → chłop<mark>cy</mark><br>mieszkaniec → mieszkań<mark>cy</mark>'],
-      ['<b>-n, -s, -z, -ch</b>', '<mark>-ni, -si, -zi, -si</mark>', 'kuzyn → kuzy<mark>ni</mark><br>mnich → mni<mark>si</mark>'],
+      ['<b>-n, -s, -z, -ch</b>', '<mark>-ni</mark>, <mark>-si</mark>, <mark>-zi</mark>, <mark>-si</mark>', 'kuzyn → kuzy<mark>ni</mark><br>mnich → mni<mark>si</mark>'],
       ['miękką lub <b>-c</b> (nie <b>-ec</b>), <b>-cz, -sz, -rz, -l, -j</b>', '<mark>-e</mark>', 'nauczyciel → nauczyciel<mark>e</mark><br>lekarz → lekarz<mark>e</mark><br>kibic → kibic<mark>e</mark><br>gość → gości<mark>e</mark>'],
     ]) +
     '<p class="rule-uwaga"><strong>Uwaga!</strong> Temat jak w innych formach: dziad<b>e</b>k → dziadkowie, ' +
@@ -88,7 +90,7 @@
       ['<b>-k</b>, <b>-czyk</b>', '<mark>-cy</mark>', 'Polak → Pola<mark>cy</mark><br>Chińczyk → Chińczy<mark>cy</mark>'],
       ['<b>-ec</b>', '<mark>-cy</mark>', 'Niemiec → Niem<mark>cy</mark><br>Ukrainiec → Ukraiń<mark>cy</mark>'],
       ['<b>-ch</b>', '<mark>-si</mark>', 'Włoch → Wło<mark>si</mark><br>Czech → Cze<mark>si</mark>'],
-      ['<b>-d, -r, -z, -s, -n, -t</b>', '<mark>-dzi, -rzy, -zi, -si, -ni, -ci</mark>', 'Szwed → Szwe<mark>dzi</mark><br>Węgier → Węg<mark>rzy</mark><br>Francuz → Francu<mark>zi</mark><br>Hindus → Hindu<mark>si</mark><br>Litwin → Litwi<mark>ni</mark>'],
+      ['<b>-d, -r, -z, -s, -n, -t</b>', '<mark>-dzi</mark>, <mark>-rzy</mark>, <mark>-zi</mark>, <mark>-si</mark>, <mark>-ni</mark>, <mark>-ci</mark>', 'Szwed → Szwe<mark>dzi</mark><br>Węgier → Węg<mark>rzy</mark><br>Francuz → Francu<mark>zi</mark><br>Hindus → Hindu<mark>si</mark><br>Litwin → Litwi<mark>ni</mark>'],
     ]) +
     '<p class="rule-uwaga"><strong>Uwaga!</strong> Znika <b>-e-</b>: Węgi<b>e</b>r → Węgrzy, Holend<b>e</b>r → Holendrzy, Tur<b>e</b>k → Turcy. ' +
     'Hiszpan → <i>Hiszpanie</i> (choć nie kończy się na -anin). Narodowości piszemy wielką literą.</p>';
