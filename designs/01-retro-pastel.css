@@ -43,6 +43,7 @@
   --accent-ink: #fbf1e3;       /* текст на акценте */
   --accent-soft: #f8d8d1;
   --rodzaj-bg: #8fbdd3;        /* полоса рода в правиле — голубая, насыщеннее карточек (--bg) */
+  --rule-line: var(--accent);  /* линия между блоками правила — томатная, как акцент */
   --shadow: none;
   --shadow-hover: none;
   --radius: 22px;

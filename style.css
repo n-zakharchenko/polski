@@ -8,6 +8,7 @@
   --accent-2: #ff4d6d;
   --accent-soft: #fde8ec;
   --rodzaj-bg: #e1e8f5;   /* полоса рода в правиле (Rodzaj męski / żeński / nijaki) */
+  --rule-line: var(--card-border);   /* линия между блоками правила на телефоне (Liczba mnoga) */
   --shadow: 0 1px 2px rgba(20, 24, 40, 0.06), 0 4px 14px rgba(20, 24, 40, 0.06);
   --shadow-hover: 0 2px 4px rgba(20, 24, 40, 0.08), 0 12px 28px rgba(220, 20, 60, 0.16);
   --radius: 18px;
@@ -1257,6 +1258,7 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
 /* Liczba mnoga: окончание внутри слова — без зазора, «-y-» не рвётся на дефисе */
 .rule-body .rule-lm td mark { padding: 0 1px; }
 .rule-lm .rule-table b { white-space: nowrap; }
+.rule-lm .rule-table tr.g1 td { border-top-color: var(--rule-line); }   /* линии между строками — как на телефоне */
 .rule-lm .lm-ex { display: block; }   /* примеры: на компьютере столбиком (на телефоне — в строку, ниже) */
 /* подзаголовок рода (Rodzaj męski / żeński / nijaki) — цветная полоса во всю ширину таблицы */
 .rule-table tr.rule-rodzaj td {
@@ -1322,7 +1324,10 @@ h1 { padding-right: 48px; } /* место под шестерёнку: длин�
     text-transform: uppercase;
   }
   /* Liczba mnoga — компактные карточки: «-k, -g → -i» одной строкой, под ней примеры через «·», без подписей */
-  .rule-lm .rule-table tr.g1 { margin-top: 6px; padding: 9px 12px; border-radius: 12px; }
+  /* блоки без фона, между ними — тонкая линия (--rule-line; в «Pastelowy» — акцентная); фон только у полосы рода */
+  .rule-lm .rule-table tr.g1 { margin-top: 0; padding: 10px 4px; border-radius: 0; background: none; }
+  .rule-lm .rule-table tr.g1 + tr.g1 { border-top: 1px solid var(--rule-line); }
+  .rule-lm .rule-table tr.rule-rodzaj + tr.g1 { padding-top: 8px; }
   .rule-lm .rule-table tr.g1 td { display: inline; width: auto; padding: 0; }
   .rule-lm .rule-table tr.g1 td[data-label]::before { content: none; }
   .rule-lm .rule-table tr.g1 td:nth-child(2)::before {
